@@ -1,0 +1,15 @@
+# Refer to https://gqlgen.com/config/
+# for detailed gqlgen.yml documentation.
+
+schema:
+- models/schema.graphql
+exec:
+  filename: models/graphql.go
+model:
+  filename: models/generated.go
+resolver:
+  filename: models/example/resolver.go
+  type: Resolver
+models:
+  Stream:
+    model: github.com/ff14wed/sibyl/backend/models.Stream

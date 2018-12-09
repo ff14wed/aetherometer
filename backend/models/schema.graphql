@@ -1,0 +1,136 @@
+type Query {
+  streams: [Stream!]!
+  stream(streamID: Int!): Stream!
+  entity(streamID: Int!, entityID: Int!): Entity!
+}
+
+type Stream {
+  pid: Int!
+  maps: [MapInfo!]!
+  territoryID: Int!
+  mapID: Int!
+  timestampMs: Int!
+  entities: [Entity!]!
+  myEntityID: Int!
+  targetHateRanking: [HateRanking!]!
+  nearbyEnemyHate: [HateEntry!]!
+
+  craftingInfo: CraftingInfo
+}
+
+type MapInfo {
+  key: Int!
+  id: ID!
+  SizeFactor: Int!
+  OffsetX: Int!
+  OffsetY: Int!
+  PlaceName: String!
+  PlaceNameSub: String!
+  TerritoryType: String!
+}
+
+type Entity {
+  id: Int!
+  index: Int!
+  name: String!
+  targetID: Int!
+  ownerID: Int!
+  level: Int!
+  class: Int!
+  isNPC: Boolean!
+  isEnemy: Boolean!
+  isPet: Boolean!
+  bNPCInfo: NPCInfo
+  resources: Resources!
+  location: Location!
+  lastAction: Action
+  statuses: [Status!]!
+
+  castingInfo: CastingInfo
+
+  rawSpawnJSONData: String!
+}
+
+type HateRanking {
+  actorID: Int!
+  hate: Int!
+}
+
+type HateEntry {
+  enemyID: Int!
+  hatePercent: Int!
+}
+
+type NPCInfo {
+  nameID: Int!
+  baseID: Int!
+  modelID: Int!
+  name: String
+  size: Float
+  error: Int!
+}
+
+type Resources {
+	hp: Int!
+	mp: Int!
+	tp: Int!
+	maxHP: Int!
+	maxMP: Int!
+	lastTickMs: Int!
+}
+
+type Location {
+  x: Float!
+  y: Float!
+  z: Float!
+  orientation: Float!
+  lastUpdatedMs: Int!
+}
+
+type Action {
+  id: Int!
+  name: String!
+  targetID: Int!
+  useTimeMs: Int!
+}
+
+type Status {
+  id: Int!
+  extra: Int!
+  name: String!
+  startedTimeMs: Int!
+  durationMs: Int!
+  actorID: Int!
+  lastTickMs: Int!
+
+  baseDamage: Int!
+  critRate: Int!
+}
+
+type CastingInfo {
+	actionID: Int!
+	actionName: String!
+	startTimeMs: Int!
+	castTimeMs: Int!
+	targetID: Int!
+  location: Location!
+
+	castType: Int!
+	effectRange: Int!
+	xAxisModifier: Int!
+	omen: String!
+}
+
+type CraftingInfo {
+	lastCraftAction: Int!
+	stepNum: Int!
+	totalProgress: Int!
+	progressDelta: Int!
+	totalQuality: Int!
+	qualityDelta: Int!
+	hqChance: Int!
+	durability: Int!
+	durabilityDelta: Int!
+	currentCondition: Int!
+	previousCondition: Int!
+}
