@@ -6,16 +6,19 @@ type Query {
 
 type Stream {
   pid: Int!
-  maps: [MapInfo!]!
-  territoryID: Int!
-  mapID: Int!
-  timestampMs: Int!
-  entities: [Entity!]!
   myEntityID: Int!
-  targetHateRanking: [HateRanking!]!
-  nearbyEnemyHate: [HateEntry!]!
 
+  place: Place!
+  enmity: Enmity!
   craftingInfo: CraftingInfo
+
+  entities: [Entity!]!
+}
+
+type Place {
+  mapID: Int!
+  territoryID: Int!
+  maps: [MapInfo!]!
 }
 
 type MapInfo {
@@ -27,6 +30,11 @@ type MapInfo {
   PlaceName: String!
   PlaceNameSub: String!
   TerritoryType: String!
+}
+
+type Enmity {
+  targetHateRanking: [HateRanking!]!
+  nearbyEnemyHate: [HateEntry!]!
 }
 
 type Entity {

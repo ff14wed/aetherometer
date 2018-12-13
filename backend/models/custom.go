@@ -49,17 +49,15 @@ func (db *DB) Entity(streamID int, entityID int) (Entity, error) {
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
 type Stream struct {
-	Pid               int            `json:"pid"`
-	Maps              []MapInfo      `json:"maps"`
-	TerritoryID       int            `json:"territoryID"`
-	MapID             int            `json:"mapID"`
-	TimestampMs       int            `json:"timestampMs"`
-	EntitiesMap       map[int]Entity `json:"entities"`
-	EntitiesKeys      []int
-	MyEntityID        int           `json:"myEntityID"`
-	TargetHateRanking []HateRanking `json:"targetHateRanking"`
-	NearbyEnemyHate   []HateEntry   `json:"nearbyEnemyHate"`
-	CraftingInfo      *CraftingInfo `json:"craftingInfo"`
+	Pid        int `json:"pid"`
+	MyEntityID int `json:"myEntityID"`
+
+	Place        Place         `json:"place"`
+	Enmity       Enmity        `json:"enmity"`
+	CraftingInfo *CraftingInfo `json:"craftingInfo"`
+
+	EntitiesMap  map[int]Entity `json:"entities"`
+	EntitiesKeys []int
 }
 
 // Entity returns a specific entity from the stream, queried by entityID.

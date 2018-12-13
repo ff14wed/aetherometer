@@ -72,6 +72,11 @@ type ComplexityRoot struct {
 		PreviousCondition func(childComplexity int) int
 	}
 
+	Enmity struct {
+		TargetHateRanking func(childComplexity int) int
+		NearbyEnemyHate   func(childComplexity int) int
+	}
+
 	Entity struct {
 		Id               func(childComplexity int) int
 		Index            func(childComplexity int) int
@@ -130,6 +135,12 @@ type ComplexityRoot struct {
 		Error   func(childComplexity int) int
 	}
 
+	Place struct {
+		MapId       func(childComplexity int) int
+		TerritoryId func(childComplexity int) int
+		Maps        func(childComplexity int) int
+	}
+
 	Query struct {
 		Streams func(childComplexity int) int
 		Stream  func(childComplexity int, streamID int) int
@@ -158,16 +169,12 @@ type ComplexityRoot struct {
 	}
 
 	Stream struct {
-		Pid               func(childComplexity int) int
-		Maps              func(childComplexity int) int
-		TerritoryId       func(childComplexity int) int
-		MapId             func(childComplexity int) int
-		TimestampMs       func(childComplexity int) int
-		Entities          func(childComplexity int) int
-		MyEntityId        func(childComplexity int) int
-		TargetHateRanking func(childComplexity int) int
-		NearbyEnemyHate   func(childComplexity int) int
-		CraftingInfo      func(childComplexity int) int
+		Pid          func(childComplexity int) int
+		MyEntityId   func(childComplexity int) int
+		Place        func(childComplexity int) int
+		Enmity       func(childComplexity int) int
+		CraftingInfo func(childComplexity int) int
+		Entities     func(childComplexity int) int
 	}
 }
 
@@ -449,6 +456,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CraftingInfo.PreviousCondition(childComplexity), true
 
+	case "Enmity.targetHateRanking":
+		if e.complexity.Enmity.TargetHateRanking == nil {
+			break
+		}
+
+		return e.complexity.Enmity.TargetHateRanking(childComplexity), true
+
+	case "Enmity.nearbyEnemyHate":
+		if e.complexity.Enmity.NearbyEnemyHate == nil {
+			break
+		}
+
+		return e.complexity.Enmity.NearbyEnemyHate(childComplexity), true
+
 	case "Entity.id":
 		if e.complexity.Entity.Id == nil {
 			break
@@ -729,6 +750,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Npcinfo.Error(childComplexity), true
 
+	case "Place.mapID":
+		if e.complexity.Place.MapId == nil {
+			break
+		}
+
+		return e.complexity.Place.MapId(childComplexity), true
+
+	case "Place.territoryID":
+		if e.complexity.Place.TerritoryId == nil {
+			break
+		}
+
+		return e.complexity.Place.TerritoryId(childComplexity), true
+
+	case "Place.maps":
+		if e.complexity.Place.Maps == nil {
+			break
+		}
+
+		return e.complexity.Place.Maps(childComplexity), true
+
 	case "Query.streams":
 		if e.complexity.Query.Streams == nil {
 			break
@@ -872,41 +914,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.Pid(childComplexity), true
 
-	case "Stream.maps":
-		if e.complexity.Stream.Maps == nil {
-			break
-		}
-
-		return e.complexity.Stream.Maps(childComplexity), true
-
-	case "Stream.territoryID":
-		if e.complexity.Stream.TerritoryId == nil {
-			break
-		}
-
-		return e.complexity.Stream.TerritoryId(childComplexity), true
-
-	case "Stream.mapID":
-		if e.complexity.Stream.MapId == nil {
-			break
-		}
-
-		return e.complexity.Stream.MapId(childComplexity), true
-
-	case "Stream.timestampMs":
-		if e.complexity.Stream.TimestampMs == nil {
-			break
-		}
-
-		return e.complexity.Stream.TimestampMs(childComplexity), true
-
-	case "Stream.entities":
-		if e.complexity.Stream.Entities == nil {
-			break
-		}
-
-		return e.complexity.Stream.Entities(childComplexity), true
-
 	case "Stream.myEntityID":
 		if e.complexity.Stream.MyEntityId == nil {
 			break
@@ -914,19 +921,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.MyEntityId(childComplexity), true
 
-	case "Stream.targetHateRanking":
-		if e.complexity.Stream.TargetHateRanking == nil {
+	case "Stream.place":
+		if e.complexity.Stream.Place == nil {
 			break
 		}
 
-		return e.complexity.Stream.TargetHateRanking(childComplexity), true
+		return e.complexity.Stream.Place(childComplexity), true
 
-	case "Stream.nearbyEnemyHate":
-		if e.complexity.Stream.NearbyEnemyHate == nil {
+	case "Stream.enmity":
+		if e.complexity.Stream.Enmity == nil {
 			break
 		}
 
-		return e.complexity.Stream.NearbyEnemyHate(childComplexity), true
+		return e.complexity.Stream.Enmity(childComplexity), true
 
 	case "Stream.craftingInfo":
 		if e.complexity.Stream.CraftingInfo == nil {
@@ -934,6 +941,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Stream.CraftingInfo(childComplexity), true
+
+	case "Stream.entities":
+		if e.complexity.Stream.Entities == nil {
+			break
+		}
+
+		return e.complexity.Stream.Entities(childComplexity), true
 
 	}
 	return 0, false
@@ -1842,6 +1856,161 @@ func (ec *executionContext) _CraftingInfo_previousCondition(ctx context.Context,
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalInt(res)
+}
+
+var enmityImplementors = []string{"Enmity"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Enmity(ctx context.Context, sel ast.SelectionSet, obj *Enmity) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, enmityImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Enmity")
+		case "targetHateRanking":
+			out.Values[i] = ec._Enmity_targetHateRanking(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "nearbyEnemyHate":
+			out.Values[i] = ec._Enmity_nearbyEnemyHate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Enmity_targetHateRanking(ctx context.Context, field graphql.CollectedField, obj *Enmity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Enmity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TargetHateRanking, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]HateRanking)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._HateRanking(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Enmity_nearbyEnemyHate(ctx context.Context, field graphql.CollectedField, obj *Enmity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Enmity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NearbyEnemyHate, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]HateEntry)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._HateEntry(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
 }
 
 var entityImplementors = []string{"Entity"}
@@ -3302,6 +3471,160 @@ func (ec *executionContext) _NPCInfo_error(ctx context.Context, field graphql.Co
 	return graphql.MarshalInt(res)
 }
 
+var placeImplementors = []string{"Place"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, obj *Place) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, placeImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Place")
+		case "mapID":
+			out.Values[i] = ec._Place_mapID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "territoryID":
+			out.Values[i] = ec._Place_territoryID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "maps":
+			out.Values[i] = ec._Place_maps(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Place_mapID(ctx context.Context, field graphql.CollectedField, obj *Place) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Place",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MapID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Place_territoryID(ctx context.Context, field graphql.CollectedField, obj *Place) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Place",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TerritoryID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Place_maps(ctx context.Context, field graphql.CollectedField, obj *Place) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Place",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Maps, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]MapInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._MapInfo(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
 var queryImplementors = []string{"Query"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -4104,48 +4427,28 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "maps":
-			out.Values[i] = ec._Stream_maps(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "territoryID":
-			out.Values[i] = ec._Stream_territoryID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "mapID":
-			out.Values[i] = ec._Stream_mapID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "timestampMs":
-			out.Values[i] = ec._Stream_timestampMs(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "entities":
-			out.Values[i] = ec._Stream_entities(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		case "myEntityID":
 			out.Values[i] = ec._Stream_myEntityID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "targetHateRanking":
-			out.Values[i] = ec._Stream_targetHateRanking(ctx, field, obj)
+		case "place":
+			out.Values[i] = ec._Stream_place(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "nearbyEnemyHate":
-			out.Values[i] = ec._Stream_nearbyEnemyHate(ctx, field, obj)
+		case "enmity":
+			out.Values[i] = ec._Stream_enmity(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
 		case "craftingInfo":
 			out.Values[i] = ec._Stream_craftingInfo(ctx, field, obj)
+		case "entities":
+			out.Values[i] = ec._Stream_entities(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4185,7 +4488,7 @@ func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.Colle
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Stream_maps(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+func (ec *executionContext) _Stream_myEntityID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4197,67 +4500,7 @@ func (ec *executionContext) _Stream_maps(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Maps, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]MapInfo)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
-	}
-
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._MapInfo(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Stream_territoryID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Stream",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TerritoryID, nil
+		return obj.MyEntityID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4272,7 +4515,7 @@ func (ec *executionContext) _Stream_territoryID(ctx context.Context, field graph
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Stream_mapID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+func (ec *executionContext) _Stream_place(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4284,7 +4527,7 @@ func (ec *executionContext) _Stream_mapID(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.MapID, nil
+		return obj.Place, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4292,14 +4535,15 @@ func (ec *executionContext) _Stream_mapID(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(Place)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._Place(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Stream_timestampMs(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+func (ec *executionContext) _Stream_enmity(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4311,7 +4555,7 @@ func (ec *executionContext) _Stream_timestampMs(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TimestampMs, nil
+		return obj.Enmity, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4319,10 +4563,40 @@ func (ec *executionContext) _Stream_timestampMs(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(Enmity)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._Enmity(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Stream_craftingInfo(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Stream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CraftingInfo, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*CraftingInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._CraftingInfo(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
@@ -4383,182 +4657,6 @@ func (ec *executionContext) _Stream_entities(ctx context.Context, field graphql.
 	}
 	wg.Wait()
 	return arr1
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Stream_myEntityID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Stream",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MyEntityID, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Stream_targetHateRanking(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Stream",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TargetHateRanking, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]HateRanking)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
-	}
-
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._HateRanking(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Stream_nearbyEnemyHate(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Stream",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NearbyEnemyHate, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]HateEntry)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
-	}
-
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._HateEntry(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Stream_craftingInfo(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Stream",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CraftingInfo, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*CraftingInfo)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-
-	return ec._CraftingInfo(ctx, field.Selections, res)
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -6044,16 +6142,19 @@ var parsedSchema = gqlparser.MustLoadSchema(
 
 type Stream {
   pid: Int!
-  maps: [MapInfo!]!
-  territoryID: Int!
-  mapID: Int!
-  timestampMs: Int!
-  entities: [Entity!]!
   myEntityID: Int!
-  targetHateRanking: [HateRanking!]!
-  nearbyEnemyHate: [HateEntry!]!
 
+  place: Place!
+  enmity: Enmity!
   craftingInfo: CraftingInfo
+
+  entities: [Entity!]!
+}
+
+type Place {
+  mapID: Int!
+  territoryID: Int!
+  maps: [MapInfo!]!
 }
 
 type MapInfo {
@@ -6065,6 +6166,11 @@ type MapInfo {
   PlaceName: String!
   PlaceNameSub: String!
   TerritoryType: String!
+}
+
+type Enmity {
+  targetHateRanking: [HateRanking!]!
+  nearbyEnemyHate: [HateEntry!]!
 }
 
 type Entity {

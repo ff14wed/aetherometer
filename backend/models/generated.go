@@ -36,6 +36,11 @@ type CraftingInfo struct {
 	PreviousCondition int `json:"previousCondition"`
 }
 
+type Enmity struct {
+	TargetHateRanking []HateRanking `json:"targetHateRanking"`
+	NearbyEnemyHate   []HateEntry   `json:"nearbyEnemyHate"`
+}
+
 type Entity struct {
 	ID               int          `json:"id"`
 	Index            int          `json:"index"`
@@ -92,6 +97,12 @@ type NPCInfo struct {
 	Name    *string  `json:"name"`
 	Size    *float64 `json:"size"`
 	Error   int      `json:"error"`
+}
+
+type Place struct {
+	MapID       int       `json:"mapID"`
+	TerritoryID int       `json:"territoryID"`
+	Maps        []MapInfo `json:"maps"`
 }
 
 type Resources struct {
