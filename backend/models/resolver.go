@@ -41,8 +41,8 @@ func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID int) 
 type subscriptionResolver struct{ *Resolver }
 
 func (r *subscriptionResolver) StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error) {
-	panic("not implemented")
+	return r.db.StreamEvents(ctx)
 }
 func (r *subscriptionResolver) EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error) {
-	panic("not implemented")
+	return r.db.EntityEvents(ctx)
 }

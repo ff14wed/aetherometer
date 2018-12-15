@@ -1,7 +1,10 @@
 package models_test
 
 import (
+	"context"
+
 	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/models/modelsfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -9,8 +12,15 @@ import (
 
 var _ = Describe("Models", func() {
 	Describe("DB", func() {
-		var db *models.DB
+		var (
+			db                    *models.DB
+			fakeStreamEventSource *modelsfakes.FakeStreamEventSource
+			fakeEntityEventSource *modelsfakes.FakeEntityEventSource
+		)
 		BeforeEach(func() {
+			fakeStreamEventSource = new(modelsfakes.FakeStreamEventSource)
+			fakeEntityEventSource = new(modelsfakes.FakeEntityEventSource)
+
 			db = &models.DB{
 				StreamsMap: map[int]models.Stream{
 					1234: models.Stream{
@@ -23,7 +33,9 @@ var _ = Describe("Models", func() {
 					},
 					5678: models.Stream{Pid: 5678},
 				},
-				StreamKeys: []int{1234, 5678},
+				StreamKeys:        []int{1234, 5678},
+				StreamEventSource: fakeStreamEventSource,
+				EntityEventSource: fakeEntityEventSource,
 			}
 		})
 		Describe("Streams", func() {
@@ -57,6 +69,86 @@ var _ = Describe("Models", func() {
 			It("returns an error if the requested entity does not exist", func() {
 				_, err := db.Entity(1234, 3)
 				Expect(err).To(MatchError("stream id 1234: entity ID 3 not found"))
+			})
+		})
+		Describe("StreamEvents", func() {
+			var eventsChannel chan models.StreamEventsPayload
+
+			BeforeEach(func() {
+				eventsChannel = make(chan models.StreamEventsPayload, 1)
+				fakeStreamEventSource.SubscribeReturns(eventsChannel, 1234)
+			})
+
+			AfterEach(func() {
+				close(eventsChannel)
+			})
+
+			It("returns a channel on which clients can receive events", func() {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				payload := models.StreamEventsPayload{
+					StreamID: 123,
+				}
+				eventsChannel <- payload
+				ch, err := db.StreamEvents(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				var receivedPayload models.StreamEventsPayload
+				Expect(ch).To(Receive(&receivedPayload))
+				Expect(receivedPayload).To(Equal(payload))
+			})
+
+			It("unsubscribes from the source when the context is done", func() {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				_, err := db.StreamEvents(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				cancel()
+				Eventually(fakeStreamEventSource.UnsubscribeCallCount).Should(Equal(1))
+				Expect(fakeStreamEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
+			})
+		})
+		Describe("EntityEvents", func() {
+			var eventsChannel chan models.EntityEventsPayload
+
+			BeforeEach(func() {
+				eventsChannel = make(chan models.EntityEventsPayload, 1)
+				fakeEntityEventSource.SubscribeReturns(eventsChannel, 1234)
+			})
+
+			AfterEach(func() {
+				close(eventsChannel)
+			})
+
+			It("returns a channel on which clients can receive events", func() {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				payload := models.EntityEventsPayload{
+					StreamID: 123,
+				}
+				eventsChannel <- payload
+				ch, err := db.EntityEvents(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				var receivedPayload models.EntityEventsPayload
+				Expect(ch).To(Receive(&receivedPayload))
+				Expect(receivedPayload).To(Equal(payload))
+			})
+
+			It("unsubscribes from the source when the context is done", func() {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				_, err := db.EntityEvents(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				cancel()
+				Eventually(fakeEntityEventSource.UnsubscribeCallCount).Should(Equal(1))
+				Expect(fakeEntityEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
 			})
 		})
 	})

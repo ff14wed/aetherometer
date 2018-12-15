@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -9,8 +10,10 @@ import (
 // stream has its own independent state. Querying for any data requires
 // walking down the data hierarchy.
 type DB struct {
-	StreamsMap map[int]Stream
-	StreamKeys []int
+	StreamsMap        map[int]Stream
+	StreamKeys        []int
+	StreamEventSource StreamEventSource
+	EntityEventSource EntityEventSource
 }
 
 // Streams returns all the streams from the internal store.
@@ -44,6 +47,28 @@ func (db *DB) Entity(streamID int, entityID int) (Entity, error) {
 		return Entity{}, fmt.Errorf("stream id %d: %s", streamID, err)
 	}
 	return e, nil
+}
+
+// StreamEvents returns an event channel that can be used for subscriptions to
+// Stream events
+func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error) {
+	ch, id := db.StreamEventSource.Subscribe()
+	go func() {
+		<-ctx.Done()
+		db.StreamEventSource.Unsubscribe(id)
+	}()
+	return ch, nil
+}
+
+// EntityEvents returns an event channel that can be used for subscriptions to
+// Entity events
+func (db *DB) EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error) {
+	ch, id := db.EntityEventSource.Subscribe()
+	go func() {
+		<-ctx.Done()
+		db.EntityEventSource.Unsubscribe(id)
+	}()
+	return ch, nil
 }
 
 // Stream represents state reconstructed from the live stream of data from a
