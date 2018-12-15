@@ -17,6 +17,7 @@ var _ = Describe("Models", func() {
 			fakeStreamEventSource *modelsfakes.FakeStreamEventSource
 			fakeEntityEventSource *modelsfakes.FakeEntityEventSource
 		)
+
 		BeforeEach(func() {
 			fakeStreamEventSource = new(modelsfakes.FakeStreamEventSource)
 			fakeEntityEventSource = new(modelsfakes.FakeEntityEventSource)
@@ -38,6 +39,7 @@ var _ = Describe("Models", func() {
 				EntityEventSource: fakeEntityEventSource,
 			}
 		})
+
 		Describe("Streams", func() {
 			It("returns all the streams found in the database", func() {
 				Expect(db.Streams()).To(Equal([]models.Stream{
@@ -46,6 +48,7 @@ var _ = Describe("Models", func() {
 				}))
 			})
 		})
+
 		Describe("Stream", func() {
 			It("returns the requested stream from the database", func() {
 				Expect(db.Stream(5678)).To(Equal(models.Stream{Pid: 5678}))
@@ -56,6 +59,7 @@ var _ = Describe("Models", func() {
 				Expect(err).To(MatchError("stream ID 2345 not found"))
 			})
 		})
+
 		Describe("Entity", func() {
 			It("returns the requested entity from the database", func() {
 				Expect(db.Entity(1234, 1)).To(Equal(models.Entity{ID: 1, Name: "FooBar"}))
@@ -71,6 +75,7 @@ var _ = Describe("Models", func() {
 				Expect(err).To(MatchError("stream id 1234: entity ID 3 not found"))
 			})
 		})
+
 		Describe("StreamEvents", func() {
 			var eventsChannel chan models.StreamEventsPayload
 
@@ -111,6 +116,7 @@ var _ = Describe("Models", func() {
 				Expect(fakeStreamEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
 			})
 		})
+
 		Describe("EntityEvents", func() {
 			var eventsChannel chan models.EntityEventsPayload
 
@@ -152,8 +158,10 @@ var _ = Describe("Models", func() {
 			})
 		})
 	})
+
 	Describe("Stream", func() {
 		var stream *models.Stream
+
 		BeforeEach(func() {
 			stream = &models.Stream{
 				Pid: 1234,
@@ -164,6 +172,7 @@ var _ = Describe("Models", func() {
 				EntitiesKeys: []int{1, 2},
 			}
 		})
+
 		Describe("Entity", func() {
 			It("returns the requested entity from the stream", func() {
 				Expect(stream.Entity(1)).To(Equal(models.Entity{ID: 1, Name: "FooBar"}))
@@ -174,6 +183,7 @@ var _ = Describe("Models", func() {
 				Expect(err).To(MatchError("entity ID 3 not found"))
 			})
 		})
+
 		Describe("Entities", func() {
 			It("returns all entities found on the stream", func() {
 				Expect(stream.Entities()).To(Equal([]models.Entity{
