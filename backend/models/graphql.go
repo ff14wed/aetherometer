@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -32,6 +33,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Query() QueryResolver
+	Subscription() SubscriptionResolver
 }
 
 type DirectiveRoot struct {
@@ -43,6 +45,14 @@ type ComplexityRoot struct {
 		Name      func(childComplexity int) int
 		TargetId  func(childComplexity int) int
 		UseTimeMs func(childComplexity int) int
+	}
+
+	AddEntity struct {
+		Entity func(childComplexity int) int
+	}
+
+	AddStream struct {
+		Stream func(childComplexity int) int
 	}
 
 	CastingInfo struct {
@@ -97,6 +107,12 @@ type ComplexityRoot struct {
 		RawSpawnJsondata func(childComplexity int) int
 	}
 
+	EntityEventsPayload struct {
+		StreamId func(childComplexity int) int
+		EntityId func(childComplexity int) int
+		Type     func(childComplexity int) int
+	}
+
 	HateEntry struct {
 		EnemyId     func(childComplexity int) int
 		HatePercent func(childComplexity int) int
@@ -147,6 +163,18 @@ type ComplexityRoot struct {
 		Entity  func(childComplexity int, streamID int, entityID int) int
 	}
 
+	RemoveEntity struct {
+		Id func(childComplexity int) int
+	}
+
+	RemoveStatus struct {
+		Index func(childComplexity int) int
+	}
+
+	RemoveStream struct {
+		Id func(childComplexity int) int
+	}
+
 	Resources struct {
 		Hp         func(childComplexity int) int
 		Mp         func(childComplexity int) int
@@ -176,12 +204,59 @@ type ComplexityRoot struct {
 		CraftingInfo func(childComplexity int) int
 		Entities     func(childComplexity int) int
 	}
+
+	StreamEventsPayload struct {
+		StreamId func(childComplexity int) int
+		Type     func(childComplexity int) int
+	}
+
+	Subscription struct {
+		StreamEvents func(childComplexity int) int
+		EntityEvents func(childComplexity int) int
+	}
+
+	UpdateCastingInfo struct {
+		CastingInfo func(childComplexity int) int
+	}
+
+	UpdateCraftingInfo struct {
+		CraftingInfo func(childComplexity int) int
+	}
+
+	UpdateEnmity struct {
+		Enmity func(childComplexity int) int
+	}
+
+	UpdateEntityClass struct {
+		Class func(childComplexity int) int
+	}
+
+	UpdateEntityTarget struct {
+		TargetId func(childComplexity int) int
+	}
+
+	UpdateLastAction struct {
+		Action func(childComplexity int) int
+	}
+
+	UpdateMap struct {
+		Place func(childComplexity int) int
+	}
+
+	UpsertStatus struct {
+		Index  func(childComplexity int) int
+		Status func(childComplexity int) int
+	}
 }
 
 type QueryResolver interface {
 	Streams(ctx context.Context) ([]Stream, error)
 	Stream(ctx context.Context, streamID int) (Stream, error)
 	Entity(ctx context.Context, streamID int, entityID int) (Entity, error)
+}
+type SubscriptionResolver interface {
+	StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error)
+	EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error)
 }
 
 func field_Query_stream_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -308,6 +383,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Action.UseTimeMs(childComplexity), true
+
+	case "AddEntity.entity":
+		if e.complexity.AddEntity.Entity == nil {
+			break
+		}
+
+		return e.complexity.AddEntity.Entity(childComplexity), true
+
+	case "AddStream.stream":
+		if e.complexity.AddStream.Stream == nil {
+			break
+		}
+
+		return e.complexity.AddStream.Stream(childComplexity), true
 
 	case "CastingInfo.actionID":
 		if e.complexity.CastingInfo.ActionId == nil {
@@ -589,6 +678,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.RawSpawnJsondata(childComplexity), true
 
+	case "EntityEventsPayload.streamID":
+		if e.complexity.EntityEventsPayload.StreamId == nil {
+			break
+		}
+
+		return e.complexity.EntityEventsPayload.StreamId(childComplexity), true
+
+	case "EntityEventsPayload.entityID":
+		if e.complexity.EntityEventsPayload.EntityId == nil {
+			break
+		}
+
+		return e.complexity.EntityEventsPayload.EntityId(childComplexity), true
+
+	case "EntityEventsPayload.type":
+		if e.complexity.EntityEventsPayload.Type == nil {
+			break
+		}
+
+		return e.complexity.EntityEventsPayload.Type(childComplexity), true
+
 	case "HateEntry.enemyID":
 		if e.complexity.HateEntry.EnemyId == nil {
 			break
@@ -802,6 +912,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Entity(childComplexity, args["streamID"].(int), args["entityID"].(int)), true
 
+	case "RemoveEntity.id":
+		if e.complexity.RemoveEntity.Id == nil {
+			break
+		}
+
+		return e.complexity.RemoveEntity.Id(childComplexity), true
+
+	case "RemoveStatus.index":
+		if e.complexity.RemoveStatus.Index == nil {
+			break
+		}
+
+		return e.complexity.RemoveStatus.Index(childComplexity), true
+
+	case "RemoveStream.id":
+		if e.complexity.RemoveStream.Id == nil {
+			break
+		}
+
+		return e.complexity.RemoveStream.Id(childComplexity), true
+
 	case "Resources.hp":
 		if e.complexity.Resources.Hp == nil {
 			break
@@ -949,6 +1080,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.Entities(childComplexity), true
 
+	case "StreamEventsPayload.streamID":
+		if e.complexity.StreamEventsPayload.StreamId == nil {
+			break
+		}
+
+		return e.complexity.StreamEventsPayload.StreamId(childComplexity), true
+
+	case "StreamEventsPayload.type":
+		if e.complexity.StreamEventsPayload.Type == nil {
+			break
+		}
+
+		return e.complexity.StreamEventsPayload.Type(childComplexity), true
+
+	case "Subscription.streamEvents":
+		if e.complexity.Subscription.StreamEvents == nil {
+			break
+		}
+
+		return e.complexity.Subscription.StreamEvents(childComplexity), true
+
+	case "Subscription.entityEvents":
+		if e.complexity.Subscription.EntityEvents == nil {
+			break
+		}
+
+		return e.complexity.Subscription.EntityEvents(childComplexity), true
+
+	case "UpdateCastingInfo.castingInfo":
+		if e.complexity.UpdateCastingInfo.CastingInfo == nil {
+			break
+		}
+
+		return e.complexity.UpdateCastingInfo.CastingInfo(childComplexity), true
+
+	case "UpdateCraftingInfo.craftingInfo":
+		if e.complexity.UpdateCraftingInfo.CraftingInfo == nil {
+			break
+		}
+
+		return e.complexity.UpdateCraftingInfo.CraftingInfo(childComplexity), true
+
+	case "UpdateEnmity.enmity":
+		if e.complexity.UpdateEnmity.Enmity == nil {
+			break
+		}
+
+		return e.complexity.UpdateEnmity.Enmity(childComplexity), true
+
+	case "UpdateEntityClass.class":
+		if e.complexity.UpdateEntityClass.Class == nil {
+			break
+		}
+
+		return e.complexity.UpdateEntityClass.Class(childComplexity), true
+
+	case "UpdateEntityTarget.targetID":
+		if e.complexity.UpdateEntityTarget.TargetId == nil {
+			break
+		}
+
+		return e.complexity.UpdateEntityTarget.TargetId(childComplexity), true
+
+	case "UpdateLastAction.action":
+		if e.complexity.UpdateLastAction.Action == nil {
+			break
+		}
+
+		return e.complexity.UpdateLastAction.Action(childComplexity), true
+
+	case "UpdateMap.place":
+		if e.complexity.UpdateMap.Place == nil {
+			break
+		}
+
+		return e.complexity.UpdateMap.Place(childComplexity), true
+
+	case "UpsertStatus.index":
+		if e.complexity.UpsertStatus.Index == nil {
+			break
+		}
+
+		return e.complexity.UpsertStatus.Index(childComplexity), true
+
+	case "UpsertStatus.status":
+		if e.complexity.UpsertStatus.Status == nil {
+			break
+		}
+
+		return e.complexity.UpsertStatus.Status(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -974,7 +1196,36 @@ func (e *executableSchema) Mutation(ctx context.Context, op *ast.OperationDefini
 }
 
 func (e *executableSchema) Subscription(ctx context.Context, op *ast.OperationDefinition) func() *graphql.Response {
-	return graphql.OneShot(graphql.ErrorResponse(ctx, "subscriptions are not supported"))
+	ec := executionContext{graphql.GetRequestContext(ctx), e}
+
+	next := ec._Subscription(ctx, op.SelectionSet)
+	if ec.Errors != nil {
+		return graphql.OneShot(&graphql.Response{Data: []byte("null"), Errors: ec.Errors})
+	}
+
+	var buf bytes.Buffer
+	return func() *graphql.Response {
+		buf := ec.RequestMiddleware(ctx, func(ctx context.Context) []byte {
+			buf.Reset()
+			data := next()
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+			return buf.Bytes()
+		})
+
+		if buf == nil {
+			return nil
+		}
+
+		return &graphql.Response{
+			Data:       buf,
+			Errors:     ec.Errors,
+			Extensions: ec.Extensions,
+		}
+	}
 }
 
 type executionContext struct {
@@ -1133,6 +1384,122 @@ func (ec *executionContext) _Action_useTimeMs(ctx context.Context, field graphql
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalInt(res)
+}
+
+var addEntityImplementors = []string{"AddEntity"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _AddEntity(ctx context.Context, sel ast.SelectionSet, obj *AddEntity) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, addEntityImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddEntity")
+		case "entity":
+			out.Values[i] = ec._AddEntity_entity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AddEntity_entity(ctx context.Context, field graphql.CollectedField, obj *AddEntity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "AddEntity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Entity, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Entity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Entity(ctx, field.Selections, &res)
+}
+
+var addStreamImplementors = []string{"AddStream"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _AddStream(ctx context.Context, sel ast.SelectionSet, obj *AddStream) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, addStreamImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddStream")
+		case "stream":
+			out.Values[i] = ec._AddStream_stream(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AddStream_stream(ctx context.Context, field graphql.CollectedField, obj *AddStream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "AddStream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Stream, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Stream)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Stream(ctx, field.Selections, &res)
 }
 
 var castingInfoImplementors = []string{"CastingInfo"}
@@ -2519,7 +2886,7 @@ func (ec *executionContext) _Entity_statuses(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]Status)
+	res := resTmp.([]*Status)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
@@ -2535,7 +2902,7 @@ func (ec *executionContext) _Entity_statuses(ctx context.Context, field graphql.
 		idx1 := idx1
 		rctx := &graphql.ResolverContext{
 			Index:  &idx1,
-			Result: &res[idx1],
+			Result: res[idx1],
 		}
 		ctx := graphql.WithResolverContext(ctx, rctx)
 		f := func(idx1 int) {
@@ -2544,7 +2911,11 @@ func (ec *executionContext) _Entity_statuses(ctx context.Context, field graphql.
 			}
 			arr1[idx1] = func() graphql.Marshaler {
 
-				return ec._Status(ctx, field.Selections, &res[idx1])
+				if res[idx1] == nil {
+					return graphql.Null
+				}
+
+				return ec._Status(ctx, field.Selections, res[idx1])
 			}()
 		}
 		if isLen1 {
@@ -2612,6 +2983,128 @@ func (ec *executionContext) _Entity_rawSpawnJSONData(ctx context.Context, field 
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalString(res)
+}
+
+var entityEventsPayloadImplementors = []string{"EntityEventsPayload"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _EntityEventsPayload(ctx context.Context, sel ast.SelectionSet, obj *EntityEventsPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, entityEventsPayloadImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EntityEventsPayload")
+		case "streamID":
+			out.Values[i] = ec._EntityEventsPayload_streamID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "entityID":
+			out.Values[i] = ec._EntityEventsPayload_entityID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "type":
+			out.Values[i] = ec._EntityEventsPayload_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _EntityEventsPayload_streamID(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "EntityEventsPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StreamID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _EntityEventsPayload_entityID(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "EntityEventsPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EntityID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _EntityEventsPayload_type(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "EntityEventsPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(EntityEventType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._EntityEventType(ctx, field.Selections, &res)
 }
 
 var hateEntryImplementors = []string{"HateEntry"}
@@ -3878,6 +4371,177 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.___Schema(ctx, field.Selections, res)
 }
 
+var removeEntityImplementors = []string{"RemoveEntity"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _RemoveEntity(ctx context.Context, sel ast.SelectionSet, obj *RemoveEntity) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, removeEntityImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RemoveEntity")
+		case "id":
+			out.Values[i] = ec._RemoveEntity_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RemoveEntity_id(ctx context.Context, field graphql.CollectedField, obj *RemoveEntity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RemoveEntity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var removeStatusImplementors = []string{"RemoveStatus"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _RemoveStatus(ctx context.Context, sel ast.SelectionSet, obj *RemoveStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, removeStatusImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RemoveStatus")
+		case "index":
+			out.Values[i] = ec._RemoveStatus_index(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RemoveStatus_index(ctx context.Context, field graphql.CollectedField, obj *RemoveStatus) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RemoveStatus",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Index, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var removeStreamImplementors = []string{"RemoveStream"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _RemoveStream(ctx context.Context, sel ast.SelectionSet, obj *RemoveStream) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, removeStreamImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RemoveStream")
+		case "id":
+			out.Values[i] = ec._RemoveStream_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RemoveStream_id(ctx context.Context, field graphql.CollectedField, obj *RemoveStream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RemoveStream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
 var resourcesImplementors = []string{"Resources"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -4657,6 +5321,663 @@ func (ec *executionContext) _Stream_entities(ctx context.Context, field graphql.
 	}
 	wg.Wait()
 	return arr1
+}
+
+var streamEventsPayloadImplementors = []string{"StreamEventsPayload"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _StreamEventsPayload(ctx context.Context, sel ast.SelectionSet, obj *StreamEventsPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, streamEventsPayloadImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("StreamEventsPayload")
+		case "streamID":
+			out.Values[i] = ec._StreamEventsPayload_streamID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "type":
+			out.Values[i] = ec._StreamEventsPayload_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _StreamEventsPayload_streamID(ctx context.Context, field graphql.CollectedField, obj *StreamEventsPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "StreamEventsPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StreamID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _StreamEventsPayload_type(ctx context.Context, field graphql.CollectedField, obj *StreamEventsPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "StreamEventsPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(StreamEventType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._StreamEventType(ctx, field.Selections, &res)
+}
+
+var subscriptionImplementors = []string{"Subscription"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Subscription(ctx context.Context, sel ast.SelectionSet) func() graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, subscriptionImplementors)
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Object: "Subscription",
+	})
+	if len(fields) != 1 {
+		ec.Errorf(ctx, "must subscribe to exactly one stream")
+		return nil
+	}
+
+	switch fields[0].Name {
+	case "streamEvents":
+		return ec._Subscription_streamEvents(ctx, fields[0])
+	case "entityEvents":
+		return ec._Subscription_entityEvents(ctx, fields[0])
+	default:
+		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
+}
+
+func (ec *executionContext) _Subscription_streamEvents(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().StreamEvents(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._StreamEventsPayload(ctx, field.Selections, &res)
+		}())
+		return &out
+	}
+}
+
+func (ec *executionContext) _Subscription_entityEvents(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().EntityEvents(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._EntityEventsPayload(ctx, field.Selections, &res)
+		}())
+		return &out
+	}
+}
+
+var updateCastingInfoImplementors = []string{"UpdateCastingInfo"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateCastingInfo(ctx context.Context, sel ast.SelectionSet, obj *UpdateCastingInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateCastingInfoImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateCastingInfo")
+		case "castingInfo":
+			out.Values[i] = ec._UpdateCastingInfo_castingInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateCastingInfo_castingInfo(ctx context.Context, field graphql.CollectedField, obj *UpdateCastingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateCastingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CastingInfo, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CastingInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._CastingInfo(ctx, field.Selections, &res)
+}
+
+var updateCraftingInfoImplementors = []string{"UpdateCraftingInfo"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateCraftingInfo(ctx context.Context, sel ast.SelectionSet, obj *UpdateCraftingInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateCraftingInfoImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateCraftingInfo")
+		case "craftingInfo":
+			out.Values[i] = ec._UpdateCraftingInfo_craftingInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateCraftingInfo_craftingInfo(ctx context.Context, field graphql.CollectedField, obj *UpdateCraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateCraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CraftingInfo, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CraftingInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._CraftingInfo(ctx, field.Selections, &res)
+}
+
+var updateEnmityImplementors = []string{"UpdateEnmity"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateEnmity(ctx context.Context, sel ast.SelectionSet, obj *UpdateEnmity) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateEnmityImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEnmity")
+		case "enmity":
+			out.Values[i] = ec._UpdateEnmity_enmity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateEnmity_enmity(ctx context.Context, field graphql.CollectedField, obj *UpdateEnmity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateEnmity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Enmity, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Enmity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Enmity(ctx, field.Selections, &res)
+}
+
+var updateEntityClassImplementors = []string{"UpdateEntityClass"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateEntityClass(ctx context.Context, sel ast.SelectionSet, obj *UpdateEntityClass) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateEntityClassImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEntityClass")
+		case "class":
+			out.Values[i] = ec._UpdateEntityClass_class(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateEntityClass_class(ctx context.Context, field graphql.CollectedField, obj *UpdateEntityClass) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateEntityClass",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Class, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var updateEntityTargetImplementors = []string{"UpdateEntityTarget"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateEntityTarget(ctx context.Context, sel ast.SelectionSet, obj *UpdateEntityTarget) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateEntityTargetImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEntityTarget")
+		case "targetID":
+			out.Values[i] = ec._UpdateEntityTarget_targetID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateEntityTarget_targetID(ctx context.Context, field graphql.CollectedField, obj *UpdateEntityTarget) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateEntityTarget",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TargetID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var updateLastActionImplementors = []string{"UpdateLastAction"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateLastAction(ctx context.Context, sel ast.SelectionSet, obj *UpdateLastAction) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateLastActionImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateLastAction")
+		case "action":
+			out.Values[i] = ec._UpdateLastAction_action(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateLastAction_action(ctx context.Context, field graphql.CollectedField, obj *UpdateLastAction) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateLastAction",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Action, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Action)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Action(ctx, field.Selections, &res)
+}
+
+var updateMapImplementors = []string{"UpdateMap"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateMap(ctx context.Context, sel ast.SelectionSet, obj *UpdateMap) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateMapImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateMap")
+		case "place":
+			out.Values[i] = ec._UpdateMap_place(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateMap_place(ctx context.Context, field graphql.CollectedField, obj *UpdateMap) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateMap",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Place, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Place)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Place(ctx, field.Selections, &res)
+}
+
+var upsertStatusImplementors = []string{"UpsertStatus"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpsertStatus(ctx context.Context, sel ast.SelectionSet, obj *UpsertStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, upsertStatusImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpsertStatus")
+		case "index":
+			out.Values[i] = ec._UpsertStatus_index(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "status":
+			out.Values[i] = ec._UpsertStatus_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpsertStatus_index(ctx context.Context, field graphql.CollectedField, obj *UpsertStatus) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpsertStatus",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Index, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpsertStatus_status(ctx context.Context, field graphql.CollectedField, obj *UpsertStatus) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpsertStatus",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Status)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Status(ctx, field.Selections, &res)
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -6104,6 +7425,76 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 	return ec.___Type(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _EntityEventType(ctx context.Context, sel ast.SelectionSet, obj *EntityEventType) graphql.Marshaler {
+	switch obj := (*obj).(type) {
+	case nil:
+		return graphql.Null
+	case AddEntity:
+		return ec._AddEntity(ctx, sel, &obj)
+	case *AddEntity:
+		return ec._AddEntity(ctx, sel, obj)
+	case RemoveEntity:
+		return ec._RemoveEntity(ctx, sel, &obj)
+	case *RemoveEntity:
+		return ec._RemoveEntity(ctx, sel, obj)
+	case UpdateEntityTarget:
+		return ec._UpdateEntityTarget(ctx, sel, &obj)
+	case *UpdateEntityTarget:
+		return ec._UpdateEntityTarget(ctx, sel, obj)
+	case UpdateEntityClass:
+		return ec._UpdateEntityClass(ctx, sel, &obj)
+	case *UpdateEntityClass:
+		return ec._UpdateEntityClass(ctx, sel, obj)
+	case UpdateLastAction:
+		return ec._UpdateLastAction(ctx, sel, &obj)
+	case *UpdateLastAction:
+		return ec._UpdateLastAction(ctx, sel, obj)
+	case UpdateCastingInfo:
+		return ec._UpdateCastingInfo(ctx, sel, &obj)
+	case *UpdateCastingInfo:
+		return ec._UpdateCastingInfo(ctx, sel, obj)
+	case UpsertStatus:
+		return ec._UpsertStatus(ctx, sel, &obj)
+	case *UpsertStatus:
+		return ec._UpsertStatus(ctx, sel, obj)
+	case RemoveStatus:
+		return ec._RemoveStatus(ctx, sel, &obj)
+	case *RemoveStatus:
+		return ec._RemoveStatus(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.SelectionSet, obj *StreamEventType) graphql.Marshaler {
+	switch obj := (*obj).(type) {
+	case nil:
+		return graphql.Null
+	case AddStream:
+		return ec._AddStream(ctx, sel, &obj)
+	case *AddStream:
+		return ec._AddStream(ctx, sel, obj)
+	case RemoveStream:
+		return ec._RemoveStream(ctx, sel, &obj)
+	case *RemoveStream:
+		return ec._RemoveStream(ctx, sel, obj)
+	case UpdateMap:
+		return ec._UpdateMap(ctx, sel, &obj)
+	case *UpdateMap:
+		return ec._UpdateMap(ctx, sel, obj)
+	case UpdateCraftingInfo:
+		return ec._UpdateCraftingInfo(ctx, sel, &obj)
+	case *UpdateCraftingInfo:
+		return ec._UpdateCraftingInfo(ctx, sel, obj)
+	case UpdateEnmity:
+		return ec._UpdateEnmity(ctx, sel, &obj)
+	case *UpdateEnmity:
+		return ec._UpdateEnmity(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) FieldMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver) (ret interface{}) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6188,7 +7579,7 @@ type Entity {
   resources: Resources!
   location: Location!
   lastAction: Action
-  statuses: [Status!]!
+  statuses: [Status]!
 
   castingInfo: CastingInfo
 
@@ -6277,5 +7668,92 @@ type CraftingInfo {
 	durabilityDelta: Int!
 	currentCondition: Int!
 	previousCondition: Int!
-}`},
+}
+
+type Subscription {
+  streamEvents: StreamEventsPayload!
+  entityEvents: EntityEventsPayload!
+}
+
+type StreamEventsPayload {
+  streamID: Int!
+  type: StreamEventType!
+}
+
+union StreamEventType =
+  AddStream |
+  RemoveStream |
+  UpdateMap |
+  UpdateCraftingInfo |
+  UpdateEnmity
+
+type AddStream {
+  stream: Stream!
+}
+
+type RemoveStream {
+  id: Int!
+}
+
+type UpdateMap {
+  place: Place!
+}
+
+type UpdateCraftingInfo {
+  craftingInfo: CraftingInfo!
+}
+
+type UpdateEnmity {
+  enmity: Enmity!
+}
+
+type EntityEventsPayload {
+  streamID: Int!
+  entityID: Int!
+  type: EntityEventType!
+}
+
+union EntityEventType =
+  AddEntity |
+  RemoveEntity |
+  UpdateEntityTarget |
+  UpdateEntityClass |
+  UpdateLastAction |
+  UpdateCastingInfo |
+  UpsertStatus |
+  RemoveStatus
+
+type AddEntity {
+  entity: Entity!
+}
+
+type RemoveEntity {
+  id: Int!
+}
+
+type UpdateEntityTarget {
+  targetID: Int!
+}
+
+type UpdateEntityClass {
+  class: Int!
+}
+
+type UpdateLastAction {
+  action: Action!
+}
+
+type UpdateCastingInfo {
+  castingInfo: CastingInfo!
+}
+
+type UpsertStatus {
+  index: Int!
+  status: Status!
+}
+
+type RemoveStatus {
+  index: Int!
+}
+`},
 )

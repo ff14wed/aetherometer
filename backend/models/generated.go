@@ -9,6 +9,18 @@ type Action struct {
 	UseTimeMs int    `json:"useTimeMs"`
 }
 
+type AddEntity struct {
+	Entity Entity `json:"entity"`
+}
+
+func (AddEntity) IsEntityEventType() {}
+
+type AddStream struct {
+	Stream Stream `json:"stream"`
+}
+
+func (AddStream) IsStreamEventType() {}
+
 type CastingInfo struct {
 	ActionID      int      `json:"actionID"`
 	ActionName    string   `json:"actionName"`
@@ -56,9 +68,19 @@ type Entity struct {
 	Resources        Resources    `json:"resources"`
 	Location         Location     `json:"location"`
 	LastAction       *Action      `json:"lastAction"`
-	Statuses         []Status     `json:"statuses"`
+	Statuses         []*Status    `json:"statuses"`
 	CastingInfo      *CastingInfo `json:"castingInfo"`
 	RawSpawnJSONData string       `json:"rawSpawnJSONData"`
+}
+
+type EntityEventType interface {
+	IsEntityEventType()
+}
+
+type EntityEventsPayload struct {
+	StreamID int             `json:"streamID"`
+	EntityID int             `json:"entityID"`
+	Type     EntityEventType `json:"type"`
 }
 
 type HateEntry struct {
@@ -105,6 +127,24 @@ type Place struct {
 	Maps        []MapInfo `json:"maps"`
 }
 
+type RemoveEntity struct {
+	ID int `json:"id"`
+}
+
+func (RemoveEntity) IsEntityEventType() {}
+
+type RemoveStatus struct {
+	Index int `json:"index"`
+}
+
+func (RemoveStatus) IsEntityEventType() {}
+
+type RemoveStream struct {
+	ID int `json:"id"`
+}
+
+func (RemoveStream) IsStreamEventType() {}
+
 type Resources struct {
 	Hp         int `json:"hp"`
 	Mp         int `json:"mp"`
@@ -125,3 +165,61 @@ type Status struct {
 	BaseDamage    int    `json:"baseDamage"`
 	CritRate      int    `json:"critRate"`
 }
+
+type StreamEventType interface {
+	IsStreamEventType()
+}
+
+type StreamEventsPayload struct {
+	StreamID int             `json:"streamID"`
+	Type     StreamEventType `json:"type"`
+}
+
+type UpdateCastingInfo struct {
+	CastingInfo CastingInfo `json:"castingInfo"`
+}
+
+func (UpdateCastingInfo) IsEntityEventType() {}
+
+type UpdateCraftingInfo struct {
+	CraftingInfo CraftingInfo `json:"craftingInfo"`
+}
+
+func (UpdateCraftingInfo) IsStreamEventType() {}
+
+type UpdateEnmity struct {
+	Enmity Enmity `json:"enmity"`
+}
+
+func (UpdateEnmity) IsStreamEventType() {}
+
+type UpdateEntityClass struct {
+	Class int `json:"class"`
+}
+
+func (UpdateEntityClass) IsEntityEventType() {}
+
+type UpdateEntityTarget struct {
+	TargetID int `json:"targetID"`
+}
+
+func (UpdateEntityTarget) IsEntityEventType() {}
+
+type UpdateLastAction struct {
+	Action Action `json:"action"`
+}
+
+func (UpdateLastAction) IsEntityEventType() {}
+
+type UpdateMap struct {
+	Place Place `json:"place"`
+}
+
+func (UpdateMap) IsStreamEventType() {}
+
+type UpsertStatus struct {
+	Index  int    `json:"index"`
+	Status Status `json:"status"`
+}
+
+func (UpsertStatus) IsEntityEventType() {}

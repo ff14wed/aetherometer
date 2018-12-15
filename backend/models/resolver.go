@@ -16,9 +16,14 @@ func NewResolver(db *DB) *Resolver {
 	return &Resolver{db: db}
 }
 
-// Query is implemented to allow graphql to resolve queries made on the system
+// Query allows graphql to resolve queries made on the system
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
+}
+
+// Subscription allows graphql to resolve subscriptions added to the system
+func (r *Resolver) Subscription() SubscriptionResolver {
+	return &subscriptionResolver{r}
 }
 
 type queryResolver struct{ *Resolver }
@@ -31,4 +36,13 @@ func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error
 }
 func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID int) (Entity, error) {
 	return r.db.Entity(streamID, entityID)
+}
+
+type subscriptionResolver struct{ *Resolver }
+
+func (r *subscriptionResolver) StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error) {
+	panic("not implemented")
+}
+func (r *subscriptionResolver) EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error) {
+	panic("not implemented")
 }

@@ -52,7 +52,7 @@ type Entity {
   resources: Resources!
   location: Location!
   lastAction: Action
-  statuses: [Status!]!
+  statuses: [Status]!
 
   castingInfo: CastingInfo
 
@@ -141,4 +141,90 @@ type CraftingInfo {
 	durabilityDelta: Int!
 	currentCondition: Int!
 	previousCondition: Int!
+}
+
+type Subscription {
+  streamEvents: StreamEventsPayload!
+  entityEvents: EntityEventsPayload!
+}
+
+type StreamEventsPayload {
+  streamID: Int!
+  type: StreamEventType!
+}
+
+union StreamEventType =
+  AddStream |
+  RemoveStream |
+  UpdateMap |
+  UpdateCraftingInfo |
+  UpdateEnmity
+
+type AddStream {
+  stream: Stream!
+}
+
+type RemoveStream {
+  id: Int!
+}
+
+type UpdateMap {
+  place: Place!
+}
+
+type UpdateCraftingInfo {
+  craftingInfo: CraftingInfo!
+}
+
+type UpdateEnmity {
+  enmity: Enmity!
+}
+
+type EntityEventsPayload {
+  streamID: Int!
+  entityID: Int!
+  type: EntityEventType!
+}
+
+union EntityEventType =
+  AddEntity |
+  RemoveEntity |
+  UpdateEntityTarget |
+  UpdateEntityClass |
+  UpdateLastAction |
+  UpdateCastingInfo |
+  UpsertStatus |
+  RemoveStatus
+
+type AddEntity {
+  entity: Entity!
+}
+
+type RemoveEntity {
+  id: Int!
+}
+
+type UpdateEntityTarget {
+  targetID: Int!
+}
+
+type UpdateEntityClass {
+  class: Int!
+}
+
+type UpdateLastAction {
+  action: Action!
+}
+
+type UpdateCastingInfo {
+  castingInfo: CastingInfo!
+}
+
+type UpsertStatus {
+  index: Int!
+  status: Status!
+}
+
+type RemoveStatus {
+  index: Int!
 }
