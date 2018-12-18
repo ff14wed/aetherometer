@@ -13,7 +13,7 @@ type FrameDecoder interface {
 }
 
 // ExtractBlocks reads frames off the reader with the FrameDecoder and
-// returns blocks that have been extracted from those frames. If there is
+// returns raw blocks that have been extracted from those frames. If there is
 // not enough data in the reader to read a full block, it does not consume the
 // remaining data in the reader. However if the data in the reader is invalid,
 // it discards the bytes in the reader until it is valid.

@@ -19,21 +19,13 @@ var testFrames = map[string]*xivnet.Frame{
 		Blocks: []*xivnet.Block{
 			&xivnet.Block{
 				Length: 123,
-				Header: xivnet.BlockHeader{
-					SubjectID: 1234,
-					CurrentID: 5678,
-					Opcode:    0x90,
-				},
-				Data: []byte{1, 2, 3, 4},
+				Header: xivnet.BlockHeader{SubjectID: 1234, CurrentID: 5678, Opcode: 0x90},
+				Data:   []byte{1, 2, 3, 4},
 			},
 			&xivnet.Block{
 				Length: 456,
-				Header: xivnet.BlockHeader{
-					SubjectID: 5678,
-					CurrentID: 5678,
-					Opcode:    0x91,
-				},
-				Data: []byte{5, 6, 7, 8},
+				Header: xivnet.BlockHeader{SubjectID: 5678, CurrentID: 5678, Opcode: 0x91},
+				Data:   []byte{5, 6, 7, 8},
 			},
 		},
 	},
@@ -41,12 +33,8 @@ var testFrames = map[string]*xivnet.Frame{
 		Blocks: []*xivnet.Block{
 			&xivnet.Block{
 				Length: 789,
-				Header: xivnet.BlockHeader{
-					SubjectID: 2345,
-					CurrentID: 5678,
-					Opcode:    0x92,
-				},
-				Data: []byte{9, 0, 1, 2},
+				Header: xivnet.BlockHeader{SubjectID: 2345, CurrentID: 5678, Opcode: 0x92},
+				Data:   []byte{9, 0, 1, 2},
 			},
 		},
 	},
