@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/ff14wed/sibyl/backend/message"
+	"github.com/ff14wed/xivnet/datatypes"
 
 	"github.com/ff14wed/xivnet"
 
@@ -167,6 +168,136 @@ var _ = Describe("Block Parser", func() {
 				_, err := message.ExtractBlocks(reader, new(testFrameDecoder))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(reader.Peek(5)).To(Equal([]byte("PRE-g")))
+			})
+		})
+	})
+
+	Describe("DedupMyMovementBlocks", func() {
+		setupBlocksList := func(cb func([]*xivnet.Block) []*xivnet.Block) []*xivnet.Block {
+			blocks := []*xivnet.Block{
+				&xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyActionOpcode},
+					Data:   []byte{1, 2, 3, 4},
+				},
+				&xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.CastingOpcode},
+					Data:   []byte{1, 2, 3, 4},
+				},
+			}
+			blocks = cb(blocks)
+			return append(blocks, &xivnet.Block{
+				Length: 123,
+				Header: xivnet.BlockHeader{Opcode: datatypes.CastingOpcode},
+				Data:   []byte{5, 6, 7, 8},
+			})
+		}
+
+		It("removes duplicate MyMovement blocks, leaves the last MyMovement block and unrelated blocks untouched", func() {
+			origBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
+				for i := 0; i < 20; i++ {
+					blocks = append(blocks, &xivnet.Block{
+						Length: 123,
+						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+						Data:   []byte{1, 2, 3, 4},
+					})
+				}
+				return append(blocks, &xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+					Data:   []byte{5, 6, 7, 8},
+				})
+			})
+			expectedBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
+				return append(blocks, &xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+					Data:   []byte{5, 6, 7, 8},
+				})
+			})
+
+			dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
+			Expect(dedupedBlocks).To(Equal(expectedBlocks))
+		})
+
+		It("removes duplicate MyMovement2 blocks, leaves the last MyMovement2 block and unrelated blocks untouched", func() {
+			origBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
+				for i := 0; i < 20; i++ {
+					blocks = append(blocks, &xivnet.Block{
+						Length: 123,
+						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
+						Data:   []byte{1, 2, 3, 4},
+					})
+				}
+				blocks = append(blocks, &xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
+					Data:   []byte{5, 6, 7, 8},
+				})
+				return blocks
+			})
+			expectedBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
+				blocks = append(blocks, &xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
+					Data:   []byte{5, 6, 7, 8},
+				})
+				return blocks
+			})
+
+			dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
+			Expect(dedupedBlocks).To(Equal(expectedBlocks))
+		})
+
+		Context("when there are only MyMovement blocks", func() {
+			It("returns only the last block", func() {
+				var origBlocks []*xivnet.Block
+				for i := 0; i < 20; i++ {
+					origBlocks = append(origBlocks, &xivnet.Block{
+						Length: 123,
+						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+						Data:   []byte{1, 2, 3, 4},
+					})
+				}
+				origBlocks = append(origBlocks, &xivnet.Block{
+					Length: 123,
+					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+					Data:   []byte{5, 6, 7, 8},
+				})
+				expectedBlocks := []*xivnet.Block{
+					&xivnet.Block{
+						Length: 123,
+						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+						Data:   []byte{5, 6, 7, 8},
+					},
+				}
+				dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
+				Expect(dedupedBlocks).To(Equal(expectedBlocks))
+			})
+		})
+
+		Context("when there is one MyMovement block", func() {
+			It("just leaves the entire block list alone", func() {
+				origBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
+					return append(blocks, &xivnet.Block{
+						Length: 123,
+						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
+						Data:   []byte{5, 6, 7, 8},
+					})
+				})
+				dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
+				Expect(dedupedBlocks).To(Equal(origBlocks))
+			})
+		})
+
+		Context("when there are no MyMovement or MyMovement2 blocks", func() {
+			It("just leaves the entire block list alone", func() {
+				origBlocks := setupBlocksList(func(b []*xivnet.Block) []*xivnet.Block {
+					return b
+				})
+				dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
+				Expect(dedupedBlocks).To(Equal(origBlocks))
 			})
 		})
 	})

@@ -4,6 +4,7 @@ import (
 	"bufio"
 
 	"github.com/ff14wed/xivnet"
+	"github.com/ff14wed/xivnet/datatypes"
 )
 
 // FrameDecoder defines any decoder that can read frames from the input reader
@@ -32,4 +33,37 @@ func ExtractBlocks(buf *bufio.Reader, d FrameDecoder) ([]*xivnet.Block, error) {
 			return nil, err
 		}
 	}
+}
+
+// DedupMyMovementBlocks returns a filtered list that does not contain
+// duplicated outgoing movement blocks.
+// This handler assumes that the list of blocks resulted from a single
+// pass of the decoder, and therefore the blocks are too temporally
+// close to be useful for us. This is especially an issue since the FFXIV
+// client spams the server with movement blocks during casts to ensure
+// any movement will interrupt casts.
+// This processing must happen here since as soon as we handle blocks
+// individually it's too late to dedup.
+func DedupMyMovementBlocks(blocks []*xivnet.Block) []*xivnet.Block {
+	var prevBlock *xivnet.Block
+	deduping := false
+	dedupedBlocks := make([]*xivnet.Block, 0, len(blocks))
+
+	for _, b := range blocks {
+		switch b.Header.Opcode {
+		case datatypes.MyMovementOpcode, datatypes.MyMovement2Opcode:
+			deduping = true
+		default:
+			if deduping {
+				dedupedBlocks = append(dedupedBlocks, prevBlock)
+				deduping = false
+			}
+			dedupedBlocks = append(dedupedBlocks, b)
+		}
+		prevBlock = b
+	}
+	if deduping {
+		dedupedBlocks = append(dedupedBlocks, prevBlock)
+	}
+	return dedupedBlocks
 }
