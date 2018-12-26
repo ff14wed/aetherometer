@@ -17,7 +17,7 @@ import (
 // stream has its own independent state. Querying for any data requires
 // walking down the data hierarchy.
 type DB struct {
-	StreamsMap        map[int]Stream
+	StreamsMap        map[int]*Stream
 	StreamKeys        []int
 	StreamEventSource StreamEventSource
 	EntityEventSource EntityEventSource
@@ -27,7 +27,7 @@ type DB struct {
 func (db *DB) Streams() []Stream {
 	streams := make([]Stream, len(db.StreamKeys))
 	for i, k := range db.StreamKeys {
-		streams[i] = db.StreamsMap[k]
+		streams[i] = *db.StreamsMap[k]
 	}
 	return streams
 }
@@ -38,7 +38,7 @@ func (db *DB) Stream(streamID int) (Stream, error) {
 	if !ok {
 		return Stream{}, fmt.Errorf("stream ID %d not found", streamID)
 	}
-	return s, nil
+	return *s, nil
 }
 
 // Entity returns a specific entity in a specific from the store, queried by
@@ -88,7 +88,7 @@ type Stream struct {
 	Enmity       Enmity        `json:"enmity"`
 	CraftingInfo *CraftingInfo `json:"craftingInfo"`
 
-	EntitiesMap  map[int]Entity `json:"entities"`
+	EntitiesMap  map[int]*Entity `json:"entities"`
 	EntitiesKeys []int
 }
 
@@ -98,14 +98,14 @@ func (s *Stream) Entity(entityID int) (Entity, error) {
 	if !ok {
 		return Entity{}, fmt.Errorf("entity ID %d not found", entityID)
 	}
-	return e, nil
+	return *e, nil
 }
 
 // Entities returns all the entities from the stream.
 func (s *Stream) Entities() []Entity {
 	entities := make([]Entity, len(s.EntitiesKeys))
 	for i, k := range s.EntitiesKeys {
-		entities[i] = s.EntitiesMap[k]
+		entities[i] = *s.EntitiesMap[k]
 	}
 	return entities
 }

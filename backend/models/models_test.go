@@ -25,16 +25,16 @@ var _ = Describe("Models", func() {
 			fakeEntityEventSource = new(modelsfakes.FakeEntityEventSource)
 
 			db = &models.DB{
-				StreamsMap: map[int]models.Stream{
-					1234: models.Stream{
+				StreamsMap: map[int]*models.Stream{
+					1234: &models.Stream{
 						Pid: 1234,
-						EntitiesMap: map[int]models.Entity{
-							1: models.Entity{ID: 1, Name: "FooBar"},
-							2: models.Entity{ID: 2, Name: "Baah"},
+						EntitiesMap: map[int]*models.Entity{
+							1: &models.Entity{ID: 1, Name: "FooBar"},
+							2: &models.Entity{ID: 2, Name: "Baah"},
 						},
 						EntitiesKeys: []int{1, 2},
 					},
-					5678: models.Stream{Pid: 5678},
+					5678: &models.Stream{Pid: 5678},
 				},
 				StreamKeys:        []int{1234, 5678},
 				StreamEventSource: fakeStreamEventSource,
@@ -45,8 +45,8 @@ var _ = Describe("Models", func() {
 		Describe("Streams", func() {
 			It("returns all the streams found in the database", func() {
 				Expect(db.Streams()).To(Equal([]models.Stream{
-					db.StreamsMap[1234],
-					db.StreamsMap[5678],
+					*db.StreamsMap[1234],
+					*db.StreamsMap[5678],
 				}))
 			})
 		})
@@ -167,9 +167,9 @@ var _ = Describe("Models", func() {
 		BeforeEach(func() {
 			stream = &models.Stream{
 				Pid: 1234,
-				EntitiesMap: map[int]models.Entity{
-					1: models.Entity{ID: 1, Name: "FooBar"},
-					2: models.Entity{ID: 2, Name: "Baah"},
+				EntitiesMap: map[int]*models.Entity{
+					1: &models.Entity{ID: 1, Name: "FooBar"},
+					2: &models.Entity{ID: 2, Name: "Baah"},
 				},
 				EntitiesKeys: []int{1, 2},
 			}
@@ -189,8 +189,8 @@ var _ = Describe("Models", func() {
 		Describe("Entities", func() {
 			It("returns all entities found on the stream", func() {
 				Expect(stream.Entities()).To(Equal([]models.Entity{
-					models.Entity{ID: 1, Name: "FooBar"},
-					models.Entity{ID: 2, Name: "Baah"},
+					*stream.EntitiesMap[1],
+					*stream.EntitiesMap[2],
 				}))
 			})
 		})
