@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+//go:generate go run ../scripts/gqlgen.go -v
+
 // DB encompasses the entire internal store for the current state of all
 // streams. There is no normalization of the data in the store, so each
 // stream has its own independent state. Querying for any data requires
@@ -51,7 +53,7 @@ func (db *DB) Entity(streamID int, entityID int) (Entity, error) {
 
 // StreamEvents returns an event channel that can be used for subscriptions to
 // Stream events
-func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error) {
+func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEvent, error) {
 	ch, id := db.StreamEventSource.Subscribe()
 	go func() {
 		<-ctx.Done()
@@ -62,7 +64,7 @@ func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, err
 
 // EntityEvents returns an event channel that can be used for subscriptions to
 // Entity events
-func (db *DB) EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error) {
+func (db *DB) EntityEvents(ctx context.Context) (<-chan EntityEvent, error) {
 	ch, id := db.EntityEventSource.Subscribe()
 	go func() {
 		<-ctx.Done()

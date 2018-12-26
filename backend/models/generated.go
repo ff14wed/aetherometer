@@ -73,14 +73,14 @@ type Entity struct {
 	RawSpawnJSONData string       `json:"rawSpawnJSONData"`
 }
 
-type EntityEventType interface {
-	IsEntityEventType()
-}
-
-type EntityEventsPayload struct {
+type EntityEvent struct {
 	StreamID int             `json:"streamID"`
 	EntityID int             `json:"entityID"`
 	Type     EntityEventType `json:"type"`
+}
+
+type EntityEventType interface {
+	IsEntityEventType()
 }
 
 type HateEntry struct {
@@ -166,13 +166,13 @@ type Status struct {
 	CritRate      int    `json:"critRate"`
 }
 
-type StreamEventType interface {
-	IsStreamEventType()
-}
-
-type StreamEventsPayload struct {
+type StreamEvent struct {
 	StreamID int             `json:"streamID"`
 	Type     StreamEventType `json:"type"`
+}
+
+type StreamEventType interface {
+	IsStreamEventType()
 }
 
 type UpdateCastingInfo struct {

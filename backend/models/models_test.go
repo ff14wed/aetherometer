@@ -77,10 +77,10 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("StreamEvents", func() {
-			var eventsChannel chan models.StreamEventsPayload
+			var eventsChannel chan models.StreamEvent
 
 			BeforeEach(func() {
-				eventsChannel = make(chan models.StreamEventsPayload, 1)
+				eventsChannel = make(chan models.StreamEvent, 1)
 				fakeStreamEventSource.SubscribeReturns(eventsChannel, 1234)
 			})
 
@@ -92,14 +92,14 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				payload := models.StreamEventsPayload{
+				payload := models.StreamEvent{
 					StreamID: 123,
 				}
 				eventsChannel <- payload
 				ch, err := db.StreamEvents(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
-				var receivedPayload models.StreamEventsPayload
+				var receivedPayload models.StreamEvent
 				Expect(ch).To(Receive(&receivedPayload))
 				Expect(receivedPayload).To(Equal(payload))
 			})
@@ -118,10 +118,10 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("EntityEvents", func() {
-			var eventsChannel chan models.EntityEventsPayload
+			var eventsChannel chan models.EntityEvent
 
 			BeforeEach(func() {
-				eventsChannel = make(chan models.EntityEventsPayload, 1)
+				eventsChannel = make(chan models.EntityEvent, 1)
 				fakeEntityEventSource.SubscribeReturns(eventsChannel, 1234)
 			})
 
@@ -133,14 +133,14 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				payload := models.EntityEventsPayload{
+				payload := models.EntityEvent{
 					StreamID: 123,
 				}
 				eventsChannel <- payload
 				ch, err := db.EntityEvents(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
-				var receivedPayload models.EntityEventsPayload
+				var receivedPayload models.EntityEvent
 				Expect(ch).To(Receive(&receivedPayload))
 				Expect(receivedPayload).To(Equal(payload))
 			})

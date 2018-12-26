@@ -14,8 +14,8 @@ import (
 var _ = Describe("EntityHub", func() {
 	It("broadcasts messages to multiple subscribers", func() {
 		h := hub.NewEntityHub(5)
-		expected := models.EntityEventsPayload{StreamID: 1234}
-		receivedChan := make(chan models.EntityEventsPayload, 5)
+		expected := models.EntityEvent{StreamID: 1234}
+		receivedChan := make(chan models.EntityEvent, 5)
 		defer close(receivedChan)
 
 		wg := sync.WaitGroup{}
@@ -36,9 +36,9 @@ var _ = Describe("EntityHub", func() {
 		// Wait for all the subscribers to finish adding their subscriber
 		wg.Wait()
 
-		h.Broadcast(models.EntityEventsPayload{StreamID: 1234})
+		h.Broadcast(models.EntityEvent{StreamID: 1234})
 		for i := 0; i < 5; i++ {
-			var receivedMsg models.EntityEventsPayload
+			var receivedMsg models.EntityEvent
 			Eventually(receivedChan).Should(
 				Receive(&receivedMsg),
 				fmt.Sprintf("Subscriber %d did not receive an expected message", i),
@@ -51,7 +51,7 @@ var _ = Describe("EntityHub", func() {
 		h := hub.NewEntityHub(5)
 		sub, id := h.Subscribe()
 		h.Unsubscribe(id)
-		h.Broadcast(models.EntityEventsPayload{StreamID: 1234})
+		h.Broadcast(models.EntityEvent{StreamID: 1234})
 		Consistently(sub).ShouldNot(Receive())
 	})
 })

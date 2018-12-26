@@ -107,7 +107,7 @@ type ComplexityRoot struct {
 		RawSpawnJsondata func(childComplexity int) int
 	}
 
-	EntityEventsPayload struct {
+	EntityEvent struct {
 		StreamId func(childComplexity int) int
 		EntityId func(childComplexity int) int
 		Type     func(childComplexity int) int
@@ -205,7 +205,7 @@ type ComplexityRoot struct {
 		Entities     func(childComplexity int) int
 	}
 
-	StreamEventsPayload struct {
+	StreamEvent struct {
 		StreamId func(childComplexity int) int
 		Type     func(childComplexity int) int
 	}
@@ -255,8 +255,8 @@ type QueryResolver interface {
 	Entity(ctx context.Context, streamID int, entityID int) (Entity, error)
 }
 type SubscriptionResolver interface {
-	StreamEvents(ctx context.Context) (<-chan StreamEventsPayload, error)
-	EntityEvents(ctx context.Context) (<-chan EntityEventsPayload, error)
+	StreamEvents(ctx context.Context) (<-chan StreamEvent, error)
+	EntityEvents(ctx context.Context) (<-chan EntityEvent, error)
 }
 
 func field_Query_stream_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -678,26 +678,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.RawSpawnJsondata(childComplexity), true
 
-	case "EntityEventsPayload.streamID":
-		if e.complexity.EntityEventsPayload.StreamId == nil {
+	case "EntityEvent.streamID":
+		if e.complexity.EntityEvent.StreamId == nil {
 			break
 		}
 
-		return e.complexity.EntityEventsPayload.StreamId(childComplexity), true
+		return e.complexity.EntityEvent.StreamId(childComplexity), true
 
-	case "EntityEventsPayload.entityID":
-		if e.complexity.EntityEventsPayload.EntityId == nil {
+	case "EntityEvent.entityID":
+		if e.complexity.EntityEvent.EntityId == nil {
 			break
 		}
 
-		return e.complexity.EntityEventsPayload.EntityId(childComplexity), true
+		return e.complexity.EntityEvent.EntityId(childComplexity), true
 
-	case "EntityEventsPayload.type":
-		if e.complexity.EntityEventsPayload.Type == nil {
+	case "EntityEvent.type":
+		if e.complexity.EntityEvent.Type == nil {
 			break
 		}
 
-		return e.complexity.EntityEventsPayload.Type(childComplexity), true
+		return e.complexity.EntityEvent.Type(childComplexity), true
 
 	case "HateEntry.enemyID":
 		if e.complexity.HateEntry.EnemyId == nil {
@@ -1080,19 +1080,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.Entities(childComplexity), true
 
-	case "StreamEventsPayload.streamID":
-		if e.complexity.StreamEventsPayload.StreamId == nil {
+	case "StreamEvent.streamID":
+		if e.complexity.StreamEvent.StreamId == nil {
 			break
 		}
 
-		return e.complexity.StreamEventsPayload.StreamId(childComplexity), true
+		return e.complexity.StreamEvent.StreamId(childComplexity), true
 
-	case "StreamEventsPayload.type":
-		if e.complexity.StreamEventsPayload.Type == nil {
+	case "StreamEvent.type":
+		if e.complexity.StreamEvent.Type == nil {
 			break
 		}
 
-		return e.complexity.StreamEventsPayload.Type(childComplexity), true
+		return e.complexity.StreamEvent.Type(childComplexity), true
 
 	case "Subscription.streamEvents":
 		if e.complexity.Subscription.StreamEvents == nil {
@@ -2985,11 +2985,11 @@ func (ec *executionContext) _Entity_rawSpawnJSONData(ctx context.Context, field 
 	return graphql.MarshalString(res)
 }
 
-var entityEventsPayloadImplementors = []string{"EntityEventsPayload"}
+var entityEventImplementors = []string{"EntityEvent"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _EntityEventsPayload(ctx context.Context, sel ast.SelectionSet, obj *EntityEventsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, entityEventsPayloadImplementors)
+func (ec *executionContext) _EntityEvent(ctx context.Context, sel ast.SelectionSet, obj *EntityEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, entityEventImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
@@ -2998,19 +2998,19 @@ func (ec *executionContext) _EntityEventsPayload(ctx context.Context, sel ast.Se
 
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("EntityEventsPayload")
+			out.Values[i] = graphql.MarshalString("EntityEvent")
 		case "streamID":
-			out.Values[i] = ec._EntityEventsPayload_streamID(ctx, field, obj)
+			out.Values[i] = ec._EntityEvent_streamID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
 		case "entityID":
-			out.Values[i] = ec._EntityEventsPayload_entityID(ctx, field, obj)
+			out.Values[i] = ec._EntityEvent_entityID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
 		case "type":
-			out.Values[i] = ec._EntityEventsPayload_type(ctx, field, obj)
+			out.Values[i] = ec._EntityEvent_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -3026,11 +3026,11 @@ func (ec *executionContext) _EntityEventsPayload(ctx context.Context, sel ast.Se
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _EntityEventsPayload_streamID(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+func (ec *executionContext) _EntityEvent_streamID(ctx context.Context, field graphql.CollectedField, obj *EntityEvent) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "EntityEventsPayload",
+		Object: "EntityEvent",
 		Args:   nil,
 		Field:  field,
 	}
@@ -3053,11 +3053,11 @@ func (ec *executionContext) _EntityEventsPayload_streamID(ctx context.Context, f
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _EntityEventsPayload_entityID(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+func (ec *executionContext) _EntityEvent_entityID(ctx context.Context, field graphql.CollectedField, obj *EntityEvent) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "EntityEventsPayload",
+		Object: "EntityEvent",
 		Args:   nil,
 		Field:  field,
 	}
@@ -3080,11 +3080,11 @@ func (ec *executionContext) _EntityEventsPayload_entityID(ctx context.Context, f
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _EntityEventsPayload_type(ctx context.Context, field graphql.CollectedField, obj *EntityEventsPayload) graphql.Marshaler {
+func (ec *executionContext) _EntityEvent_type(ctx context.Context, field graphql.CollectedField, obj *EntityEvent) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "EntityEventsPayload",
+		Object: "EntityEvent",
 		Args:   nil,
 		Field:  field,
 	}
@@ -5323,11 +5323,11 @@ func (ec *executionContext) _Stream_entities(ctx context.Context, field graphql.
 	return arr1
 }
 
-var streamEventsPayloadImplementors = []string{"StreamEventsPayload"}
+var streamEventImplementors = []string{"StreamEvent"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _StreamEventsPayload(ctx context.Context, sel ast.SelectionSet, obj *StreamEventsPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, streamEventsPayloadImplementors)
+func (ec *executionContext) _StreamEvent(ctx context.Context, sel ast.SelectionSet, obj *StreamEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, streamEventImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
@@ -5336,14 +5336,14 @@ func (ec *executionContext) _StreamEventsPayload(ctx context.Context, sel ast.Se
 
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("StreamEventsPayload")
+			out.Values[i] = graphql.MarshalString("StreamEvent")
 		case "streamID":
-			out.Values[i] = ec._StreamEventsPayload_streamID(ctx, field, obj)
+			out.Values[i] = ec._StreamEvent_streamID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
 		case "type":
-			out.Values[i] = ec._StreamEventsPayload_type(ctx, field, obj)
+			out.Values[i] = ec._StreamEvent_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -5359,11 +5359,11 @@ func (ec *executionContext) _StreamEventsPayload(ctx context.Context, sel ast.Se
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _StreamEventsPayload_streamID(ctx context.Context, field graphql.CollectedField, obj *StreamEventsPayload) graphql.Marshaler {
+func (ec *executionContext) _StreamEvent_streamID(ctx context.Context, field graphql.CollectedField, obj *StreamEvent) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "StreamEventsPayload",
+		Object: "StreamEvent",
 		Args:   nil,
 		Field:  field,
 	}
@@ -5386,11 +5386,11 @@ func (ec *executionContext) _StreamEventsPayload_streamID(ctx context.Context, f
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _StreamEventsPayload_type(ctx context.Context, field graphql.CollectedField, obj *StreamEventsPayload) graphql.Marshaler {
+func (ec *executionContext) _StreamEvent_type(ctx context.Context, field graphql.CollectedField, obj *StreamEvent) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "StreamEventsPayload",
+		Object: "StreamEvent",
 		Args:   nil,
 		Field:  field,
 	}
@@ -5455,7 +5455,7 @@ func (ec *executionContext) _Subscription_streamEvents(ctx context.Context, fiel
 		}
 		var out graphql.OrderedMap
 		out.Add(field.Alias, func() graphql.Marshaler {
-			return ec._StreamEventsPayload(ctx, field.Selections, &res)
+			return ec._StreamEvent(ctx, field.Selections, &res)
 		}())
 		return &out
 	}
@@ -5480,7 +5480,7 @@ func (ec *executionContext) _Subscription_entityEvents(ctx context.Context, fiel
 		}
 		var out graphql.OrderedMap
 		out.Add(field.Alias, func() graphql.Marshaler {
-			return ec._EntityEventsPayload(ctx, field.Selections, &res)
+			return ec._EntityEvent(ctx, field.Selections, &res)
 		}())
 		return &out
 	}
@@ -7671,11 +7671,11 @@ type CraftingInfo {
 }
 
 type Subscription {
-  streamEvents: StreamEventsPayload!
-  entityEvents: EntityEventsPayload!
+  streamEvents: StreamEvent!
+  entityEvents: EntityEvent!
 }
 
-type StreamEventsPayload {
+type StreamEvent {
   streamID: Int!
   type: StreamEventType!
 }
@@ -7707,7 +7707,7 @@ type UpdateEnmity {
   enmity: Enmity!
 }
 
-type EntityEventsPayload {
+type EntityEvent {
   streamID: Int!
   entityID: Int!
   type: EntityEventType!

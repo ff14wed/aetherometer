@@ -144,11 +144,11 @@ type CraftingInfo {
 }
 
 type Subscription {
-  streamEvents: StreamEventsPayload!
-  entityEvents: EntityEventsPayload!
+  streamEvents: StreamEvent!
+  entityEvents: EntityEvent!
 }
 
-type StreamEventsPayload {
+type StreamEvent {
   streamID: Int!
   type: StreamEventType!
 }
@@ -180,7 +180,7 @@ type UpdateEnmity {
   enmity: Enmity!
 }
 
-type EntityEventsPayload {
+type EntityEvent {
   streamID: Int!
   entityID: Int!
   type: EntityEventType!
