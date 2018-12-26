@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -41,10 +42,10 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Action struct {
-		Id        func(childComplexity int) int
-		Name      func(childComplexity int) int
-		TargetId  func(childComplexity int) int
-		UseTimeMs func(childComplexity int) int
+		Id       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		TargetId func(childComplexity int) int
+		UseTime  func(childComplexity int) int
 	}
 
 	AddEntity struct {
@@ -58,8 +59,8 @@ type ComplexityRoot struct {
 	CastingInfo struct {
 		ActionId      func(childComplexity int) int
 		ActionName    func(childComplexity int) int
-		StartTimeMs   func(childComplexity int) int
-		CastTimeMs    func(childComplexity int) int
+		StartTime     func(childComplexity int) int
+		CastTime      func(childComplexity int) int
 		TargetId      func(childComplexity int) int
 		Location      func(childComplexity int) int
 		CastType      func(childComplexity int) int
@@ -124,11 +125,11 @@ type ComplexityRoot struct {
 	}
 
 	Location struct {
-		X             func(childComplexity int) int
-		Y             func(childComplexity int) int
-		Z             func(childComplexity int) int
-		Orientation   func(childComplexity int) int
-		LastUpdatedMs func(childComplexity int) int
+		X           func(childComplexity int) int
+		Y           func(childComplexity int) int
+		Z           func(childComplexity int) int
+		Orientation func(childComplexity int) int
+		LastUpdated func(childComplexity int) int
 	}
 
 	MapInfo struct {
@@ -176,24 +177,24 @@ type ComplexityRoot struct {
 	}
 
 	Resources struct {
-		Hp         func(childComplexity int) int
-		Mp         func(childComplexity int) int
-		Tp         func(childComplexity int) int
-		MaxHp      func(childComplexity int) int
-		MaxMp      func(childComplexity int) int
-		LastTickMs func(childComplexity int) int
+		Hp       func(childComplexity int) int
+		Mp       func(childComplexity int) int
+		Tp       func(childComplexity int) int
+		MaxHp    func(childComplexity int) int
+		MaxMp    func(childComplexity int) int
+		LastTick func(childComplexity int) int
 	}
 
 	Status struct {
-		Id            func(childComplexity int) int
-		Extra         func(childComplexity int) int
-		Name          func(childComplexity int) int
-		StartedTimeMs func(childComplexity int) int
-		DurationMs    func(childComplexity int) int
-		ActorId       func(childComplexity int) int
-		LastTickMs    func(childComplexity int) int
-		BaseDamage    func(childComplexity int) int
-		CritRate      func(childComplexity int) int
+		Id          func(childComplexity int) int
+		Extra       func(childComplexity int) int
+		Name        func(childComplexity int) int
+		StartedTime func(childComplexity int) int
+		Duration    func(childComplexity int) int
+		ActorId     func(childComplexity int) int
+		LastTick    func(childComplexity int) int
+		BaseDamage  func(childComplexity int) int
+		CritRate    func(childComplexity int) int
 	}
 
 	Stream struct {
@@ -385,12 +386,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Action.TargetId(childComplexity), true
 
-	case "Action.useTimeMs":
-		if e.complexity.Action.UseTimeMs == nil {
+	case "Action.useTime":
+		if e.complexity.Action.UseTime == nil {
 			break
 		}
 
-		return e.complexity.Action.UseTimeMs(childComplexity), true
+		return e.complexity.Action.UseTime(childComplexity), true
 
 	case "AddEntity.entity":
 		if e.complexity.AddEntity.Entity == nil {
@@ -420,19 +421,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CastingInfo.ActionName(childComplexity), true
 
-	case "CastingInfo.startTimeMs":
-		if e.complexity.CastingInfo.StartTimeMs == nil {
+	case "CastingInfo.startTime":
+		if e.complexity.CastingInfo.StartTime == nil {
 			break
 		}
 
-		return e.complexity.CastingInfo.StartTimeMs(childComplexity), true
+		return e.complexity.CastingInfo.StartTime(childComplexity), true
 
-	case "CastingInfo.castTimeMs":
-		if e.complexity.CastingInfo.CastTimeMs == nil {
+	case "CastingInfo.castTime":
+		if e.complexity.CastingInfo.CastTime == nil {
 			break
 		}
 
-		return e.complexity.CastingInfo.CastTimeMs(childComplexity), true
+		return e.complexity.CastingInfo.CastTime(childComplexity), true
 
 	case "CastingInfo.targetID":
 		if e.complexity.CastingInfo.TargetId == nil {
@@ -763,12 +764,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Location.Orientation(childComplexity), true
 
-	case "Location.lastUpdatedMs":
-		if e.complexity.Location.LastUpdatedMs == nil {
+	case "Location.lastUpdated":
+		if e.complexity.Location.LastUpdated == nil {
 			break
 		}
 
-		return e.complexity.Location.LastUpdatedMs(childComplexity), true
+		return e.complexity.Location.LastUpdated(childComplexity), true
 
 	case "MapInfo.key":
 		if e.complexity.MapInfo.Key == nil {
@@ -976,12 +977,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Resources.MaxMp(childComplexity), true
 
-	case "Resources.lastTickMs":
-		if e.complexity.Resources.LastTickMs == nil {
+	case "Resources.lastTick":
+		if e.complexity.Resources.LastTick == nil {
 			break
 		}
 
-		return e.complexity.Resources.LastTickMs(childComplexity), true
+		return e.complexity.Resources.LastTick(childComplexity), true
 
 	case "Status.id":
 		if e.complexity.Status.Id == nil {
@@ -1004,19 +1005,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Status.Name(childComplexity), true
 
-	case "Status.startedTimeMs":
-		if e.complexity.Status.StartedTimeMs == nil {
+	case "Status.startedTime":
+		if e.complexity.Status.StartedTime == nil {
 			break
 		}
 
-		return e.complexity.Status.StartedTimeMs(childComplexity), true
+		return e.complexity.Status.StartedTime(childComplexity), true
 
-	case "Status.durationMs":
-		if e.complexity.Status.DurationMs == nil {
+	case "Status.duration":
+		if e.complexity.Status.Duration == nil {
 			break
 		}
 
-		return e.complexity.Status.DurationMs(childComplexity), true
+		return e.complexity.Status.Duration(childComplexity), true
 
 	case "Status.actorID":
 		if e.complexity.Status.ActorId == nil {
@@ -1025,12 +1026,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Status.ActorId(childComplexity), true
 
-	case "Status.lastTickMs":
-		if e.complexity.Status.LastTickMs == nil {
+	case "Status.lastTick":
+		if e.complexity.Status.LastTick == nil {
 			break
 		}
 
-		return e.complexity.Status.LastTickMs(childComplexity), true
+		return e.complexity.Status.LastTick(childComplexity), true
 
 	case "Status.baseDamage":
 		if e.complexity.Status.BaseDamage == nil {
@@ -1284,8 +1285,8 @@ func (ec *executionContext) _Action(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "useTimeMs":
-			out.Values[i] = ec._Action_useTimeMs(ctx, field, obj)
+		case "useTime":
+			out.Values[i] = ec._Action_useTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -1382,7 +1383,7 @@ func (ec *executionContext) _Action_targetID(ctx context.Context, field graphql.
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Action_useTimeMs(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+func (ec *executionContext) _Action_useTime(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1394,7 +1395,7 @@ func (ec *executionContext) _Action_useTimeMs(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UseTimeMs, nil
+		return obj.UseTime, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1402,10 +1403,10 @@ func (ec *executionContext) _Action_useTimeMs(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 var addEntityImplementors = []string{"AddEntity"}
@@ -1548,13 +1549,13 @@ func (ec *executionContext) _CastingInfo(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "startTimeMs":
-			out.Values[i] = ec._CastingInfo_startTimeMs(ctx, field, obj)
+		case "startTime":
+			out.Values[i] = ec._CastingInfo_startTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "castTimeMs":
-			out.Values[i] = ec._CastingInfo_castTimeMs(ctx, field, obj)
+		case "castTime":
+			out.Values[i] = ec._CastingInfo_castTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -1654,7 +1655,7 @@ func (ec *executionContext) _CastingInfo_actionName(ctx context.Context, field g
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CastingInfo_startTimeMs(ctx context.Context, field graphql.CollectedField, obj *CastingInfo) graphql.Marshaler {
+func (ec *executionContext) _CastingInfo_startTime(ctx context.Context, field graphql.CollectedField, obj *CastingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1666,7 +1667,7 @@ func (ec *executionContext) _CastingInfo_startTimeMs(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.StartTimeMs, nil
+		return obj.StartTime, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1674,14 +1675,14 @@ func (ec *executionContext) _CastingInfo_startTimeMs(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CastingInfo_castTimeMs(ctx context.Context, field graphql.CollectedField, obj *CastingInfo) graphql.Marshaler {
+func (ec *executionContext) _CastingInfo_castTime(ctx context.Context, field graphql.CollectedField, obj *CastingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1693,7 +1694,7 @@ func (ec *executionContext) _CastingInfo_castTimeMs(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CastTimeMs, nil
+		return obj.CastTime, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1701,10 +1702,10 @@ func (ec *executionContext) _CastingInfo_castTimeMs(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 // nolint: vetshadow
@@ -3341,8 +3342,8 @@ func (ec *executionContext) _Location(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "lastUpdatedMs":
-			out.Values[i] = ec._Location_lastUpdatedMs(ctx, field, obj)
+		case "lastUpdated":
+			out.Values[i] = ec._Location_lastUpdated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -3466,7 +3467,7 @@ func (ec *executionContext) _Location_orientation(ctx context.Context, field gra
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Location_lastUpdatedMs(ctx context.Context, field graphql.CollectedField, obj *Location) graphql.Marshaler {
+func (ec *executionContext) _Location_lastUpdated(ctx context.Context, field graphql.CollectedField, obj *Location) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -3478,7 +3479,7 @@ func (ec *executionContext) _Location_lastUpdatedMs(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastUpdatedMs, nil
+		return obj.LastUpdated, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3486,10 +3487,10 @@ func (ec *executionContext) _Location_lastUpdatedMs(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 var mapInfoImplementors = []string{"MapInfo"}
@@ -4603,8 +4604,8 @@ func (ec *executionContext) _Resources(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "lastTickMs":
-			out.Values[i] = ec._Resources_lastTickMs(ctx, field, obj)
+		case "lastTick":
+			out.Values[i] = ec._Resources_lastTick(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -4755,7 +4756,7 @@ func (ec *executionContext) _Resources_maxMP(ctx context.Context, field graphql.
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Resources_lastTickMs(ctx context.Context, field graphql.CollectedField, obj *Resources) graphql.Marshaler {
+func (ec *executionContext) _Resources_lastTick(ctx context.Context, field graphql.CollectedField, obj *Resources) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4767,7 +4768,7 @@ func (ec *executionContext) _Resources_lastTickMs(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastTickMs, nil
+		return obj.LastTick, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4775,10 +4776,10 @@ func (ec *executionContext) _Resources_lastTickMs(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 var statusImplementors = []string{"Status"}
@@ -4810,13 +4811,13 @@ func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "startedTimeMs":
-			out.Values[i] = ec._Status_startedTimeMs(ctx, field, obj)
+		case "startedTime":
+			out.Values[i] = ec._Status_startedTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "durationMs":
-			out.Values[i] = ec._Status_durationMs(ctx, field, obj)
+		case "duration":
+			out.Values[i] = ec._Status_duration(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -4825,8 +4826,8 @@ func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "lastTickMs":
-			out.Values[i] = ec._Status_lastTickMs(ctx, field, obj)
+		case "lastTick":
+			out.Values[i] = ec._Status_lastTick(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -4933,7 +4934,7 @@ func (ec *executionContext) _Status_name(ctx context.Context, field graphql.Coll
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Status_startedTimeMs(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
+func (ec *executionContext) _Status_startedTime(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4945,7 +4946,7 @@ func (ec *executionContext) _Status_startedTimeMs(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.StartedTimeMs, nil
+		return obj.StartedTime, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4953,14 +4954,14 @@ func (ec *executionContext) _Status_startedTimeMs(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Status_durationMs(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
+func (ec *executionContext) _Status_duration(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -4972,7 +4973,7 @@ func (ec *executionContext) _Status_durationMs(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DurationMs, nil
+		return obj.Duration, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4980,10 +4981,10 @@ func (ec *executionContext) _Status_durationMs(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 // nolint: vetshadow
@@ -5014,7 +5015,7 @@ func (ec *executionContext) _Status_actorID(ctx context.Context, field graphql.C
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Status_lastTickMs(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
+func (ec *executionContext) _Status_lastTick(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -5026,7 +5027,7 @@ func (ec *executionContext) _Status_lastTickMs(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastTickMs, nil
+		return obj.LastTick, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -5034,10 +5035,10 @@ func (ec *executionContext) _Status_lastTickMs(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalTimestamp(res)
 }
 
 // nolint: vetshadow
@@ -7757,7 +7758,7 @@ type Resources {
 	tp: Int!
 	maxHP: Int!
 	maxMP: Int!
-	lastTickMs: Int!
+	lastTick: Timestamp!
 }
 
 type Location {
@@ -7765,24 +7766,24 @@ type Location {
   y: Float!
   z: Float!
   orientation: Float!
-  lastUpdatedMs: Int!
+  lastUpdated: Timestamp!
 }
 
 type Action {
   id: Int!
   name: String!
   targetID: Int!
-  useTimeMs: Int!
+  useTime: Timestamp!
 }
 
 type Status {
   id: Int!
   extra: Int!
   name: String!
-  startedTimeMs: Int!
-  durationMs: Int!
+  startedTime: Timestamp!
+  duration: Timestamp!
   actorID: Int!
-  lastTickMs: Int!
+  lastTick: Timestamp!
 
   baseDamage: Int!
   critRate: Int!
@@ -7791,8 +7792,8 @@ type Status {
 type CastingInfo {
 	actionID: Int!
 	actionName: String!
-	startTimeMs: Int!
-	castTimeMs: Int!
+	startTime: Timestamp!
+	castTime: Timestamp!
 	targetID: Int!
   location: Location!
 
@@ -7911,5 +7912,7 @@ type UpdateLocation {
 type UpdateResources {
   resources: Resources!
 }
+
+scalar Timestamp
 `},
 )

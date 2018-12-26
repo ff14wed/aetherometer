@@ -1,7 +1,9 @@
 package models_test
 
 import (
+	"bytes"
 	"context"
+	"time"
 
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/models/modelsfakes"
@@ -191,6 +193,16 @@ var _ = Describe("Models", func() {
 					models.Entity{ID: 2, Name: "Baah"},
 				}))
 			})
+		})
+	})
+
+	Describe("Timestamp", func() {
+		It("marshals the provided time to the time since the Unix epoch in milliseconds", func() {
+			t := time.Unix(101, 302000000)
+			m := models.MarshalTimestamp(t)
+			b := new(bytes.Buffer)
+			m.MarshalGQL(b)
+			Expect(b.String()).To(Equal("101302"))
 		})
 	})
 })

@@ -2,11 +2,15 @@
 
 package models
 
+import (
+	"time"
+)
+
 type Action struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	TargetID  int    `json:"targetID"`
-	UseTimeMs int    `json:"useTimeMs"`
+	ID       int       `json:"id"`
+	Name     string    `json:"name"`
+	TargetID int       `json:"targetID"`
+	UseTime  time.Time `json:"useTime"`
 }
 
 type AddEntity struct {
@@ -22,16 +26,16 @@ type AddStream struct {
 func (AddStream) IsStreamEventType() {}
 
 type CastingInfo struct {
-	ActionID      int      `json:"actionID"`
-	ActionName    string   `json:"actionName"`
-	StartTimeMs   int      `json:"startTimeMs"`
-	CastTimeMs    int      `json:"castTimeMs"`
-	TargetID      int      `json:"targetID"`
-	Location      Location `json:"location"`
-	CastType      int      `json:"castType"`
-	EffectRange   int      `json:"effectRange"`
-	XAxisModifier int      `json:"xAxisModifier"`
-	Omen          string   `json:"omen"`
+	ActionID      int       `json:"actionID"`
+	ActionName    string    `json:"actionName"`
+	StartTime     time.Time `json:"startTime"`
+	CastTime      time.Time `json:"castTime"`
+	TargetID      int       `json:"targetID"`
+	Location      Location  `json:"location"`
+	CastType      int       `json:"castType"`
+	EffectRange   int       `json:"effectRange"`
+	XAxisModifier int       `json:"xAxisModifier"`
+	Omen          string    `json:"omen"`
 }
 
 type CraftingInfo struct {
@@ -94,11 +98,11 @@ type HateRanking struct {
 }
 
 type Location struct {
-	X             float64 `json:"x"`
-	Y             float64 `json:"y"`
-	Z             float64 `json:"z"`
-	Orientation   float64 `json:"orientation"`
-	LastUpdatedMs int     `json:"lastUpdatedMs"`
+	X           float64   `json:"x"`
+	Y           float64   `json:"y"`
+	Z           float64   `json:"z"`
+	Orientation float64   `json:"orientation"`
+	LastUpdated time.Time `json:"lastUpdated"`
 }
 
 type MapInfo struct {
@@ -146,24 +150,24 @@ type RemoveStream struct {
 func (RemoveStream) IsStreamEventType() {}
 
 type Resources struct {
-	Hp         int `json:"hp"`
-	Mp         int `json:"mp"`
-	Tp         int `json:"tp"`
-	MaxHP      int `json:"maxHP"`
-	MaxMP      int `json:"maxMP"`
-	LastTickMs int `json:"lastTickMs"`
+	Hp       int       `json:"hp"`
+	Mp       int       `json:"mp"`
+	Tp       int       `json:"tp"`
+	MaxHP    int       `json:"maxHP"`
+	MaxMP    int       `json:"maxMP"`
+	LastTick time.Time `json:"lastTick"`
 }
 
 type Status struct {
-	ID            int    `json:"id"`
-	Extra         int    `json:"extra"`
-	Name          string `json:"name"`
-	StartedTimeMs int    `json:"startedTimeMs"`
-	DurationMs    int    `json:"durationMs"`
-	ActorID       int    `json:"actorID"`
-	LastTickMs    int    `json:"lastTickMs"`
-	BaseDamage    int    `json:"baseDamage"`
-	CritRate      int    `json:"critRate"`
+	ID          int       `json:"id"`
+	Extra       int       `json:"extra"`
+	Name        string    `json:"name"`
+	StartedTime time.Time `json:"startedTime"`
+	Duration    time.Time `json:"duration"`
+	ActorID     int       `json:"actorID"`
+	LastTick    time.Time `json:"lastTick"`
+	BaseDamage  int       `json:"baseDamage"`
+	CritRate    int       `json:"critRate"`
 }
 
 type StreamEvent struct {

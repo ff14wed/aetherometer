@@ -3,6 +3,11 @@ package models
 import (
 	"context"
 	"fmt"
+	"io"
+	"strconv"
+	"time"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 //go:generate go run ../scripts/gqlgen.go -v
@@ -103,4 +108,16 @@ func (s *Stream) Entities() []Entity {
 		entities[i] = s.EntitiesMap[k]
 	}
 	return entities
+}
+
+// MarshalTimestamp converts the provided time to milliseconds since the Unix
+// epoch.
+func MarshalTimestamp(t time.Time) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		io.WriteString(w, strconv.FormatInt(getTimeInMs(t), 10))
+	})
+}
+
+func getTimeInMs(t time.Time) int64 {
+	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }

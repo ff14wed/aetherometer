@@ -84,7 +84,7 @@ type Resources {
 	tp: Int!
 	maxHP: Int!
 	maxMP: Int!
-	lastTickMs: Int!
+	lastTick: Timestamp!
 }
 
 type Location {
@@ -92,24 +92,24 @@ type Location {
   y: Float!
   z: Float!
   orientation: Float!
-  lastUpdatedMs: Int!
+  lastUpdated: Timestamp!
 }
 
 type Action {
   id: Int!
   name: String!
   targetID: Int!
-  useTimeMs: Int!
+  useTime: Timestamp!
 }
 
 type Status {
   id: Int!
   extra: Int!
   name: String!
-  startedTimeMs: Int!
-  durationMs: Int!
+  startedTime: Timestamp!
+  duration: Timestamp!
   actorID: Int!
-  lastTickMs: Int!
+  lastTick: Timestamp!
 
   baseDamage: Int!
   critRate: Int!
@@ -118,8 +118,8 @@ type Status {
 type CastingInfo {
 	actionID: Int!
 	actionName: String!
-	startTimeMs: Int!
-	castTimeMs: Int!
+	startTime: Timestamp!
+	castTime: Timestamp!
 	targetID: Int!
   location: Location!
 
@@ -238,3 +238,5 @@ type UpdateLocation {
 type UpdateResources {
   resources: Resources!
 }
+
+scalar Timestamp
