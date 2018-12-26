@@ -211,11 +211,23 @@ type UpdateLastAction struct {
 
 func (UpdateLastAction) IsEntityEventType() {}
 
+type UpdateLocation struct {
+	Location Location `json:"location"`
+}
+
+func (UpdateLocation) IsEntityEventType() {}
+
 type UpdateMap struct {
 	Place Place `json:"place"`
 }
 
 func (UpdateMap) IsStreamEventType() {}
+
+type UpdateResources struct {
+	Resources Resources `json:"resources"`
+}
+
+func (UpdateResources) IsEntityEventType() {}
 
 type UpsertStatus struct {
 	Index  int    `json:"index"`

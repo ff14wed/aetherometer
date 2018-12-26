@@ -239,8 +239,16 @@ type ComplexityRoot struct {
 		Action func(childComplexity int) int
 	}
 
+	UpdateLocation struct {
+		Location func(childComplexity int) int
+	}
+
 	UpdateMap struct {
 		Place func(childComplexity int) int
+	}
+
+	UpdateResources struct {
+		Resources func(childComplexity int) int
 	}
 
 	UpsertStatus struct {
@@ -1150,12 +1158,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateLastAction.Action(childComplexity), true
 
+	case "UpdateLocation.location":
+		if e.complexity.UpdateLocation.Location == nil {
+			break
+		}
+
+		return e.complexity.UpdateLocation.Location(childComplexity), true
+
 	case "UpdateMap.place":
 		if e.complexity.UpdateMap.Place == nil {
 			break
 		}
 
 		return e.complexity.UpdateMap.Place(childComplexity), true
+
+	case "UpdateResources.resources":
+		if e.complexity.UpdateResources.Resources == nil {
+			break
+		}
+
+		return e.complexity.UpdateResources.Resources(childComplexity), true
 
 	case "UpsertStatus.index":
 		if e.complexity.UpsertStatus.Index == nil {
@@ -5832,6 +5854,64 @@ func (ec *executionContext) _UpdateLastAction_action(ctx context.Context, field 
 	return ec._Action(ctx, field.Selections, &res)
 }
 
+var updateLocationImplementors = []string{"UpdateLocation"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateLocation(ctx context.Context, sel ast.SelectionSet, obj *UpdateLocation) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateLocationImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateLocation")
+		case "location":
+			out.Values[i] = ec._UpdateLocation_location(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateLocation_location(ctx context.Context, field graphql.CollectedField, obj *UpdateLocation) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateLocation",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Location)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Location(ctx, field.Selections, &res)
+}
+
 var updateMapImplementors = []string{"UpdateMap"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -5888,6 +5968,64 @@ func (ec *executionContext) _UpdateMap_place(ctx context.Context, field graphql.
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._Place(ctx, field.Selections, &res)
+}
+
+var updateResourcesImplementors = []string{"UpdateResources"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateResources(ctx context.Context, sel ast.SelectionSet, obj *UpdateResources) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateResourcesImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateResources")
+		case "resources":
+			out.Values[i] = ec._UpdateResources_resources(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateResources_resources(ctx context.Context, field graphql.CollectedField, obj *UpdateResources) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateResources",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resources, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Resources)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Resources(ctx, field.Selections, &res)
 }
 
 var upsertStatusImplementors = []string{"UpsertStatus"}
@@ -7461,6 +7599,14 @@ func (ec *executionContext) _EntityEventType(ctx context.Context, sel ast.Select
 		return ec._RemoveStatus(ctx, sel, &obj)
 	case *RemoveStatus:
 		return ec._RemoveStatus(ctx, sel, obj)
+	case UpdateLocation:
+		return ec._UpdateLocation(ctx, sel, &obj)
+	case *UpdateLocation:
+		return ec._UpdateLocation(ctx, sel, obj)
+	case UpdateResources:
+		return ec._UpdateResources(ctx, sel, &obj)
+	case *UpdateResources:
+		return ec._UpdateResources(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -7721,7 +7867,9 @@ union EntityEventType =
   UpdateLastAction |
   UpdateCastingInfo |
   UpsertStatus |
-  RemoveStatus
+  RemoveStatus |
+  UpdateLocation |
+  UpdateResources
 
 type AddEntity {
   entity: Entity!
@@ -7754,6 +7902,14 @@ type UpsertStatus {
 
 type RemoveStatus {
   index: Int!
+}
+
+type UpdateLocation {
+  location: Location!
+}
+
+type UpdateResources {
+  resources: Resources!
 }
 `},
 )

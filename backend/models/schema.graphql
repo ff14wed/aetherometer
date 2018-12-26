@@ -194,7 +194,9 @@ union EntityEventType =
   UpdateLastAction |
   UpdateCastingInfo |
   UpsertStatus |
-  RemoveStatus
+  RemoveStatus |
+  UpdateLocation |
+  UpdateResources
 
 type AddEntity {
   entity: Entity!
@@ -227,4 +229,12 @@ type UpsertStatus {
 
 type RemoveStatus {
   index: Int!
+}
+
+type UpdateLocation {
+  location: Location!
+}
+
+type UpdateResources {
+  resources: Resources!
 }
