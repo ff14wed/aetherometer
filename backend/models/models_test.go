@@ -3,6 +3,7 @@ package models_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/models"
@@ -28,11 +29,11 @@ var _ = Describe("Models", func() {
 				StreamsMap: map[int]*models.Stream{
 					1234: &models.Stream{
 						Pid: 1234,
-						EntitiesMap: map[int]*models.Entity{
+						EntitiesMap: map[uint64]*models.Entity{
 							1: &models.Entity{ID: 1, Name: "FooBar"},
 							2: &models.Entity{ID: 2, Name: "Baah"},
 						},
-						EntitiesKeys: []int{1, 2},
+						EntitiesKeys: []uint64{1, 2},
 					},
 					5678: &models.Stream{Pid: 5678},
 				},
@@ -167,11 +168,11 @@ var _ = Describe("Models", func() {
 		BeforeEach(func() {
 			stream = &models.Stream{
 				Pid: 1234,
-				EntitiesMap: map[int]*models.Entity{
+				EntitiesMap: map[uint64]*models.Entity{
 					1: &models.Entity{ID: 1, Name: "FooBar"},
 					2: &models.Entity{ID: 2, Name: "Baah"},
 				},
-				EntitiesKeys: []int{1, 2},
+				EntitiesKeys: []uint64{1, 2},
 			}
 		})
 
@@ -203,6 +204,38 @@ var _ = Describe("Models", func() {
 			b := new(bytes.Buffer)
 			m.MarshalGQL(b)
 			Expect(b.String()).To(Equal("101302"))
+		})
+	})
+
+	Describe("Uint", func() {
+		It("marshals the provided uint to string", func() {
+			m := models.MarshalUint(123456789000000)
+			b := new(bytes.Buffer)
+			m.MarshalGQL(b)
+			Expect(b.String()).To(Equal("123456789000000"))
+		})
+
+		It("unmarshals the string to the expected uint", func() {
+			u, err := models.UnmarshalUint("123456789000000")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(u).To(Equal(uint64(123456789000000)))
+		})
+
+		It("unmarshals the JSON number to the expected uint", func() {
+			u, err := models.UnmarshalUint(json.Number("123456789000000"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(u).To(Equal(uint64(123456789000000)))
+		})
+
+		It("unmarshals the integers to the expected uint", func() {
+			u, err := models.UnmarshalUint(123456789)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(u).To(Equal(uint64(123456789)))
+		})
+
+		It("errors if the data is not an integer type", func() {
+			_, err := models.UnmarshalUint(1.2)
+			Expect(err).To(MatchError(MatchRegexp(`.* is not a supported integer type`)))
 		})
 	})
 })

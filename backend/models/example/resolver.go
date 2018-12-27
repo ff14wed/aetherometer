@@ -23,7 +23,7 @@ func (r *queryResolver) Streams(ctx context.Context) ([]models.Stream, error) {
 func (r *queryResolver) Stream(ctx context.Context, streamID int) (models.Stream, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID int) (models.Entity, error) {
+func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (models.Entity, error) {
 	panic("not implemented")
 }
 

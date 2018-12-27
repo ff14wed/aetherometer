@@ -34,7 +34,7 @@ func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
 func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error) {
 	return r.db.Stream(streamID)
 }
-func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID int) (Entity, error) {
+func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error) {
 	return r.db.Entity(streamID, entityID)
 }
 

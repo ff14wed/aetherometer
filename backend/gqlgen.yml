@@ -15,3 +15,5 @@ models:
     model: github.com/ff14wed/sibyl/backend/models.Stream
   Timestamp:
     model: github.com/ff14wed/sibyl/backend/models.Timestamp
+  Uint:
+    model: github.com/ff14wed/sibyl/backend/models.Uint

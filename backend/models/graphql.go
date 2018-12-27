@@ -161,7 +161,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Streams func(childComplexity int) int
 		Stream  func(childComplexity int, streamID int) int
-		Entity  func(childComplexity int, streamID int, entityID int) int
+		Entity  func(childComplexity int, streamID int, entityID uint64) int
 	}
 
 	RemoveEntity struct {
@@ -261,7 +261,7 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	Streams(ctx context.Context) ([]Stream, error)
 	Stream(ctx context.Context, streamID int) (Stream, error)
-	Entity(ctx context.Context, streamID int, entityID int) (Entity, error)
+	Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error)
 }
 type SubscriptionResolver interface {
 	StreamEvents(ctx context.Context) (<-chan StreamEvent, error)
@@ -294,10 +294,10 @@ func field_Query_entity_args(rawArgs map[string]interface{}) (map[string]interfa
 		}
 	}
 	args["streamID"] = arg0
-	var arg1 int
+	var arg1 uint64
 	if tmp, ok := rawArgs["entityID"]; ok {
 		var err error
-		arg1, err = graphql.UnmarshalInt(tmp)
+		arg1, err = UnmarshalUint(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -919,7 +919,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Entity(childComplexity, args["streamID"].(int), args["entityID"].(int)), true
+		return e.complexity.Query.Entity(childComplexity, args["streamID"].(int), args["entityID"].(uint64)), true
 
 	case "RemoveEntity.id":
 		if e.complexity.RemoveEntity.Id == nil {
@@ -1376,10 +1376,10 @@ func (ec *executionContext) _Action_targetID(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -1729,10 +1729,10 @@ func (ec *executionContext) _CastingInfo_targetID(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -2525,10 +2525,10 @@ func (ec *executionContext) _Entity_id(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -2606,10 +2606,10 @@ func (ec *executionContext) _Entity_targetID(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -2633,10 +2633,10 @@ func (ec *executionContext) _Entity_ownerID(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -3096,10 +3096,10 @@ func (ec *executionContext) _EntityEvent_entityID(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -3186,10 +3186,10 @@ func (ec *executionContext) _HateEntry_enemyID(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -3275,10 +3275,10 @@ func (ec *executionContext) _HateRanking_actorID(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -4315,7 +4315,7 @@ func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Entity(rctx, args["streamID"].(int), args["entityID"].(int))
+		return ec.resolvers.Query().Entity(rctx, args["streamID"].(int), args["entityID"].(uint64))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -4445,10 +4445,10 @@ func (ec *executionContext) _RemoveEntity_id(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 var removeStatusImplementors = []string{"RemoveStatus"}
@@ -5008,10 +5008,10 @@ func (ec *executionContext) _Status_actorID(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -5195,10 +5195,10 @@ func (ec *executionContext) _Stream_myEntityID(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 // nolint: vetshadow
@@ -5791,10 +5791,10 @@ func (ec *executionContext) _UpdateEntityTarget_targetID(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return MarshalUint(res)
 }
 
 var updateLastActionImplementors = []string{"UpdateLastAction"}
@@ -7675,12 +7675,12 @@ var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "models/schema.graphql", Input: `type Query {
   streams: [Stream!]!
   stream(streamID: Int!): Stream!
-  entity(streamID: Int!, entityID: Int!): Entity!
+  entity(streamID: Int!, entityID: Uint!): Entity!
 }
 
 type Stream {
   pid: Int!
-  myEntityID: Int!
+  myEntityID: Uint!
 
   place: Place!
   enmity: Enmity!
@@ -7712,11 +7712,11 @@ type Enmity {
 }
 
 type Entity {
-  id: Int!
+  id: Uint!
   index: Int!
   name: String!
-  targetID: Int!
-  ownerID: Int!
+  targetID: Uint!
+  ownerID: Uint!
   level: Int!
   class: Int!
   isNPC: Boolean!
@@ -7734,12 +7734,12 @@ type Entity {
 }
 
 type HateRanking {
-  actorID: Int!
+  actorID: Uint!
   hate: Int!
 }
 
 type HateEntry {
-  enemyID: Int!
+  enemyID: Uint!
   hatePercent: Int!
 }
 
@@ -7772,7 +7772,7 @@ type Location {
 type Action {
   id: Int!
   name: String!
-  targetID: Int!
+  targetID: Uint!
   useTime: Timestamp!
 }
 
@@ -7782,7 +7782,7 @@ type Status {
   name: String!
   startedTime: Timestamp!
   duration: Timestamp!
-  actorID: Int!
+  actorID: Uint!
   lastTick: Timestamp!
 
   baseDamage: Int!
@@ -7794,7 +7794,7 @@ type CastingInfo {
 	actionName: String!
 	startTime: Timestamp!
 	castTime: Timestamp!
-	targetID: Int!
+	targetID: Uint!
   location: Location!
 
 	castType: Int!
@@ -7856,7 +7856,7 @@ type UpdateEnmity {
 
 type EntityEvent {
   streamID: Int!
-  entityID: Int!
+  entityID: Uint!
   type: EntityEventType!
 }
 
@@ -7877,11 +7877,11 @@ type AddEntity {
 }
 
 type RemoveEntity {
-  id: Int!
+  id: Uint!
 }
 
 type UpdateEntityTarget {
-  targetID: Int!
+  targetID: Uint!
 }
 
 type UpdateEntityClass {
@@ -7914,5 +7914,6 @@ type UpdateResources {
 }
 
 scalar Timestamp
+scalar Uint
 `},
 )

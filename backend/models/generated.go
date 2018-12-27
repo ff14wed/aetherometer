@@ -9,7 +9,7 @@ import (
 type Action struct {
 	ID       int       `json:"id"`
 	Name     string    `json:"name"`
-	TargetID int       `json:"targetID"`
+	TargetID uint64    `json:"targetID"`
 	UseTime  time.Time `json:"useTime"`
 }
 
@@ -30,7 +30,7 @@ type CastingInfo struct {
 	ActionName    string    `json:"actionName"`
 	StartTime     time.Time `json:"startTime"`
 	CastTime      time.Time `json:"castTime"`
-	TargetID      int       `json:"targetID"`
+	TargetID      uint64    `json:"targetID"`
 	Location      Location  `json:"location"`
 	CastType      int       `json:"castType"`
 	EffectRange   int       `json:"effectRange"`
@@ -58,11 +58,11 @@ type Enmity struct {
 }
 
 type Entity struct {
-	ID               int          `json:"id"`
+	ID               uint64       `json:"id"`
 	Index            int          `json:"index"`
 	Name             string       `json:"name"`
-	TargetID         int          `json:"targetID"`
-	OwnerID          int          `json:"ownerID"`
+	TargetID         uint64       `json:"targetID"`
+	OwnerID          uint64       `json:"ownerID"`
 	Level            int          `json:"level"`
 	Class            int          `json:"class"`
 	IsNPC            bool         `json:"isNPC"`
@@ -79,7 +79,7 @@ type Entity struct {
 
 type EntityEvent struct {
 	StreamID int             `json:"streamID"`
-	EntityID int             `json:"entityID"`
+	EntityID uint64          `json:"entityID"`
 	Type     EntityEventType `json:"type"`
 }
 
@@ -88,13 +88,13 @@ type EntityEventType interface {
 }
 
 type HateEntry struct {
-	EnemyID     int `json:"enemyID"`
-	HatePercent int `json:"hatePercent"`
+	EnemyID     uint64 `json:"enemyID"`
+	HatePercent int    `json:"hatePercent"`
 }
 
 type HateRanking struct {
-	ActorID int `json:"actorID"`
-	Hate    int `json:"hate"`
+	ActorID uint64 `json:"actorID"`
+	Hate    int    `json:"hate"`
 }
 
 type Location struct {
@@ -132,7 +132,7 @@ type Place struct {
 }
 
 type RemoveEntity struct {
-	ID int `json:"id"`
+	ID uint64 `json:"id"`
 }
 
 func (RemoveEntity) IsEntityEventType() {}
@@ -164,7 +164,7 @@ type Status struct {
 	Name        string    `json:"name"`
 	StartedTime time.Time `json:"startedTime"`
 	Duration    time.Time `json:"duration"`
-	ActorID     int       `json:"actorID"`
+	ActorID     uint64    `json:"actorID"`
 	LastTick    time.Time `json:"lastTick"`
 	BaseDamage  int       `json:"baseDamage"`
 	CritRate    int       `json:"critRate"`
@@ -204,7 +204,7 @@ type UpdateEntityClass struct {
 func (UpdateEntityClass) IsEntityEventType() {}
 
 type UpdateEntityTarget struct {
-	TargetID int `json:"targetID"`
+	TargetID uint64 `json:"targetID"`
 }
 
 func (UpdateEntityTarget) IsEntityEventType() {}

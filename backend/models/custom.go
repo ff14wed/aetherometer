@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -44,7 +45,7 @@ func (db *DB) Stream(streamID int) (Stream, error) {
 // Entity returns a specific entity in a specific from the store, queried by
 // streamID and entityID. It returns an error if the stream ID is not found or
 // if the entityID is not found in the stream.
-func (db *DB) Entity(streamID int, entityID int) (Entity, error) {
+func (db *DB) Entity(streamID int, entityID uint64) (Entity, error) {
 	s, err := db.Stream(streamID)
 	if err != nil {
 		return Entity{}, err
@@ -81,19 +82,19 @@ func (db *DB) EntityEvents(ctx context.Context) (<-chan EntityEvent, error) {
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
 type Stream struct {
-	Pid        int `json:"pid"`
-	MyEntityID int `json:"myEntityID"`
+	Pid        int    `json:"pid"`
+	MyEntityID uint64 `json:"myEntityID"`
 
 	Place        Place         `json:"place"`
 	Enmity       Enmity        `json:"enmity"`
 	CraftingInfo *CraftingInfo `json:"craftingInfo"`
 
-	EntitiesMap  map[int]*Entity `json:"entities"`
-	EntitiesKeys []int
+	EntitiesMap  map[uint64]*Entity `json:"entities"`
+	EntitiesKeys []uint64
 }
 
 // Entity returns a specific entity from the stream, queried by entityID.
-func (s *Stream) Entity(entityID int) (Entity, error) {
+func (s *Stream) Entity(entityID uint64) (Entity, error) {
 	e, ok := s.EntitiesMap[entityID]
 	if !ok {
 		return Entity{}, fmt.Errorf("entity ID %d not found", entityID)
@@ -120,4 +121,34 @@ func MarshalTimestamp(t time.Time) graphql.Marshaler {
 
 func getTimeInMs(t time.Time) int64 {
 	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
+}
+
+// MarshalUint marshals the provided uint64 to a string
+func MarshalUint(u uint64) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		io.WriteString(w, strconv.FormatUint(u, 10))
+	})
+}
+
+func UnmarshalUint(v interface{}) (uint64, error) {
+	switch v := v.(type) {
+	case string:
+		return strconv.ParseUint(v, 10, 64)
+	case int:
+		return uint64(v), nil
+	case int32:
+		return uint64(v), nil
+	case int64:
+		return uint64(v), nil
+	case uint:
+		return uint64(v), nil
+	case uint32:
+		return uint64(v), nil
+	case uint64:
+		return v, nil
+	case json.Number:
+		return strconv.ParseUint(string(v), 10, 64)
+	default:
+		return 0, fmt.Errorf("%T is not a supported integer type", v)
+	}
 }
