@@ -51,9 +51,9 @@ func (d *testFrameDecoder) Decode(buf *bufio.Reader) (*xivnet.Frame, error) {
 	if string(token[0:4]) != "PRE-" {
 		return nil, xivnet.ErrInvalidHeader
 	}
-	key := string(token[4:7])
+	key := token[4:7]
 	_, _ = buf.Discard(7)
-	if f, ok := testFrames[key]; ok {
+	if f, ok := testFrames[string(key)]; ok {
 		return f, nil
 	}
 	return nil, errors.New("invalid data")

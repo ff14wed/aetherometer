@@ -20,20 +20,20 @@ func newMailbox() mailbox {
 
 // Sorter sorts messages to the correct destination
 type Sorter struct {
-	mailboxes map[int]mailbox
+	mailboxes map[uint32]mailbox
 }
 
 // NewSorter creates a new sorter
 func NewSorter() *Sorter {
 	return &Sorter{
-		mailboxes: make(map[int]mailbox),
+		mailboxes: make(map[uint32]mailbox),
 	}
 }
 
 // Sort sorts each message into the correct buffer and returns the buffered
 // reader that received the new message.
 // If the buffer doesn't exist, it creates a new one.
-func (s *Sorter) Sort(dst int, message []byte) *bufio.Reader {
+func (s *Sorter) Sort(dst uint32, message []byte) *bufio.Reader {
 	if _, found := s.mailboxes[dst]; !found {
 		s.mailboxes[dst] = newMailbox()
 	}
