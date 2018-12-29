@@ -180,7 +180,7 @@ type StreamEventType interface {
 }
 
 type UpdateCastingInfo struct {
-	CastingInfo CastingInfo `json:"castingInfo"`
+	CastingInfo *CastingInfo `json:"castingInfo"`
 }
 
 func (UpdateCastingInfo) IsEntityEventType() {}

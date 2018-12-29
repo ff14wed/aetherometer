@@ -5525,9 +5525,6 @@ func (ec *executionContext) _UpdateCastingInfo(ctx context.Context, sel ast.Sele
 			out.Values[i] = graphql.MarshalString("UpdateCastingInfo")
 		case "castingInfo":
 			out.Values[i] = ec._UpdateCastingInfo_castingInfo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5555,16 +5552,17 @@ func (ec *executionContext) _UpdateCastingInfo_castingInfo(ctx context.Context, 
 		return obj.CastingInfo, nil
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(CastingInfo)
+	res := resTmp.(*CastingInfo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._CastingInfo(ctx, field.Selections, &res)
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._CastingInfo(ctx, field.Selections, res)
 }
 
 var updateClassImplementors = []string{"UpdateClass"}
@@ -7893,7 +7891,7 @@ type UpdateLastAction {
 }
 
 type UpdateCastingInfo {
-  castingInfo: CastingInfo!
+  castingInfo: CastingInfo
 }
 
 type UpsertStatus {

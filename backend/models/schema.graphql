@@ -219,7 +219,7 @@ type UpdateLastAction {
 }
 
 type UpdateCastingInfo {
-  castingInfo: CastingInfo!
+  castingInfo: CastingInfo
 }
 
 type UpsertStatus {
