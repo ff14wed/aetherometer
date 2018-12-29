@@ -14,7 +14,7 @@ func newMailbox() mailbox {
 	buffer := bytes.NewBuffer(nil)
 	return mailbox{
 		buffer: buffer,
-		reader: bufio.NewReader(buffer),
+		reader: bufio.NewReaderSize(buffer, 65536),
 	}
 }
 
