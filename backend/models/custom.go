@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strconv"
 	"time"
 
@@ -89,8 +90,7 @@ type Stream struct {
 	Enmity       Enmity        `json:"enmity"`
 	CraftingInfo *CraftingInfo `json:"craftingInfo"`
 
-	EntitiesMap  map[uint64]*Entity `json:"entities"`
-	EntitiesKeys []uint64
+	EntitiesMap map[uint64]*Entity `json:"entities"`
 }
 
 // Entity returns a specific entity from the stream, queried by entityID.
@@ -102,12 +102,15 @@ func (s *Stream) Entity(entityID uint64) (Entity, error) {
 	return *e, nil
 }
 
-// Entities returns all the entities from the stream.
+// Entities returns all the entities from the stream, sorted in order by index.
 func (s *Stream) Entities() []Entity {
-	entities := make([]Entity, len(s.EntitiesKeys))
-	for i, k := range s.EntitiesKeys {
-		entities[i] = *s.EntitiesMap[k]
+	var entities []Entity
+	for _, e := range s.EntitiesMap {
+		entities = append(entities, *e)
 	}
+	sort.SliceStable(entities, func(i, j int) bool {
+		return entities[i].Index < entities[j].Index
+	})
 	return entities
 }
 

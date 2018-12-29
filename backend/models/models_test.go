@@ -30,10 +30,9 @@ var _ = Describe("Models", func() {
 					1234: &models.Stream{
 						Pid: 1234,
 						EntitiesMap: map[uint64]*models.Entity{
-							1: &models.Entity{ID: 1, Name: "FooBar"},
-							2: &models.Entity{ID: 2, Name: "Baah"},
+							1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
+							2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
 						},
-						EntitiesKeys: []uint64{1, 2},
 					},
 					5678: &models.Stream{Pid: 5678},
 				},
@@ -65,7 +64,7 @@ var _ = Describe("Models", func() {
 
 		Describe("Entity", func() {
 			It("returns the requested entity from the database", func() {
-				Expect(db.Entity(1234, 1)).To(Equal(models.Entity{ID: 1, Name: "FooBar"}))
+				Expect(db.Entity(1234, 1)).To(Equal(models.Entity{ID: 1, Name: "FooBar", Index: 2}))
 			})
 
 			It("returns an error if the requested stream does not exist", func() {
@@ -169,16 +168,15 @@ var _ = Describe("Models", func() {
 			stream = &models.Stream{
 				Pid: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
-					1: &models.Entity{ID: 1, Name: "FooBar"},
-					2: &models.Entity{ID: 2, Name: "Baah"},
+					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
+					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
 				},
-				EntitiesKeys: []uint64{1, 2},
 			}
 		})
 
 		Describe("Entity", func() {
 			It("returns the requested entity from the stream", func() {
-				Expect(stream.Entity(1)).To(Equal(models.Entity{ID: 1, Name: "FooBar"}))
+				Expect(stream.Entity(1)).To(Equal(*stream.EntitiesMap[1]))
 			})
 
 			It("returns an error if the requested entity does not exist", func() {
@@ -188,10 +186,10 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("Entities", func() {
-			It("returns all entities found on the stream", func() {
+			It("returns all entities found on the stream, sorted in order by index", func() {
 				Expect(stream.Entities()).To(Equal([]models.Entity{
-					*stream.EntitiesMap[1],
 					*stream.EntitiesMap[2],
+					*stream.EntitiesMap[1],
 				}))
 			})
 		})
