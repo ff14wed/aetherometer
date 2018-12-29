@@ -220,20 +220,16 @@ type ComplexityRoot struct {
 		CastingInfo func(childComplexity int) int
 	}
 
+	UpdateClass struct {
+		Class func(childComplexity int) int
+	}
+
 	UpdateCraftingInfo struct {
 		CraftingInfo func(childComplexity int) int
 	}
 
 	UpdateEnmity struct {
 		Enmity func(childComplexity int) int
-	}
-
-	UpdateEntityClass struct {
-		Class func(childComplexity int) int
-	}
-
-	UpdateEntityTarget struct {
-		TargetId func(childComplexity int) int
 	}
 
 	UpdateLastAction struct {
@@ -250,6 +246,10 @@ type ComplexityRoot struct {
 
 	UpdateResources struct {
 		Resources func(childComplexity int) int
+	}
+
+	UpdateTarget struct {
+		TargetId func(childComplexity int) int
 	}
 
 	UpsertStatus struct {
@@ -1124,6 +1124,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateCastingInfo.CastingInfo(childComplexity), true
 
+	case "UpdateClass.class":
+		if e.complexity.UpdateClass.Class == nil {
+			break
+		}
+
+		return e.complexity.UpdateClass.Class(childComplexity), true
+
 	case "UpdateCraftingInfo.craftingInfo":
 		if e.complexity.UpdateCraftingInfo.CraftingInfo == nil {
 			break
@@ -1137,20 +1144,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateEnmity.Enmity(childComplexity), true
-
-	case "UpdateEntityClass.class":
-		if e.complexity.UpdateEntityClass.Class == nil {
-			break
-		}
-
-		return e.complexity.UpdateEntityClass.Class(childComplexity), true
-
-	case "UpdateEntityTarget.targetID":
-		if e.complexity.UpdateEntityTarget.TargetId == nil {
-			break
-		}
-
-		return e.complexity.UpdateEntityTarget.TargetId(childComplexity), true
 
 	case "UpdateLastAction.action":
 		if e.complexity.UpdateLastAction.Action == nil {
@@ -1179,6 +1172,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateResources.Resources(childComplexity), true
+
+	case "UpdateTarget.targetID":
+		if e.complexity.UpdateTarget.TargetId == nil {
+			break
+		}
+
+		return e.complexity.UpdateTarget.TargetId(childComplexity), true
 
 	case "UpsertStatus.index":
 		if e.complexity.UpsertStatus.Index == nil {
@@ -5567,6 +5567,63 @@ func (ec *executionContext) _UpdateCastingInfo_castingInfo(ctx context.Context, 
 	return ec._CastingInfo(ctx, field.Selections, &res)
 }
 
+var updateClassImplementors = []string{"UpdateClass"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateClass(ctx context.Context, sel ast.SelectionSet, obj *UpdateClass) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateClassImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateClass")
+		case "class":
+			out.Values[i] = ec._UpdateClass_class(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateClass_class(ctx context.Context, field graphql.CollectedField, obj *UpdateClass) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateClass",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Class, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
 var updateCraftingInfoImplementors = []string{"UpdateCraftingInfo"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -5681,120 +5738,6 @@ func (ec *executionContext) _UpdateEnmity_enmity(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._Enmity(ctx, field.Selections, &res)
-}
-
-var updateEntityClassImplementors = []string{"UpdateEntityClass"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _UpdateEntityClass(ctx context.Context, sel ast.SelectionSet, obj *UpdateEntityClass) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, updateEntityClassImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateEntityClass")
-		case "class":
-			out.Values[i] = ec._UpdateEntityClass_class(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _UpdateEntityClass_class(ctx context.Context, field graphql.CollectedField, obj *UpdateEntityClass) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "UpdateEntityClass",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Class, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-var updateEntityTargetImplementors = []string{"UpdateEntityTarget"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _UpdateEntityTarget(ctx context.Context, sel ast.SelectionSet, obj *UpdateEntityTarget) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, updateEntityTargetImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UpdateEntityTarget")
-		case "targetID":
-			out.Values[i] = ec._UpdateEntityTarget_targetID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _UpdateEntityTarget_targetID(ctx context.Context, field graphql.CollectedField, obj *UpdateEntityTarget) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "UpdateEntityTarget",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TargetID, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(uint64)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return MarshalUint(res)
 }
 
 var updateLastActionImplementors = []string{"UpdateLastAction"}
@@ -6027,6 +5970,63 @@ func (ec *executionContext) _UpdateResources_resources(ctx context.Context, fiel
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._Resources(ctx, field.Selections, &res)
+}
+
+var updateTargetImplementors = []string{"UpdateTarget"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateTarget(ctx context.Context, sel ast.SelectionSet, obj *UpdateTarget) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateTargetImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateTarget")
+		case "targetID":
+			out.Values[i] = ec._UpdateTarget_targetID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateTarget_targetID(ctx context.Context, field graphql.CollectedField, obj *UpdateTarget) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateTarget",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TargetID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
 }
 
 var upsertStatusImplementors = []string{"UpsertStatus"}
@@ -7576,14 +7576,14 @@ func (ec *executionContext) _EntityEventType(ctx context.Context, sel ast.Select
 		return ec._RemoveEntity(ctx, sel, &obj)
 	case *RemoveEntity:
 		return ec._RemoveEntity(ctx, sel, obj)
-	case UpdateEntityTarget:
-		return ec._UpdateEntityTarget(ctx, sel, &obj)
-	case *UpdateEntityTarget:
-		return ec._UpdateEntityTarget(ctx, sel, obj)
-	case UpdateEntityClass:
-		return ec._UpdateEntityClass(ctx, sel, &obj)
-	case *UpdateEntityClass:
-		return ec._UpdateEntityClass(ctx, sel, obj)
+	case UpdateTarget:
+		return ec._UpdateTarget(ctx, sel, &obj)
+	case *UpdateTarget:
+		return ec._UpdateTarget(ctx, sel, obj)
+	case UpdateClass:
+		return ec._UpdateClass(ctx, sel, &obj)
+	case *UpdateClass:
+		return ec._UpdateClass(ctx, sel, obj)
 	case UpdateLastAction:
 		return ec._UpdateLastAction(ctx, sel, &obj)
 	case *UpdateLastAction:
@@ -7863,8 +7863,8 @@ type EntityEvent {
 union EntityEventType =
   AddEntity |
   RemoveEntity |
-  UpdateEntityTarget |
-  UpdateEntityClass |
+  UpdateTarget |
+  UpdateClass |
   UpdateLastAction |
   UpdateCastingInfo |
   UpsertStatus |
@@ -7880,11 +7880,11 @@ type RemoveEntity {
   id: Uint!
 }
 
-type UpdateEntityTarget {
+type UpdateTarget {
   targetID: Uint!
 }
 
-type UpdateEntityClass {
+type UpdateClass {
   class: Int!
 }
 

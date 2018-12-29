@@ -185,6 +185,12 @@ type UpdateCastingInfo struct {
 
 func (UpdateCastingInfo) IsEntityEventType() {}
 
+type UpdateClass struct {
+	Class int `json:"class"`
+}
+
+func (UpdateClass) IsEntityEventType() {}
+
 type UpdateCraftingInfo struct {
 	CraftingInfo CraftingInfo `json:"craftingInfo"`
 }
@@ -196,18 +202,6 @@ type UpdateEnmity struct {
 }
 
 func (UpdateEnmity) IsStreamEventType() {}
-
-type UpdateEntityClass struct {
-	Class int `json:"class"`
-}
-
-func (UpdateEntityClass) IsEntityEventType() {}
-
-type UpdateEntityTarget struct {
-	TargetID uint64 `json:"targetID"`
-}
-
-func (UpdateEntityTarget) IsEntityEventType() {}
 
 type UpdateLastAction struct {
 	Action Action `json:"action"`
@@ -232,6 +226,12 @@ type UpdateResources struct {
 }
 
 func (UpdateResources) IsEntityEventType() {}
+
+type UpdateTarget struct {
+	TargetID uint64 `json:"targetID"`
+}
+
+func (UpdateTarget) IsEntityEventType() {}
 
 type UpsertStatus struct {
 	Index  int    `json:"index"`

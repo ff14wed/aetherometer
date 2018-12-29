@@ -189,8 +189,8 @@ type EntityEvent {
 union EntityEventType =
   AddEntity |
   RemoveEntity |
-  UpdateEntityTarget |
-  UpdateEntityClass |
+  UpdateTarget |
+  UpdateClass |
   UpdateLastAction |
   UpdateCastingInfo |
   UpsertStatus |
@@ -206,11 +206,11 @@ type RemoveEntity {
   id: Uint!
 }
 
-type UpdateEntityTarget {
+type UpdateTarget {
   targetID: Uint!
 }
 
-type UpdateEntityClass {
+type UpdateClass {
   class: Int!
 }
 
