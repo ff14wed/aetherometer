@@ -78,7 +78,7 @@ var _ = Describe("Models", func() {
 			})
 		})
 
-		Describe("StreamEvents", func() {
+		Describe("StreamEvent", func() {
 			var eventsChannel chan models.StreamEvent
 
 			BeforeEach(func() {
@@ -98,7 +98,7 @@ var _ = Describe("Models", func() {
 					StreamID: 123,
 				}
 				eventsChannel <- payload
-				ch, err := db.StreamEvents(ctx)
+				ch, err := db.StreamEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
 				var receivedPayload models.StreamEvent
@@ -110,7 +110,7 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				_, err := db.StreamEvents(ctx)
+				_, err := db.StreamEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
 				cancel()
@@ -119,7 +119,7 @@ var _ = Describe("Models", func() {
 			})
 		})
 
-		Describe("EntityEvents", func() {
+		Describe("EntityEvent", func() {
 			var eventsChannel chan models.EntityEvent
 
 			BeforeEach(func() {
@@ -139,7 +139,7 @@ var _ = Describe("Models", func() {
 					StreamID: 123,
 				}
 				eventsChannel <- payload
-				ch, err := db.EntityEvents(ctx)
+				ch, err := db.EntityEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
 				var receivedPayload models.EntityEvent
@@ -151,7 +151,7 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				_, err := db.EntityEvents(ctx)
+				_, err := db.EntityEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
 				cancel()

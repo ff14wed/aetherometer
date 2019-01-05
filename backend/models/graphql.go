@@ -212,8 +212,8 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		StreamEvents func(childComplexity int) int
-		EntityEvents func(childComplexity int) int
+		StreamEvent func(childComplexity int) int
+		EntityEvent func(childComplexity int) int
 	}
 
 	UpdateCastingInfo struct {
@@ -264,8 +264,8 @@ type QueryResolver interface {
 	Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error)
 }
 type SubscriptionResolver interface {
-	StreamEvents(ctx context.Context) (<-chan StreamEvent, error)
-	EntityEvents(ctx context.Context) (<-chan EntityEvent, error)
+	StreamEvent(ctx context.Context) (<-chan StreamEvent, error)
+	EntityEvent(ctx context.Context) (<-chan EntityEvent, error)
 }
 
 func field_Query_stream_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -1103,19 +1103,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StreamEvent.Type(childComplexity), true
 
-	case "Subscription.streamEvents":
-		if e.complexity.Subscription.StreamEvents == nil {
+	case "Subscription.streamEvent":
+		if e.complexity.Subscription.StreamEvent == nil {
 			break
 		}
 
-		return e.complexity.Subscription.StreamEvents(childComplexity), true
+		return e.complexity.Subscription.StreamEvent(childComplexity), true
 
-	case "Subscription.entityEvents":
-		if e.complexity.Subscription.EntityEvents == nil {
+	case "Subscription.entityEvent":
+		if e.complexity.Subscription.EntityEvent == nil {
 			break
 		}
 
-		return e.complexity.Subscription.EntityEvents(childComplexity), true
+		return e.complexity.Subscription.EntityEvent(childComplexity), true
 
 	case "UpdateCastingInfo.castingInfo":
 		if e.complexity.UpdateCastingInfo.CastingInfo == nil {
@@ -5450,23 +5450,23 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 
 	switch fields[0].Name {
-	case "streamEvents":
-		return ec._Subscription_streamEvents(ctx, fields[0])
-	case "entityEvents":
-		return ec._Subscription_entityEvents(ctx, fields[0])
+	case "streamEvent":
+		return ec._Subscription_streamEvent(ctx, fields[0])
+	case "entityEvent":
+		return ec._Subscription_entityEvent(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
 }
 
-func (ec *executionContext) _Subscription_streamEvents(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+func (ec *executionContext) _Subscription_streamEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Field: field,
 	})
 	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
 	//          and Tracer stack
 	rctx := ctx
-	results, err := ec.resolvers.Subscription().StreamEvents(rctx)
+	results, err := ec.resolvers.Subscription().StreamEvent(rctx)
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
@@ -5484,14 +5484,14 @@ func (ec *executionContext) _Subscription_streamEvents(ctx context.Context, fiel
 	}
 }
 
-func (ec *executionContext) _Subscription_entityEvents(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+func (ec *executionContext) _Subscription_entityEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Field: field,
 	})
 	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
 	//          and Tracer stack
 	rctx := ctx
-	results, err := ec.resolvers.Subscription().EntityEvents(rctx)
+	results, err := ec.resolvers.Subscription().EntityEvent(rctx)
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
@@ -7816,8 +7816,8 @@ type CraftingInfo {
 }
 
 type Subscription {
-  streamEvents: StreamEvent!
-  entityEvents: EntityEvent!
+  streamEvent: StreamEvent!
+  entityEvent: EntityEvent!
 }
 
 type StreamEvent {

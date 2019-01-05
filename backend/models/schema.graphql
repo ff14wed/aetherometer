@@ -144,8 +144,8 @@ type CraftingInfo {
 }
 
 type Subscription {
-  streamEvents: StreamEvent!
-  entityEvents: EntityEvent!
+  streamEvent: StreamEvent!
+  entityEvent: EntityEvent!
 }
 
 type StreamEvent {

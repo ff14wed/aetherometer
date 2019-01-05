@@ -58,9 +58,9 @@ func (db *DB) Entity(streamID int, entityID uint64) (Entity, error) {
 	return e, nil
 }
 
-// StreamEvents returns an event channel that can be used for subscriptions to
+// StreamEvent returns an event channel that can be used for subscriptions to
 // Stream events
-func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEvent, error) {
+func (db *DB) StreamEvent(ctx context.Context) (<-chan StreamEvent, error) {
 	ch, id := db.StreamEventSource.Subscribe()
 	go func() {
 		<-ctx.Done()
@@ -69,9 +69,9 @@ func (db *DB) StreamEvents(ctx context.Context) (<-chan StreamEvent, error) {
 	return ch, nil
 }
 
-// EntityEvents returns an event channel that can be used for subscriptions to
+// EntityEvent returns an event channel that can be used for subscriptions to
 // Entity events
-func (db *DB) EntityEvents(ctx context.Context) (<-chan EntityEvent, error) {
+func (db *DB) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
 	ch, id := db.EntityEventSource.Subscribe()
 	go func() {
 		<-ctx.Done()

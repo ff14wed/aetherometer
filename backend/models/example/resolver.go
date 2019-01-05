@@ -29,9 +29,9 @@ func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint6
 
 type subscriptionResolver struct{ *Resolver }
 
-func (r *subscriptionResolver) StreamEvents(ctx context.Context) (<-chan models.StreamEvent, error) {
+func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan models.StreamEvent, error) {
 	panic("not implemented")
 }
-func (r *subscriptionResolver) EntityEvents(ctx context.Context) (<-chan models.EntityEvent, error) {
+func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan models.EntityEvent, error) {
 	panic("not implemented")
 }

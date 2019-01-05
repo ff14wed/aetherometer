@@ -40,9 +40,9 @@ func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint6
 
 type subscriptionResolver struct{ *Resolver }
 
-func (r *subscriptionResolver) StreamEvents(ctx context.Context) (<-chan StreamEvent, error) {
-	return r.db.StreamEvents(ctx)
+func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEvent, error) {
+	return r.db.StreamEvent(ctx)
 }
-func (r *subscriptionResolver) EntityEvents(ctx context.Context) (<-chan EntityEvent, error) {
-	return r.db.EntityEvents(ctx)
+func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
+	return r.db.EntityEvent(ctx)
 }
