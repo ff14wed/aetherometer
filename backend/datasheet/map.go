@@ -27,7 +27,7 @@ type TerritoryInfo struct {
 
 // MapStore stores information about all maps and territories
 type MapStore struct {
-	Maps        map[string]MapInfo
+	Maps        map[uint16]MapInfo
 	Territories map[uint16]TerritoryInfo
 
 	mapsForTerritories map[string][]MapInfo
@@ -36,7 +36,8 @@ type MapStore struct {
 // PopulateMaps will populate the MapStore with map data provided a
 // path to the data sheet for Maps
 func (m *MapStore) PopulateMaps(dataBytes io.Reader) error {
-	m.Maps = make(map[string]MapInfo)
+	m.Maps = make(map[uint16]MapInfo)
+
 	var rows []MapInfo
 	d := json.NewDecoder(dataBytes)
 	err := d.Decode(&rows)
@@ -44,7 +45,7 @@ func (m *MapStore) PopulateMaps(dataBytes io.Reader) error {
 		return fmt.Errorf("PopulateMaps: %s", err)
 	}
 	for _, mapInfo := range rows {
-		m.Maps[mapInfo.ID] = mapInfo
+		m.Maps[mapInfo.Key] = mapInfo
 	}
 	return nil
 }
@@ -74,20 +75,9 @@ func (m *MapStore) GetMaps(ID uint16) []MapInfo {
 	}
 
 	if m.mapsForTerritories == nil {
-		// Initialize the cache
 		m.mapsForTerritories = make(map[string][]MapInfo)
-	}
 
-	_, ok = m.mapsForTerritories[t.Name]
-	if !ok {
-		// Regenerate cache
-		if defaultMap, ok := m.Maps[t.MapID]; ok {
-			m.mapsForTerritories[t.Name] = []MapInfo{defaultMap}
-		}
-		for mid, mv := range m.Maps {
-			if mid == t.MapID {
-				continue
-			}
+		for _, mv := range m.Maps {
 			m.mapsForTerritories[mv.TerritoryType] =
 				append(m.mapsForTerritories[mv.TerritoryType], mv)
 		}

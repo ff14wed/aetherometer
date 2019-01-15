@@ -3,30 +3,33 @@ package testassets
 import "github.com/ff14wed/sibyl/backend/datasheet"
 
 // ExpectedMapInfo derives from MapJSON
-var ExpectedMapInfo = map[string]datasheet.MapInfo{
-	"":           datasheet.MapInfo{SizeFactor: 100},
-	"default/00": datasheet.MapInfo{Key: 1, ID: "default/00", SizeFactor: 100, PlaceName: "Eorzea"},
-	"f1t1/00": datasheet.MapInfo{
+var ExpectedMapInfo = map[uint16]datasheet.MapInfo{
+	0: datasheet.MapInfo{SizeFactor: 100},
+	1: datasheet.MapInfo{Key: 1, ID: "default/00", SizeFactor: 100, PlaceName: "Eorzea"},
+	2: datasheet.MapInfo{
 		Key: 2, ID: "f1t1/00", SizeFactor: 200, PlaceName: "New Gridania", TerritoryType: "f1t1",
 	},
-	"f1t2/00": datasheet.MapInfo{
+	3: datasheet.MapInfo{
 		Key: 3, ID: "f1t2/00", SizeFactor: 200,
 		PlaceName: "Old Gridania", TerritoryType: "f1t2",
 	},
-	"w1t2/01": datasheet.MapInfo{
+	14: datasheet.MapInfo{
 		Key: 14, ID: "w1t2/01", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 		PlaceNameSub: "Merchant Strip", TerritoryType: "w1t2",
 	},
-	"w1t2/02": datasheet.MapInfo{
+	73: datasheet.MapInfo{
 		Key: 73, ID: "w1t2/02", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 		PlaceNameSub: "Hustings Strip", TerritoryType: "w1t2",
 	},
-	"w1b4/00": datasheet.MapInfo{
+	178: datasheet.MapInfo{
 		Key: 178, ID: "w1b4/00", SizeFactor: 200, OffsetX: -448, OffsetY: 0,
 		PlaceName: "The Burning Heart", TerritoryType: "w1b4",
 	},
-	"s1fa/00": datasheet.MapInfo{
+	33: datasheet.MapInfo{
 		Key: 33, ID: "s1fa/00", SizeFactor: 400, PlaceName: "The Navel", TerritoryType: "s1fa",
+	},
+	403: datasheet.MapInfo{
+		Key: 403, ID: "s1fa/00", SizeFactor: 400, PlaceName: "The Navel", TerritoryType: "s1fa_2",
 	},
 }
 

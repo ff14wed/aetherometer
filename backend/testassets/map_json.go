@@ -161,5 +161,25 @@ var MapJSON = `[
     "SizeFactor": 400,
     "TerritoryType": "s1fa",
     "key": 33
+  },
+  {
+    "0": 0,
+    "1": 0,
+    "13": 0,
+    "16": false,
+    "2": 0,
+    "DiscoveryArrayByte": true,
+    "DiscoveryIndex": -1,
+    "Hierarchy": 1,
+    "Id": "s1fa/00",
+    "MapMarkerRange": 0,
+    "Offset{X}": 0,
+    "Offset{Y}": 0,
+    "PlaceName": "The Navel",
+    "PlaceName{Region}": "La Noscea",
+    "PlaceName{Sub}": "",
+    "SizeFactor": 400,
+    "TerritoryType": "s1fa_2",
+    "key": 403
   }
 ]`

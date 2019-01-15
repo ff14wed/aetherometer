@@ -73,11 +73,17 @@ var _ = Describe("Map", func() {
 				},
 			))
 		})
-		It("correctly returns maps in the case of a many to 1 territory -> map relation", func() {
-			Expect(mapStore.GetMaps(293)).To(ConsistOf(
+		It("correctly returns maps in the case of a many to 1 (territory -> map ID) relation", func() {
+			Expect(mapStore.GetMaps(206)).To(ConsistOf(
 				datasheet.MapInfo{
 					Key: 33, ID: "s1fa/00", SizeFactor: 400, PlaceName: "The Navel",
 					TerritoryType: "s1fa",
+				},
+			))
+			Expect(mapStore.GetMaps(293)).To(ConsistOf(
+				datasheet.MapInfo{
+					Key: 403, ID: "s1fa/00", SizeFactor: 400, PlaceName: "The Navel",
+					TerritoryType: "s1fa_2",
 				},
 			))
 		})
