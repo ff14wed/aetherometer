@@ -33,6 +33,17 @@ var ExpectedMapInfo = map[uint16]datasheet.MapInfo{
 	},
 }
 
+var ExpectedDefaultMapsForMapIDs = map[string]uint16{
+	"":           0,
+	"default/00": 1,
+	"f1t1/00":    2,
+	"f1t2/00":    3,
+	"w1t2/01":    14,
+	"w1t2/02":    73,
+	"w1b4/00":    178,
+	"s1fa/00":    33,
+}
+
 // ExpectedTerritoryInfo derives from TerritoryTypeJSON
 var ExpectedTerritoryInfo = map[uint16]datasheet.TerritoryInfo{
 	1:   datasheet.TerritoryInfo{ID: 1, Name: "", MapID: ""},
@@ -45,6 +56,7 @@ var ExpectedTerritoryInfo = map[uint16]datasheet.TerritoryInfo{
 	196: datasheet.TerritoryInfo{ID: 196, Name: "w1b4", MapID: "w1b4/00"},
 	206: datasheet.TerritoryInfo{ID: 206, Name: "s1fa", MapID: "s1fa/00"},
 	293: datasheet.TerritoryInfo{ID: 293, Name: "s1fa_2", MapID: "s1fa/00"},
+	296: datasheet.TerritoryInfo{ID: 296, Name: "s1fa_3", MapID: "s1fa/00"},
 }
 
 // ExpectedActionData derives from ActionJSON

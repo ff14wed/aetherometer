@@ -16,6 +16,7 @@ var _ = Describe("Map", func() {
 			err := m.PopulateMaps(bytes.NewReader([]byte(testassets.MapJSON)))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(m.Maps).To(Equal(testassets.ExpectedMapInfo))
+			Expect(m.DefaultMapsForMapIDs).To(Equal(testassets.ExpectedDefaultMapsForMapIDs))
 		})
 		It("returns an error if the datasheet is blank", func() {
 			m := new(datasheet.MapStore)
@@ -50,8 +51,10 @@ var _ = Describe("Map", func() {
 		var mapStore *datasheet.MapStore
 		BeforeEach(func() {
 			mapStore = new(datasheet.MapStore)
-			mapStore.Maps = testassets.ExpectedMapInfo
-			mapStore.Territories = testassets.ExpectedTerritoryInfo
+			err := mapStore.PopulateMaps(bytes.NewReader([]byte(testassets.MapJSON)))
+			Expect(err).ToNot(HaveOccurred())
+			err = mapStore.PopulateTerritories(bytes.NewReader([]byte(testassets.TerritoryTypeJSON)))
+			Expect(err).ToNot(HaveOccurred())
 		})
 		It("correctly returns a map associated with territory ID", func() {
 			Expect(mapStore.GetMaps(133)).To(Equal([]datasheet.MapInfo{
@@ -87,7 +90,15 @@ var _ = Describe("Map", func() {
 				},
 			))
 		})
-		It("returns empty array if the territory exists but the map does not", func() {
+		It("returns the default map for the territory's MapID if there are no maps associated the territory ID", func() {
+			Expect(mapStore.GetMaps(296)).To(ConsistOf(
+				datasheet.MapInfo{
+					Key: 33, ID: "s1fa/00", SizeFactor: 400, PlaceName: "The Navel",
+					TerritoryType: "s1fa",
+				},
+			))
+		})
+		It("returns empty array if the territory exists but the map or default map for its MapID does not", func() {
 			Expect(mapStore.GetMaps(128)).To(BeNil())
 		})
 		It("returns nil if the territory does not exist", func() {

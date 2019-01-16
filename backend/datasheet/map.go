@@ -27,8 +27,9 @@ type TerritoryInfo struct {
 
 // MapStore stores information about all maps and territories
 type MapStore struct {
-	Maps        map[uint16]MapInfo
-	Territories map[uint16]TerritoryInfo
+	Maps                 map[uint16]MapInfo
+	Territories          map[uint16]TerritoryInfo
+	DefaultMapsForMapIDs map[string]uint16
 
 	mapsForTerritories map[string][]MapInfo
 }
@@ -37,6 +38,7 @@ type MapStore struct {
 // path to the data sheet for Maps
 func (m *MapStore) PopulateMaps(dataBytes io.Reader) error {
 	m.Maps = make(map[uint16]MapInfo)
+	m.DefaultMapsForMapIDs = make(map[string]uint16)
 
 	var rows []MapInfo
 	d := json.NewDecoder(dataBytes)
@@ -46,6 +48,9 @@ func (m *MapStore) PopulateMaps(dataBytes io.Reader) error {
 	}
 	for _, mapInfo := range rows {
 		m.Maps[mapInfo.Key] = mapInfo
+		if _, found := m.DefaultMapsForMapIDs[mapInfo.ID]; !found {
+			m.DefaultMapsForMapIDs[mapInfo.ID] = mapInfo.Key
+		}
 	}
 	return nil
 }
@@ -83,5 +88,9 @@ func (m *MapStore) GetMaps(ID uint16) []MapInfo {
 		}
 	}
 
-	return m.mapsForTerritories[t.Name]
+	maps := m.mapsForTerritories[t.Name]
+	if defaultMapKey, found := m.DefaultMapsForMapIDs[t.MapID]; len(maps) == 0 && found {
+		return []MapInfo{m.Maps[defaultMapKey]}
+	}
+	return maps
 }
