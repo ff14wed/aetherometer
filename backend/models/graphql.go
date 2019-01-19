@@ -193,8 +193,6 @@ type ComplexityRoot struct {
 		Duration    func(childComplexity int) int
 		ActorId     func(childComplexity int) int
 		LastTick    func(childComplexity int) int
-		BaseDamage  func(childComplexity int) int
-		CritRate    func(childComplexity int) int
 	}
 
 	Stream struct {
@@ -1032,20 +1030,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Status.LastTick(childComplexity), true
-
-	case "Status.baseDamage":
-		if e.complexity.Status.BaseDamage == nil {
-			break
-		}
-
-		return e.complexity.Status.BaseDamage(childComplexity), true
-
-	case "Status.critRate":
-		if e.complexity.Status.CritRate == nil {
-			break
-		}
-
-		return e.complexity.Status.CritRate(childComplexity), true
 
 	case "Stream.pid":
 		if e.complexity.Stream.Pid == nil {
@@ -4831,16 +4815,6 @@ func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "baseDamage":
-			out.Values[i] = ec._Status_baseDamage(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "critRate":
-			out.Values[i] = ec._Status_critRate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5039,60 +5013,6 @@ func (ec *executionContext) _Status_lastTick(ctx context.Context, field graphql.
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return MarshalTimestamp(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Status_baseDamage(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Status",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BaseDamage, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Status_critRate(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Status",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CritRate, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
 }
 
 var streamImplementors = []string{"Stream"}
@@ -7782,9 +7702,6 @@ type Status {
   duration: Timestamp!
   actorID: Uint!
   lastTick: Timestamp!
-
-  baseDamage: Int!
-  critRate: Int!
 }
 
 type CastingInfo {

@@ -110,9 +110,6 @@ type Status {
   duration: Timestamp!
   actorID: Uint!
   lastTick: Timestamp!
-
-  baseDamage: Int!
-  critRate: Int!
 }
 
 type CastingInfo {

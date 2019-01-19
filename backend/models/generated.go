@@ -166,8 +166,6 @@ type Status struct {
 	Duration    time.Time `json:"duration"`
 	ActorID     uint64    `json:"actorID"`
 	LastTick    time.Time `json:"lastTick"`
-	BaseDamage  int       `json:"baseDamage"`
-	CritRate    int       `json:"critRate"`
 }
 
 type StreamEvent struct {
