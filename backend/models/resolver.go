@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+const SibylAPIVersion = "v0.0.0-beta"
+
 // Resolver is a resolver for the queried data
 type Resolver struct {
 	db *DB
@@ -28,6 +30,9 @@ func (r *Resolver) Subscription() SubscriptionResolver {
 
 type queryResolver struct{ *Resolver }
 
+func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
+	return SibylAPIVersion, nil
+}
 func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
 	return r.db.Streams(), nil
 }

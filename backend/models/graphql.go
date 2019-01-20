@@ -159,9 +159,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Streams func(childComplexity int) int
-		Stream  func(childComplexity int, streamID int) int
-		Entity  func(childComplexity int, streamID int, entityID uint64) int
+		ApiVersion func(childComplexity int) int
+		Streams    func(childComplexity int) int
+		Stream     func(childComplexity int, streamID int) int
+		Entity     func(childComplexity int, streamID int, entityID uint64) int
 	}
 
 	RemoveEntity struct {
@@ -261,6 +262,7 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
+	APIVersion(ctx context.Context) (string, error)
 	Streams(ctx context.Context) ([]Stream, error)
 	Stream(ctx context.Context, streamID int) (Stream, error)
 	Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error)
@@ -891,6 +893,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Place.Maps(childComplexity), true
+
+	case "Query.apiVersion":
+		if e.complexity.Query.ApiVersion == nil {
+			break
+		}
+
+		return e.complexity.Query.ApiVersion(childComplexity), true
 
 	case "Query.streams":
 		if e.complexity.Query.Streams == nil {
@@ -4155,6 +4164,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "apiVersion":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_apiVersion(ctx, field)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		case "streams":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -4195,6 +4213,33 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		return graphql.Null
 	}
 	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_apiVersion(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().APIVersion(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
 }
 
 // nolint: vetshadow
@@ -7696,6 +7741,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "models/schema.graphql", Input: `type Query {
+  apiVersion: ID!
   streams: [Stream!]!
   stream(streamID: Int!): Stream!
   entity(streamID: Int!, entityID: Uint!): Entity!

@@ -1,4 +1,5 @@
 type Query {
+  apiVersion: ID!
   streams: [Stream!]!
   stream(streamID: Int!): Stream!
   entity(streamID: Int!, entityID: Uint!): Entity!

@@ -17,6 +17,9 @@ func (r *Resolver) Subscription() SubscriptionResolver {
 
 type queryResolver struct{ *Resolver }
 
+func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) Streams(ctx context.Context) ([]models.Stream, error) {
 	panic("not implemented")
 }
