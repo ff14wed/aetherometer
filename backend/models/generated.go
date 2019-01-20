@@ -158,6 +158,12 @@ type Resources struct {
 	LastTick time.Time `json:"lastTick"`
 }
 
+type SetEntities struct {
+	Entities []Entity `json:"entities"`
+}
+
+func (SetEntities) IsEntityEventType() {}
+
 type Status struct {
 	ID          int       `json:"id"`
 	Extra       int       `json:"extra"`

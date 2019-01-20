@@ -185,6 +185,10 @@ type ComplexityRoot struct {
 		LastTick func(childComplexity int) int
 	}
 
+	SetEntities struct {
+		Entities func(childComplexity int) int
+	}
+
 	Status struct {
 		Id          func(childComplexity int) int
 		Extra       func(childComplexity int) int
@@ -981,6 +985,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Resources.LastTick(childComplexity), true
+
+	case "SetEntities.entities":
+		if e.complexity.SetEntities.Entities == nil {
+			break
+		}
+
+		return e.complexity.SetEntities.Entities(childComplexity), true
 
 	case "Status.id":
 		if e.complexity.Status.Id == nil {
@@ -4766,6 +4777,96 @@ func (ec *executionContext) _Resources_lastTick(ctx context.Context, field graph
 	return MarshalTimestamp(res)
 }
 
+var setEntitiesImplementors = []string{"SetEntities"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _SetEntities(ctx context.Context, sel ast.SelectionSet, obj *SetEntities) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, setEntitiesImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SetEntities")
+		case "entities":
+			out.Values[i] = ec._SetEntities_entities(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _SetEntities_entities(ctx context.Context, field graphql.CollectedField, obj *SetEntities) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "SetEntities",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Entities, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]Entity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._Entity(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
 var statusImplementors = []string{"Status"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -7494,6 +7595,10 @@ func (ec *executionContext) _EntityEventType(ctx context.Context, sel ast.Select
 		return ec._RemoveEntity(ctx, sel, &obj)
 	case *RemoveEntity:
 		return ec._RemoveEntity(ctx, sel, obj)
+	case SetEntities:
+		return ec._SetEntities(ctx, sel, &obj)
+	case *SetEntities:
+		return ec._SetEntities(ctx, sel, obj)
 	case UpdateTarget:
 		return ec._UpdateTarget(ctx, sel, &obj)
 	case *UpdateTarget:
@@ -7778,6 +7883,7 @@ type EntityEvent {
 union EntityEventType =
   AddEntity |
   RemoveEntity |
+  SetEntities |
   UpdateTarget |
   UpdateClass |
   UpdateLastAction |
@@ -7793,6 +7899,10 @@ type AddEntity {
 
 type RemoveEntity {
   id: Uint!
+}
+
+type SetEntities {
+  entities: [Entity!]!
 }
 
 type UpdateTarget {

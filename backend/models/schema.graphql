@@ -186,6 +186,7 @@ type EntityEvent {
 union EntityEventType =
   AddEntity |
   RemoveEntity |
+  SetEntities |
   UpdateTarget |
   UpdateClass |
   UpdateLastAction |
@@ -201,6 +202,10 @@ type AddEntity {
 
 type RemoveEntity {
   id: Uint!
+}
+
+type SetEntities {
+  entities: [Entity!]!
 }
 
 type UpdateTarget {
