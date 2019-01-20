@@ -42,10 +42,30 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Action struct {
-		Id       func(childComplexity int) int
-		Name     func(childComplexity int) int
-		TargetId func(childComplexity int) int
-		UseTime  func(childComplexity int) int
+		TargetId          func(childComplexity int) int
+		Name              func(childComplexity int) int
+		GlobalCounter     func(childComplexity int) int
+		AnimationLockTime func(childComplexity int) int
+		HiddenAnimation   func(childComplexity int) int
+		Location          func(childComplexity int) int
+		Id                func(childComplexity int) int
+		Variation         func(childComplexity int) int
+		EffectDisplayType func(childComplexity int) int
+		IsAoE             func(childComplexity int) int
+		Effects           func(childComplexity int) int
+		EffectFlags       func(childComplexity int) int
+		UseTime           func(childComplexity int) int
+	}
+
+	ActionEffect struct {
+		TargetId        func(childComplexity int) int
+		Type            func(childComplexity int) int
+		HitSeverity     func(childComplexity int) int
+		Param           func(childComplexity int) int
+		BonusPercent    func(childComplexity int) int
+		ValueMultiplier func(childComplexity int) int
+		Flags           func(childComplexity int) int
+		Value           func(childComplexity int) int
 	}
 
 	AddEntity struct {
@@ -369,12 +389,12 @@ func (e *executableSchema) Schema() *ast.Schema {
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
 	switch typeName + "." + field {
 
-	case "Action.id":
-		if e.complexity.Action.Id == nil {
+	case "Action.targetID":
+		if e.complexity.Action.TargetId == nil {
 			break
 		}
 
-		return e.complexity.Action.Id(childComplexity), true
+		return e.complexity.Action.TargetId(childComplexity), true
 
 	case "Action.name":
 		if e.complexity.Action.Name == nil {
@@ -383,12 +403,75 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Action.Name(childComplexity), true
 
-	case "Action.targetID":
-		if e.complexity.Action.TargetId == nil {
+	case "Action.globalCounter":
+		if e.complexity.Action.GlobalCounter == nil {
 			break
 		}
 
-		return e.complexity.Action.TargetId(childComplexity), true
+		return e.complexity.Action.GlobalCounter(childComplexity), true
+
+	case "Action.animationLockTime":
+		if e.complexity.Action.AnimationLockTime == nil {
+			break
+		}
+
+		return e.complexity.Action.AnimationLockTime(childComplexity), true
+
+	case "Action.hiddenAnimation":
+		if e.complexity.Action.HiddenAnimation == nil {
+			break
+		}
+
+		return e.complexity.Action.HiddenAnimation(childComplexity), true
+
+	case "Action.location":
+		if e.complexity.Action.Location == nil {
+			break
+		}
+
+		return e.complexity.Action.Location(childComplexity), true
+
+	case "Action.id":
+		if e.complexity.Action.Id == nil {
+			break
+		}
+
+		return e.complexity.Action.Id(childComplexity), true
+
+	case "Action.variation":
+		if e.complexity.Action.Variation == nil {
+			break
+		}
+
+		return e.complexity.Action.Variation(childComplexity), true
+
+	case "Action.effectDisplayType":
+		if e.complexity.Action.EffectDisplayType == nil {
+			break
+		}
+
+		return e.complexity.Action.EffectDisplayType(childComplexity), true
+
+	case "Action.isAoE":
+		if e.complexity.Action.IsAoE == nil {
+			break
+		}
+
+		return e.complexity.Action.IsAoE(childComplexity), true
+
+	case "Action.effects":
+		if e.complexity.Action.Effects == nil {
+			break
+		}
+
+		return e.complexity.Action.Effects(childComplexity), true
+
+	case "Action.effectFlags":
+		if e.complexity.Action.EffectFlags == nil {
+			break
+		}
+
+		return e.complexity.Action.EffectFlags(childComplexity), true
 
 	case "Action.useTime":
 		if e.complexity.Action.UseTime == nil {
@@ -396,6 +479,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Action.UseTime(childComplexity), true
+
+	case "ActionEffect.targetID":
+		if e.complexity.ActionEffect.TargetId == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.TargetId(childComplexity), true
+
+	case "ActionEffect.type":
+		if e.complexity.ActionEffect.Type == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.Type(childComplexity), true
+
+	case "ActionEffect.hitSeverity":
+		if e.complexity.ActionEffect.HitSeverity == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.HitSeverity(childComplexity), true
+
+	case "ActionEffect.param":
+		if e.complexity.ActionEffect.Param == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.Param(childComplexity), true
+
+	case "ActionEffect.bonusPercent":
+		if e.complexity.ActionEffect.BonusPercent == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.BonusPercent(childComplexity), true
+
+	case "ActionEffect.valueMultiplier":
+		if e.complexity.ActionEffect.ValueMultiplier == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.ValueMultiplier(childComplexity), true
+
+	case "ActionEffect.flags":
+		if e.complexity.ActionEffect.Flags == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.Flags(childComplexity), true
+
+	case "ActionEffect.value":
+		if e.complexity.ActionEffect.Value == nil {
+			break
+		}
+
+		return e.complexity.ActionEffect.Value(childComplexity), true
 
 	case "AddEntity.entity":
 		if e.complexity.AddEntity.Entity == nil {
@@ -1274,8 +1413,8 @@ func (ec *executionContext) _Action(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Action")
-		case "id":
-			out.Values[i] = ec._Action_id(ctx, field, obj)
+		case "targetID":
+			out.Values[i] = ec._Action_targetID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -1284,8 +1423,53 @@ func (ec *executionContext) _Action(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "targetID":
-			out.Values[i] = ec._Action_targetID(ctx, field, obj)
+		case "globalCounter":
+			out.Values[i] = ec._Action_globalCounter(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "animationLockTime":
+			out.Values[i] = ec._Action_animationLockTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "hiddenAnimation":
+			out.Values[i] = ec._Action_hiddenAnimation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "location":
+			out.Values[i] = ec._Action_location(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "id":
+			out.Values[i] = ec._Action_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "variation":
+			out.Values[i] = ec._Action_variation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "effectDisplayType":
+			out.Values[i] = ec._Action_effectDisplayType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "isAoE":
+			out.Values[i] = ec._Action_isAoE(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "effects":
+			out.Values[i] = ec._Action_effects(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "effectFlags":
+			out.Values[i] = ec._Action_effectFlags(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -1303,60 +1487,6 @@ func (ec *executionContext) _Action(ctx context.Context, sel ast.SelectionSet, o
 		return graphql.Null
 	}
 	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Action_id(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Action",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Action_name(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "Action",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalString(res)
 }
 
 // nolint: vetshadow
@@ -1387,6 +1517,337 @@ func (ec *executionContext) _Action_targetID(ctx context.Context, field graphql.
 }
 
 // nolint: vetshadow
+func (ec *executionContext) _Action_name(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_globalCounter(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GlobalCounter, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_animationLockTime(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnimationLockTime, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalFloat(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_hiddenAnimation(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HiddenAnimation, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_location(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Location)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Location(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_id(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_variation(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Variation, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_effectDisplayType(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EffectDisplayType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_isAoE(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsAoE, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_effects(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Effects, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]ActionEffect)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._ActionEffect(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Action_effectFlags(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Action",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EffectFlags, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
 func (ec *executionContext) _Action_useTime(ctx context.Context, field graphql.CollectedField, obj *Action) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -1411,6 +1872,287 @@ func (ec *executionContext) _Action_useTime(ctx context.Context, field graphql.C
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return MarshalTimestamp(res)
+}
+
+var actionEffectImplementors = []string{"ActionEffect"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ActionEffect(ctx context.Context, sel ast.SelectionSet, obj *ActionEffect) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, actionEffectImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ActionEffect")
+		case "targetID":
+			out.Values[i] = ec._ActionEffect_targetID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "type":
+			out.Values[i] = ec._ActionEffect_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "hitSeverity":
+			out.Values[i] = ec._ActionEffect_hitSeverity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "param":
+			out.Values[i] = ec._ActionEffect_param(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "bonusPercent":
+			out.Values[i] = ec._ActionEffect_bonusPercent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "valueMultiplier":
+			out.Values[i] = ec._ActionEffect_valueMultiplier(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "flags":
+			out.Values[i] = ec._ActionEffect_flags(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "value":
+			out.Values[i] = ec._ActionEffect_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_targetID(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TargetID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_type(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_hitSeverity(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HitSeverity, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_param(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Param, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_bonusPercent(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BonusPercent, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_valueMultiplier(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValueMultiplier, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_flags(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Flags, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ActionEffect_value(ctx context.Context, field graphql.CollectedField, obj *ActionEffect) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ActionEffect",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 var addEntityImplementors = []string{"AddEntity"}
@@ -7839,10 +8581,30 @@ type Location {
 }
 
 type Action {
-  id: Int!
-  name: String!
   targetID: Uint!
+  name: String!
+  globalCounter: Int!
+  animationLockTime: Float!
+  hiddenAnimation: Int!
+  location: Location!
+  id: Int!
+  variation: Int!
+  effectDisplayType: Int!
+  isAoE: Boolean!
+  effects: [ActionEffect!]!
+  effectFlags: Int!
   useTime: Timestamp!
+}
+
+type ActionEffect {
+  targetID: Uint!
+  type: Int!
+  hitSeverity: Int!
+  param: Int!
+  bonusPercent: Int!
+  valueMultiplier: Int!
+  flags: Int!
+  value: Int!
 }
 
 type Status {

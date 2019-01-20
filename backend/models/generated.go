@@ -7,10 +7,30 @@ import (
 )
 
 type Action struct {
-	ID       int       `json:"id"`
-	Name     string    `json:"name"`
-	TargetID uint64    `json:"targetID"`
-	UseTime  time.Time `json:"useTime"`
+	TargetID          uint64         `json:"targetID"`
+	Name              string         `json:"name"`
+	GlobalCounter     int            `json:"globalCounter"`
+	AnimationLockTime float64        `json:"animationLockTime"`
+	HiddenAnimation   int            `json:"hiddenAnimation"`
+	Location          Location       `json:"location"`
+	ID                int            `json:"id"`
+	Variation         int            `json:"variation"`
+	EffectDisplayType int            `json:"effectDisplayType"`
+	IsAoE             bool           `json:"isAoE"`
+	Effects           []ActionEffect `json:"effects"`
+	EffectFlags       int            `json:"effectFlags"`
+	UseTime           time.Time      `json:"useTime"`
+}
+
+type ActionEffect struct {
+	TargetID        uint64 `json:"targetID"`
+	Type            int    `json:"type"`
+	HitSeverity     int    `json:"hitSeverity"`
+	Param           int    `json:"param"`
+	BonusPercent    int    `json:"bonusPercent"`
+	ValueMultiplier int    `json:"valueMultiplier"`
+	Flags           int    `json:"flags"`
+	Value           int    `json:"value"`
 }
 
 type AddEntity struct {

@@ -97,10 +97,30 @@ type Location {
 }
 
 type Action {
-  id: Int!
-  name: String!
   targetID: Uint!
+  name: String!
+  globalCounter: Int!
+  animationLockTime: Float!
+  hiddenAnimation: Int!
+  location: Location!
+  id: Int!
+  variation: Int!
+  effectDisplayType: Int!
+  isAoE: Boolean!
+  effects: [ActionEffect!]!
+  effectFlags: Int!
   useTime: Timestamp!
+}
+
+type ActionEffect {
+  targetID: Uint!
+  type: Int!
+  hitSeverity: Int!
+  param: Int!
+  bonusPercent: Int!
+  valueMultiplier: Int!
+  flags: Int!
+  value: Int!
 }
 
 type Status {
