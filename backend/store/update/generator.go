@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"reflect"
+	"time"
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/xivnet"
@@ -58,4 +59,9 @@ func (g *Generator) Generate(b *xivnet.Block) Update {
 func getCanonicalOrientation(d uint32, max uint32) float64 {
 	factor := float32(d) / float32(max)
 	return float64(factor) * 2 * math.Pi
+}
+
+func getTimeForDuration(secs float32) time.Time {
+	nsecDuration := float64(secs) * float64(int64(time.Second)/int64(time.Nanosecond))
+	return time.Unix(0, int64(nsecDuration))
 }
