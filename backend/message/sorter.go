@@ -18,7 +18,11 @@ func newMailbox() mailbox {
 	}
 }
 
-// Sorter sorts messages to the correct destination
+// Sorter sorts messages to the correct destination.
+// This is especially useful for handling multiple sources of data and feeding
+// them to the correct handler in a single goroutine. This same task could be
+// done with goroutines, but it may lead to goroutine leaks when it is not clear
+// or impossible to know when these sources of data appear or disappear.
 type Sorter struct {
 	mailboxes map[uint32]mailbox
 }

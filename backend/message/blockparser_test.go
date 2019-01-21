@@ -21,12 +21,12 @@ var testFrames = map[string]*xivnet.Frame{
 			&xivnet.Block{
 				Length: 123,
 				Header: xivnet.BlockHeader{SubjectID: 1234, CurrentID: 5678, Opcode: 0x90},
-				Data:   []byte{1, 2, 3, 4},
+				Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 			},
 			&xivnet.Block{
 				Length: 456,
 				Header: xivnet.BlockHeader{SubjectID: 5678, CurrentID: 5678, Opcode: 0x91},
-				Data:   []byte{5, 6, 7, 8},
+				Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 			},
 		},
 	},
@@ -35,7 +35,7 @@ var testFrames = map[string]*xivnet.Frame{
 			&xivnet.Block{
 				Length: 789,
 				Header: xivnet.BlockHeader{SubjectID: 2345, CurrentID: 5678, Opcode: 0x92},
-				Data:   []byte{9, 0, 1, 2},
+				Data:   xivnet.GenericBlockDataFromBytes([]byte{9, 0, 1, 2}),
 			},
 		},
 	},
@@ -178,19 +178,19 @@ var _ = Describe("Block Parser", func() {
 				&xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyActionOpcode},
-					Data:   []byte{1, 2, 3, 4},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 				},
 				&xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.CastingOpcode},
-					Data:   []byte{1, 2, 3, 4},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 				},
 			}
 			blocks = cb(blocks)
 			return append(blocks, &xivnet.Block{
 				Length: 123,
 				Header: xivnet.BlockHeader{Opcode: datatypes.CastingOpcode},
-				Data:   []byte{5, 6, 7, 8},
+				Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 			})
 		}
 
@@ -200,20 +200,20 @@ var _ = Describe("Block Parser", func() {
 					blocks = append(blocks, &xivnet.Block{
 						Length: 123,
 						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-						Data:   []byte{1, 2, 3, 4},
+						Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 					})
 				}
 				return append(blocks, &xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-					Data:   []byte{5, 6, 7, 8},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 				})
 			})
 			expectedBlocks := setupBlocksList(func(blocks []*xivnet.Block) []*xivnet.Block {
 				return append(blocks, &xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-					Data:   []byte{5, 6, 7, 8},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 				})
 			})
 
@@ -227,13 +227,13 @@ var _ = Describe("Block Parser", func() {
 					blocks = append(blocks, &xivnet.Block{
 						Length: 123,
 						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
-						Data:   []byte{1, 2, 3, 4},
+						Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 					})
 				}
 				blocks = append(blocks, &xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
-					Data:   []byte{5, 6, 7, 8},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 				})
 				return blocks
 			})
@@ -241,7 +241,7 @@ var _ = Describe("Block Parser", func() {
 				blocks = append(blocks, &xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovement2Opcode},
-					Data:   []byte{5, 6, 7, 8},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 				})
 				return blocks
 			})
@@ -257,19 +257,19 @@ var _ = Describe("Block Parser", func() {
 					origBlocks = append(origBlocks, &xivnet.Block{
 						Length: 123,
 						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-						Data:   []byte{1, 2, 3, 4},
+						Data:   xivnet.GenericBlockDataFromBytes([]byte{1, 2, 3, 4}),
 					})
 				}
 				origBlocks = append(origBlocks, &xivnet.Block{
 					Length: 123,
 					Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-					Data:   []byte{5, 6, 7, 8},
+					Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 				})
 				expectedBlocks := []*xivnet.Block{
 					&xivnet.Block{
 						Length: 123,
 						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-						Data:   []byte{5, 6, 7, 8},
+						Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 					},
 				}
 				dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
@@ -283,7 +283,7 @@ var _ = Describe("Block Parser", func() {
 					return append(blocks, &xivnet.Block{
 						Length: 123,
 						Header: xivnet.BlockHeader{Opcode: datatypes.MyMovementOpcode},
-						Data:   []byte{5, 6, 7, 8},
+						Data:   xivnet.GenericBlockDataFromBytes([]byte{5, 6, 7, 8}),
 					})
 				})
 				dedupedBlocks := message.DedupMyMovementBlocks(origBlocks)
