@@ -6,10 +6,6 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNg
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/ff14wed/xivnet v1.45.0 h1:ZcF9AZoKv2PIGlErHi6BsfROBWFVaOAwwvsh1CxqhiU=
-github.com/ff14wed/xivnet v1.45.0/go.mod h1:W2eq19nbMDeNzuDWyr13YuMybQfIFffm7qtsalIyDoo=
-github.com/ff14wed/xivnet v1.45.1 h1:WDJZQMY5YKAS9cI1hCdANNvc5KLST3RADjKvVLQVsZw=
-github.com/ff14wed/xivnet v1.45.1/go.mod h1:W2eq19nbMDeNzuDWyr13YuMybQfIFffm7qtsalIyDoo=
 github.com/ff14wed/xivnet v1.45.2 h1:fNGxgsgurrxmt06vWxhjuODcjospPmWdDHkV+UNx+kY=
 github.com/ff14wed/xivnet v1.45.2/go.mod h1:W2eq19nbMDeNzuDWyr13YuMybQfIFffm7qtsalIyDoo=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
@@ -57,8 +53,8 @@ golang.org/x/sys v0.0.0-20181208175041-ad97f365e150 h1:a+Y1JYYfPXfb6xhWlOV++uijP
 golang.org/x/sys v0.0.0-20181208175041-ad97f365e150/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
-golang.org/x/tools v0.0.0-20190118193359-16909d206f00 h1:6OmoTtlNJlHuWNIjTEyUtMBHrryp8NRuf/XtnC7MmXM=
-golang.org/x/tools v0.0.0-20190118193359-16909d206f00/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+golang.org/x/tools v0.0.0-20190121143147-24cd39ecf745 h1:aGoTCTvIjOOSnuAeiybrXAIbqAuPVB4DvRXlCrKT02s=
+golang.org/x/tools v0.0.0-20190121143147-24cd39ecf745/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
