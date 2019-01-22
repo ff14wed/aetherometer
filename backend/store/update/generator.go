@@ -31,27 +31,25 @@ func registerEgressHandler(example interface{}, f updateFactory) {
 // Generator generates database updates for a given process and direction of
 // data traffic
 type Generator struct {
-	pid      int
-	isEgress bool
-	data     *datasheet.Collection
+	data *datasheet.Collection
 }
 
 // NewGenerator returns a new Generator that converts blocks to updates.
-// - pid is the process ID for which updates are generated
-// - isEgress is true if the input blocks were sent from the client to the server
 // - data stores the lookup tables for game information needed by
-func NewGenerator(pid int, isEgress bool, data *datasheet.Collection) Generator {
-	return Generator{pid: pid, isEgress: isEgress, data: data}
+func NewGenerator(data *datasheet.Collection) Generator {
+	return Generator{data: data}
 }
 
 // Generate creates an update based off the block received
-func (g *Generator) Generate(b *xivnet.Block) Update {
+// - pid is the process ID for which updates are generated
+// - isEgress is true if the input blocks were sent from the client to the server
+func (g *Generator) Generate(pid int, isEgress bool, b *xivnet.Block) Update {
 	registry := ingressRegistry
-	if g.isEgress {
+	if isEgress {
 		registry = egressRegistry
 	}
 	if factory, found := registry[reflect.TypeOf(b.Data)]; found {
-		return factory(g.pid, b, g.data)
+		return factory(pid, b, g.data)
 	}
 	return nil
 }

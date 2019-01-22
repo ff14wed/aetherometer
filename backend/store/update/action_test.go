@@ -24,6 +24,8 @@ var _ = Describe("Action Update", func() {
 		subjectID uint64
 		entity    *models.Entity
 
+		generator update.Generator
+
 		matchExpectedAction types.GomegaMatcher
 	)
 
@@ -48,6 +50,8 @@ var _ = Describe("Action Update", func() {
 		d.ActionData = datasheet.ActionStore{
 			456: datasheet.Action{ID: 456, Name: "Foo"},
 		}
+
+		generator = update.NewGenerator(d)
 
 		b = &xivnet.Block{
 			Length: 1234,
@@ -140,8 +144,7 @@ var _ = Describe("Action Update", func() {
 	})
 
 	It("generates an update that sets the entity's last action", func() {
-		g := update.NewGenerator(stream, false, d)
-		u := g.Generate(b)
+		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
 		streamEvents, entityEvents, err := u.ModifyDB(db)
 		Expect(err).ToNot(HaveOccurred())
@@ -159,8 +162,7 @@ var _ = Describe("Action Update", func() {
 	})
 
 	It("errors when the stream doesn't exist", func() {
-		g := update.NewGenerator(1000, false, d)
-		u := g.Generate(b)
+		u := generator.Generate(1000, false, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyDB(db)
@@ -172,8 +174,7 @@ var _ = Describe("Action Update", func() {
 	It("errors when the entity doesn't exist", func() {
 		b.Header.SubjectID = 0x9ABCDEF0
 
-		g := update.NewGenerator(1234, false, d)
-		u := g.Generate(b)
+		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyDB(db)
@@ -188,8 +189,7 @@ var _ = Describe("Action Update", func() {
 		})
 
 		It("sets the action name to Unknown_X instead", func() {
-			g := update.NewGenerator(stream, false, d)
-			u := g.Generate(b)
+			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyDB(db)
 			Expect(err).ToNot(HaveOccurred())
@@ -215,8 +215,7 @@ var _ = Describe("Action Update", func() {
 		})
 
 		It("generates update that sets the entity's last action and removes the casting info", func() {
-			g := update.NewGenerator(stream, false, d)
-			u := g.Generate(b)
+			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyDB(db)
 			Expect(err).ToNot(HaveOccurred())
