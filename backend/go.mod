@@ -15,6 +15,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2 // indirect
+	github.com/thejerf/suture v3.0.0+incompatible
 	github.com/urfave/cli v1.20.0 // indirect
 	github.com/vektah/gqlparser v1.0.0
 	golang.org/x/net v0.0.0-20181207154023-610586996380 // indirect
