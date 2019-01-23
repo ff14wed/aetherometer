@@ -47,7 +47,7 @@ var _ = Describe("Server", func() {
 			})
 			supervisor.ServeBackground()
 			_ = supervisor.Add(s)
-			s.WaitForStart()
+			s.WaitUntilReady()
 		})
 
 		AfterEach(func() {

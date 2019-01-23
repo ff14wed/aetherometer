@@ -86,8 +86,8 @@ func (s *Server) Serve() {
 	}
 }
 
-// WaitForStart blocks until the server has started listening
-func (s *Server) WaitForStart() {
+// WaitUntilReady blocks until the server has started listening
+func (s *Server) WaitUntilReady() {
 	<-s.ready
 }
 
