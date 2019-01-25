@@ -83,8 +83,8 @@ func (db *DB) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
 type Stream struct {
-	Pid        int    `json:"pid"`
-	MyEntityID uint64 `json:"myEntityID"`
+	Pid         int    `json:"pid"`
+	CharacterID uint64 `json:"characterID"`
 
 	Place        Place         `json:"place"`
 	Enmity       Enmity        `json:"enmity"`
@@ -118,7 +118,7 @@ func (s *Stream) Entities() []Entity {
 // epoch.
 func MarshalTimestamp(t time.Time) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		io.WriteString(w, strconv.FormatInt(getTimeInMs(t), 10))
+		_, _ = io.WriteString(w, strconv.FormatInt(getTimeInMs(t), 10))
 	})
 }
 
@@ -129,7 +129,7 @@ func getTimeInMs(t time.Time) int64 {
 // MarshalUint marshals the provided uint64 to a string
 func MarshalUint(u uint64) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-		io.WriteString(w, strconv.FormatUint(u, 10))
+		_, _ = io.WriteString(w, strconv.FormatUint(u, 10))
 	})
 }
 

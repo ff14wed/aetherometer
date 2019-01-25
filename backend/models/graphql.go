@@ -222,7 +222,7 @@ type ComplexityRoot struct {
 
 	Stream struct {
 		Pid          func(childComplexity int) int
-		MyEntityId   func(childComplexity int) int
+		CharacterId  func(childComplexity int) int
 		Place        func(childComplexity int) int
 		Enmity       func(childComplexity int) int
 		CraftingInfo func(childComplexity int) int
@@ -1197,12 +1197,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.Pid(childComplexity), true
 
-	case "Stream.myEntityID":
-		if e.complexity.Stream.MyEntityId == nil {
+	case "Stream.characterID":
+		if e.complexity.Stream.CharacterId == nil {
 			break
 		}
 
-		return e.complexity.Stream.MyEntityId(childComplexity), true
+		return e.complexity.Stream.CharacterId(childComplexity), true
 
 	case "Stream.place":
 		if e.complexity.Stream.Place == nil {
@@ -5922,8 +5922,8 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "myEntityID":
-			out.Values[i] = ec._Stream_myEntityID(ctx, field, obj)
+		case "characterID":
+			out.Values[i] = ec._Stream_characterID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -5983,7 +5983,7 @@ func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.Colle
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Stream_myEntityID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+func (ec *executionContext) _Stream_characterID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -5995,7 +5995,7 @@ func (ec *executionContext) _Stream_myEntityID(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.MyEntityID, nil
+		return obj.CharacterID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -8491,7 +8491,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 
 type Stream {
   pid: Int!
-  myEntityID: Uint!
+  characterID: Uint!
 
   place: Place!
   enmity: Enmity!

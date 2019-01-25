@@ -7,7 +7,7 @@ type Query {
 
 type Stream {
   pid: Int!
-  myEntityID: Uint!
+  characterID: Uint!
 
   place: Place!
   enmity: Enmity!
