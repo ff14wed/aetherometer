@@ -54,6 +54,7 @@ type Entity {
   location: Location!
   lastAction: Action
   statuses: [Status]!
+  lockonMarker: Int!
 
   castingInfo: CastingInfo
 
@@ -215,7 +216,8 @@ union EntityEventType =
   UpsertStatus |
   RemoveStatus |
   UpdateLocation |
-  UpdateResources
+  UpdateResources |
+  UpdateLockonMarker
 
 type AddEntity {
   entity: Entity!
@@ -260,6 +262,10 @@ type UpdateLocation {
 
 type UpdateResources {
   resources: Resources!
+}
+
+type UpdateLockonMarker {
+  lockonMarker: Int!
 }
 
 scalar Timestamp

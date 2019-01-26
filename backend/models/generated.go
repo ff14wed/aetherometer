@@ -93,6 +93,7 @@ type Entity struct {
 	Location         Location     `json:"location"`
 	LastAction       *Action      `json:"lastAction"`
 	Statuses         []*Status    `json:"statuses"`
+	LockonMarker     int          `json:"lockonMarker"`
 	CastingInfo      *CastingInfo `json:"castingInfo"`
 	RawSpawnJSONData string       `json:"rawSpawnJSONData"`
 }
@@ -238,6 +239,12 @@ type UpdateLocation struct {
 }
 
 func (UpdateLocation) IsEntityEventType() {}
+
+type UpdateLockonMarker struct {
+	LockonMarker int `json:"lockonMarker"`
+}
+
+func (UpdateLockonMarker) IsEntityEventType() {}
 
 type UpdateMap struct {
 	Place Place `json:"place"`

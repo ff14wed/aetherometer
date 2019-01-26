@@ -124,6 +124,7 @@ type ComplexityRoot struct {
 		Location         func(childComplexity int) int
 		LastAction       func(childComplexity int) int
 		Statuses         func(childComplexity int) int
+		LockonMarker     func(childComplexity int) int
 		CastingInfo      func(childComplexity int) int
 		RawSpawnJsondata func(childComplexity int) int
 	}
@@ -261,6 +262,10 @@ type ComplexityRoot struct {
 
 	UpdateLocation struct {
 		Location func(childComplexity int) int
+	}
+
+	UpdateLockonMarker struct {
+		LockonMarker func(childComplexity int) int
 	}
 
 	UpdateMap struct {
@@ -816,6 +821,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.Statuses(childComplexity), true
 
+	case "Entity.lockonMarker":
+		if e.complexity.Entity.LockonMarker == nil {
+			break
+		}
+
+		return e.complexity.Entity.LockonMarker(childComplexity), true
+
 	case "Entity.castingInfo":
 		if e.complexity.Entity.CastingInfo == nil {
 			break
@@ -1301,6 +1313,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateLocation.Location(childComplexity), true
+
+	case "UpdateLockonMarker.lockonMarker":
+		if e.complexity.UpdateLockonMarker.LockonMarker == nil {
+			break
+		}
+
+		return e.complexity.UpdateLockonMarker.LockonMarker(childComplexity), true
 
 	case "UpdateMap.place":
 		if e.complexity.UpdateMap.Place == nil {
@@ -3232,6 +3251,11 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "lockonMarker":
+			out.Values[i] = ec._Entity_lockonMarker(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "castingInfo":
 			out.Values[i] = ec._Entity_castingInfo(ctx, field, obj)
 		case "rawSpawnJSONData":
@@ -3696,6 +3720,33 @@ func (ec *executionContext) _Entity_statuses(ctx context.Context, field graphql.
 	}
 	wg.Wait()
 	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Entity_lockonMarker(ctx context.Context, field graphql.CollectedField, obj *Entity) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Entity",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LockonMarker, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -6662,6 +6713,63 @@ func (ec *executionContext) _UpdateLocation_location(ctx context.Context, field 
 	return ec._Location(ctx, field.Selections, &res)
 }
 
+var updateLockonMarkerImplementors = []string{"UpdateLockonMarker"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateLockonMarker(ctx context.Context, sel ast.SelectionSet, obj *UpdateLockonMarker) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateLockonMarkerImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateLockonMarker")
+		case "lockonMarker":
+			out.Values[i] = ec._UpdateLockonMarker_lockonMarker(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateLockonMarker_lockonMarker(ctx context.Context, field graphql.CollectedField, obj *UpdateLockonMarker) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateLockonMarker",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LockonMarker, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
 var updateMapImplementors = []string{"UpdateMap"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -8418,6 +8526,10 @@ func (ec *executionContext) _EntityEventType(ctx context.Context, sel ast.Select
 		return ec._UpdateResources(ctx, sel, &obj)
 	case *UpdateResources:
 		return ec._UpdateResources(ctx, sel, obj)
+	case UpdateLockonMarker:
+		return ec._UpdateLockonMarker(ctx, sel, &obj)
+	case *UpdateLockonMarker:
+		return ec._UpdateLockonMarker(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -8538,6 +8650,7 @@ type Entity {
   location: Location!
   lastAction: Action
   statuses: [Status]!
+  lockonMarker: Int!
 
   castingInfo: CastingInfo
 
@@ -8699,7 +8812,8 @@ union EntityEventType =
   UpsertStatus |
   RemoveStatus |
   UpdateLocation |
-  UpdateResources
+  UpdateResources |
+  UpdateLockonMarker
 
 type AddEntity {
   entity: Entity!
@@ -8744,6 +8858,10 @@ type UpdateLocation {
 
 type UpdateResources {
   resources: Resources!
+}
+
+type UpdateLockonMarker {
+  lockonMarker: Int!
 }
 
 scalar Timestamp
