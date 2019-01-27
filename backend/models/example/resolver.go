@@ -8,11 +8,20 @@ import (
 
 type Resolver struct{}
 
+func (r *Resolver) Mutation() MutationResolver {
+	return &mutationResolver{r}
+}
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
 }
 func (r *Resolver) Subscription() SubscriptionResolver {
 	return &subscriptionResolver{r}
+}
+
+type mutationResolver struct{ *Resolver }
+
+func (r *mutationResolver) SendAdapterRequest(ctx context.Context, request models.AdapterRequest) (string, error) {
+	panic("not implemented")
 }
 
 type queryResolver struct{ *Resolver }

@@ -33,6 +33,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
 }
@@ -164,6 +165,10 @@ type ComplexityRoot struct {
 		TerritoryType func(childComplexity int) int
 	}
 
+	Mutation struct {
+		SendAdapterRequest func(childComplexity int, request AdapterRequest) int
+	}
+
 	Npcinfo struct {
 		NameId  func(childComplexity int) int
 		BaseId  func(childComplexity int) int
@@ -286,6 +291,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	SendAdapterRequest(ctx context.Context, request AdapterRequest) (string, error)
+}
 type QueryResolver interface {
 	APIVersion(ctx context.Context) (string, error)
 	Streams(ctx context.Context) ([]Stream, error)
@@ -295,6 +303,21 @@ type QueryResolver interface {
 type SubscriptionResolver interface {
 	StreamEvent(ctx context.Context) (<-chan StreamEvent, error)
 	EntityEvent(ctx context.Context) (<-chan EntityEvent, error)
+}
+
+func field_Mutation_sendAdapterRequest_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 AdapterRequest
+	if tmp, ok := rawArgs["request"]; ok {
+		var err error
+		arg0, err = UnmarshalAdapterRequest(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["request"] = arg0
+	return args, nil
+
 }
 
 func field_Query_stream_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -982,6 +1005,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MapInfo.TerritoryType(childComplexity), true
 
+	case "Mutation.sendAdapterRequest":
+		if e.complexity.Mutation.SendAdapterRequest == nil {
+			break
+		}
+
+		args, err := field_Mutation_sendAdapterRequest_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SendAdapterRequest(childComplexity, args["request"].(AdapterRequest)), true
+
 	case "NPCInfo.nameID":
 		if e.complexity.Npcinfo.NameId == nil {
 			break
@@ -1377,7 +1412,20 @@ func (e *executableSchema) Query(ctx context.Context, op *ast.OperationDefinitio
 }
 
 func (e *executableSchema) Mutation(ctx context.Context, op *ast.OperationDefinition) *graphql.Response {
-	return graphql.ErrorResponse(ctx, "mutations are not supported")
+	ec := executionContext{graphql.GetRequestContext(ctx), e}
+
+	buf := ec.RequestMiddleware(ctx, func(ctx context.Context) []byte {
+		data := ec._Mutation(ctx, op.SelectionSet)
+		var buf bytes.Buffer
+		data.MarshalGQL(&buf)
+		return buf.Bytes()
+	})
+
+	return &graphql.Response{
+		Data:       buf,
+		Errors:     ec.Errors,
+		Extensions: ec.Extensions,
+	}
 }
 
 func (e *executableSchema) Subscription(ctx context.Context, op *ast.OperationDefinition) func() *graphql.Response {
@@ -4558,6 +4606,73 @@ func (ec *executionContext) _MapInfo_TerritoryType(ctx context.Context, field gr
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TerritoryType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, mutationImplementors)
+
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "sendAdapterRequest":
+			out.Values[i] = ec._Mutation_sendAdapterRequest(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_sendAdapterRequest(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_sendAdapterRequest_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SendAdapterRequest(rctx, args["request"].(AdapterRequest))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -8564,6 +8679,30 @@ func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.Select
 	}
 }
 
+func UnmarshalAdapterRequest(v interface{}) (AdapterRequest, error) {
+	var it AdapterRequest
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "streamID":
+			var err error
+			it.StreamID, err = graphql.UnmarshalInt(v)
+			if err != nil {
+				return it, err
+			}
+		case "data":
+			var err error
+			it.Data, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) FieldMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver) (ret interface{}) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8866,5 +9005,13 @@ type UpdateLockonMarker {
 
 scalar Timestamp
 scalar Uint
-`},
+
+type Mutation {
+  sendAdapterRequest(request: AdapterRequest!): String!
+}
+
+input AdapterRequest {
+  streamID: Int!
+  data: String!
+}`},
 )

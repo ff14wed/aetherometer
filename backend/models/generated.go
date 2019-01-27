@@ -33,6 +33,11 @@ type ActionEffect struct {
 	Value           int    `json:"value"`
 }
 
+type AdapterRequest struct {
+	StreamID int    `json:"streamID"`
+	Data     string `json:"data"`
+}
+
 type AddEntity struct {
 	Entity Entity `json:"entity"`
 }

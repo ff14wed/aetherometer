@@ -270,3 +270,12 @@ type UpdateLockonMarker {
 
 scalar Timestamp
 scalar Uint
+
+type Mutation {
+  sendAdapterRequest(request: AdapterRequest!): String!
+}
+
+input AdapterRequest {
+  streamID: Int!
+  data: String!
+}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/models"
@@ -157,6 +158,67 @@ var _ = Describe("Models", func() {
 				cancel()
 				Eventually(fakeEntityEventSource.UnsubscribeCallCount).Should(Equal(1))
 				Expect(fakeEntityEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
+			})
+		})
+
+		Describe("SendAdapterRequest", func() {
+			var (
+				requestedPid  int
+				requestedData []byte
+			)
+
+			BeforeEach(func() {
+				requestedPid = 0
+				requestedData = nil
+				db.AdapterRequestHandler = func(pid int, data []byte) (string, error) {
+					requestedPid = pid
+					requestedData = data
+					return "Success", nil
+				}
+			})
+
+			It("successfully calls the provided handler", func() {
+				resp, err := db.SendAdapterRequest(models.AdapterRequest{
+					StreamID: 123,
+					Data:     "hello",
+				})
+				Expect(resp).To(Equal("Success"))
+				Expect(err).To(BeNil())
+
+				Expect(requestedPid).To(Equal(123))
+				Expect(requestedData).To(Equal([]byte("hello")))
+			})
+
+			Context("when the handler errors", func() {
+				BeforeEach(func() {
+					db.AdapterRequestHandler = func(pid int, data []byte) (string, error) {
+						return "", errors.New("kaboom")
+					}
+				})
+
+				It("successfully calls the provided handler", func() {
+					resp, err := db.SendAdapterRequest(models.AdapterRequest{
+						StreamID: 123,
+						Data:     "hello",
+					})
+					Expect(resp).To(BeEmpty())
+					Expect(err).To(MatchError("kaboom"))
+				})
+			})
+
+			Context("when the request handler is missing", func() {
+				BeforeEach(func() {
+					db.AdapterRequestHandler = nil
+				})
+
+				It("returns an error", func() {
+					resp, err := db.SendAdapterRequest(models.AdapterRequest{
+						StreamID: 123,
+						Data:     "hello",
+					})
+					Expect(resp).To(BeEmpty())
+					Expect(err).To(MatchError("Request handler is missing"))
+				})
 			})
 		})
 	})

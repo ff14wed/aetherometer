@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -19,10 +20,11 @@ import (
 // stream has its own independent state. Querying for any data requires
 // walking down the data hierarchy.
 type DB struct {
-	StreamsMap        map[int]*Stream
-	StreamKeys        []int
-	StreamEventSource StreamEventSource
-	EntityEventSource EntityEventSource
+	StreamsMap            map[int]*Stream
+	StreamKeys            []int
+	StreamEventSource     StreamEventSource
+	EntityEventSource     EntityEventSource
+	AdapterRequestHandler func(pid int, data []byte) (resp string, err error)
 }
 
 // Streams returns all the streams from the internal store.
@@ -78,6 +80,15 @@ func (db *DB) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
 		db.EntityEventSource.Unsubscribe(id)
 	}()
 	return ch, nil
+}
+
+// SendAdapterRequest allows a client to send data upstream to configure the
+// adapter (the data source) at runtime.
+func (db *DB) SendAdapterRequest(req AdapterRequest) (string, error) {
+	if db.AdapterRequestHandler == nil {
+		return "", errors.New("Request handler is missing")
+	}
+	return db.AdapterRequestHandler(req.StreamID, []byte(req.Data))
 }
 
 // Stream represents state reconstructed from the live stream of data from a

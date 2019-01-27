@@ -18,6 +18,10 @@ func NewResolver(db *DB) *Resolver {
 	return &Resolver{db: db}
 }
 
+func (r *Resolver) Mutation() MutationResolver {
+	return &mutationResolver{r}
+}
+
 // Query allows graphql to resolve queries made on the system
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
@@ -26,6 +30,12 @@ func (r *Resolver) Query() QueryResolver {
 // Subscription allows graphql to resolve subscriptions added to the system
 func (r *Resolver) Subscription() SubscriptionResolver {
 	return &subscriptionResolver{r}
+}
+
+type mutationResolver struct{ *Resolver }
+
+func (r *mutationResolver) SendAdapterRequest(ctx context.Context, req AdapterRequest) (string, error) {
+	return r.db.SendAdapterRequest(req)
 }
 
 type queryResolver struct{ *Resolver }
