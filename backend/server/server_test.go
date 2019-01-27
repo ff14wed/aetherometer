@@ -3,28 +3,39 @@ package server_test
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"sync/atomic"
 
 	"github.com/ff14wed/sibyl/backend/config"
 	"github.com/ff14wed/sibyl/backend/server"
+	"github.com/ff14wed/sibyl/backend/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/thejerf/suture"
+	"go.uber.org/zap"
 )
 
 var _ = Describe("Server", func() {
 	var (
 		s      *server.Server
-		buf    *gbytes.Buffer
-		logger *log.Logger
+		buf    *testhelpers.LogBuffer
+		logger *zap.Logger
 	)
+	buf = new(testhelpers.LogBuffer)
+	err := zap.RegisterSink("servertest", func(*url.URL) (zap.Sink, error) {
+		return buf, nil
+	})
+
 	BeforeEach(func() {
-		buf = gbytes.NewBuffer()
-		logger = log.New(buf, "", 0)
+		buf.Reset()
+		Expect(err).ToNot(HaveOccurred())
+		zapCfg := zap.NewDevelopmentConfig()
+		zapCfg.OutputPaths = []string{"servertest://"}
+		logger, err = zapCfg.Build()
+		Expect(err).ToNot(HaveOccurred())
 		cfg := config.Config{}
 		s = server.New(cfg, logger)
 	})
@@ -59,7 +70,7 @@ var _ = Describe("Server", func() {
 		})
 
 		It("logs the port the server started on", func() {
-			Expect(buf).To(gbytes.Say(`Server: running at `))
+			Expect(buf).To(gbytes.Say(`http-server.*Running`))
 			Expect(buf).To(gbytes.Say(s.Address().String()))
 		})
 
@@ -176,7 +187,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("logs that it is shutting down", func() {
-				Expect(buf).To(gbytes.Say(`Server: stopping...`))
+				Expect(buf).To(gbytes.Say(`http-server.*Stopping...`))
 			})
 		})
 	})

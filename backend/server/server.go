@@ -3,17 +3,17 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/config"
+	"go.uber.org/zap"
 )
 
 // Server handles serving the backend API for Sibyl
 type Server struct {
-	logger *log.Logger
+	logger *zap.Logger
 
 	s          *http.Server
 	ctx        context.Context
@@ -27,12 +27,12 @@ type Server struct {
 // New initializes a new instance of the backend server
 func New(
 	cfg config.Config,
-	logger *log.Logger,
+	logger *zap.Logger,
 ) *Server {
 	serveMux := http.NewServeMux()
 
 	s := &Server{
-		logger: logger,
+		logger: logger.Named("http-server"),
 
 		s: &http.Server{
 			Addr:    fmt.Sprintf("localhost:%d", cfg.APIPort),
@@ -71,17 +71,17 @@ func (ln tcpKeepAliveListener) Accept() (net.Conn, error) {
 func (s *Server) Serve() {
 	ln, err := net.Listen("tcp", s.s.Addr)
 	if err != nil {
-		s.logger.Println("Server: error starting listener:", err)
+		s.logger.Error("Error starting listener", zap.Error(err))
 		return
 	}
 	s.address = ln.Addr()
 
-	s.logger.Println("Server: running at", s.Address().String())
+	s.logger.Info("Running", zap.String("address", s.Address().String()))
 	close(s.ready)
 
 	err = s.s.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)})
 	if err != nil && err != http.ErrServerClosed {
-		s.logger.Println("Server: encountered error serving:", err)
+		s.logger.Error("Error serving", zap.Error(err))
 		return
 	}
 }
@@ -93,13 +93,13 @@ func (s *Server) WaitUntilReady() {
 
 // Stop will shutdown the backend server, and will timeout within 1 second
 func (s *Server) Stop() {
-	s.logger.Println("Server: stopping...")
+	s.logger.Info("Stopping...")
 	s.cancelFunc()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	err := s.s.Shutdown(ctx)
 	if err != nil {
-		s.logger.Println("Server: error shutting down:", err)
+		s.logger.Error("Error shutting down", zap.Error(err))
 		return
 	}
 }
