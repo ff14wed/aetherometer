@@ -166,7 +166,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		SendAdapterRequest func(childComplexity int, request AdapterRequest) int
+		SendStreamRequest func(childComplexity int, request StreamRequest) int
 	}
 
 	Npcinfo struct {
@@ -292,7 +292,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	SendAdapterRequest(ctx context.Context, request AdapterRequest) (string, error)
+	SendStreamRequest(ctx context.Context, request StreamRequest) (string, error)
 }
 type QueryResolver interface {
 	APIVersion(ctx context.Context) (string, error)
@@ -305,12 +305,12 @@ type SubscriptionResolver interface {
 	EntityEvent(ctx context.Context) (<-chan EntityEvent, error)
 }
 
-func field_Mutation_sendAdapterRequest_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func field_Mutation_sendStreamRequest_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 AdapterRequest
+	var arg0 StreamRequest
 	if tmp, ok := rawArgs["request"]; ok {
 		var err error
-		arg0, err = UnmarshalAdapterRequest(tmp)
+		arg0, err = UnmarshalStreamRequest(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1005,17 +1005,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MapInfo.TerritoryType(childComplexity), true
 
-	case "Mutation.sendAdapterRequest":
-		if e.complexity.Mutation.SendAdapterRequest == nil {
+	case "Mutation.sendStreamRequest":
+		if e.complexity.Mutation.SendStreamRequest == nil {
 			break
 		}
 
-		args, err := field_Mutation_sendAdapterRequest_args(rawArgs)
+		args, err := field_Mutation_sendStreamRequest_args(rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SendAdapterRequest(childComplexity, args["request"].(AdapterRequest)), true
+		return e.complexity.Mutation.SendStreamRequest(childComplexity, args["request"].(StreamRequest)), true
 
 	case "NPCInfo.nameID":
 		if e.complexity.Npcinfo.NameId == nil {
@@ -4637,8 +4637,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "sendAdapterRequest":
-			out.Values[i] = ec._Mutation_sendAdapterRequest(ctx, field)
+		case "sendStreamRequest":
+			out.Values[i] = ec._Mutation_sendStreamRequest(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -4654,11 +4654,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Mutation_sendAdapterRequest(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+func (ec *executionContext) _Mutation_sendStreamRequest(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := field_Mutation_sendAdapterRequest_args(rawArgs)
+	args, err := field_Mutation_sendStreamRequest_args(rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -4672,7 +4672,7 @@ func (ec *executionContext) _Mutation_sendAdapterRequest(ctx context.Context, fi
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SendAdapterRequest(rctx, args["request"].(AdapterRequest))
+		return ec.resolvers.Mutation().SendStreamRequest(rctx, args["request"].(StreamRequest))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -8679,8 +8679,8 @@ func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.Select
 	}
 }
 
-func UnmarshalAdapterRequest(v interface{}) (AdapterRequest, error) {
-	var it AdapterRequest
+func UnmarshalStreamRequest(v interface{}) (StreamRequest, error) {
+	var it StreamRequest
 	var asMap = v.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -9007,10 +9007,10 @@ scalar Timestamp
 scalar Uint
 
 type Mutation {
-  sendAdapterRequest(request: AdapterRequest!): String!
+  sendStreamRequest(request: StreamRequest!): String!
 }
 
-input AdapterRequest {
+input StreamRequest {
   streamID: Int!
   data: String!
 }`},

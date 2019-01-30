@@ -34,8 +34,8 @@ func (r *Resolver) Subscription() SubscriptionResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) SendAdapterRequest(ctx context.Context, req AdapterRequest) (string, error) {
-	return r.db.SendAdapterRequest(req)
+func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequest) (string, error) {
+	return r.db.SendStreamRequest(req)
 }
 
 type queryResolver struct{ *Resolver }

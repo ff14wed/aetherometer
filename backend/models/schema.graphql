@@ -272,10 +272,10 @@ scalar Timestamp
 scalar Uint
 
 type Mutation {
-  sendAdapterRequest(request: AdapterRequest!): String!
+  sendStreamRequest(request: StreamRequest!): String!
 }
 
-input AdapterRequest {
+input StreamRequest {
   streamID: Int!
   data: String!
 }

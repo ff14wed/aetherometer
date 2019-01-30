@@ -161,7 +161,7 @@ var _ = Describe("Models", func() {
 			})
 		})
 
-		Describe("SendAdapterRequest", func() {
+		Describe("SendStreamRequest", func() {
 			var (
 				requestedPid  int
 				requestedData []byte
@@ -170,7 +170,7 @@ var _ = Describe("Models", func() {
 			BeforeEach(func() {
 				requestedPid = 0
 				requestedData = nil
-				db.AdapterRequestHandler = func(pid int, data []byte) (string, error) {
+				db.StreamRequestHandler = func(pid int, data []byte) (string, error) {
 					requestedPid = pid
 					requestedData = data
 					return "Success", nil
@@ -178,7 +178,7 @@ var _ = Describe("Models", func() {
 			})
 
 			It("successfully calls the provided handler", func() {
-				resp, err := db.SendAdapterRequest(models.AdapterRequest{
+				resp, err := db.SendStreamRequest(models.StreamRequest{
 					StreamID: 123,
 					Data:     "hello",
 				})
@@ -191,13 +191,13 @@ var _ = Describe("Models", func() {
 
 			Context("when the handler errors", func() {
 				BeforeEach(func() {
-					db.AdapterRequestHandler = func(pid int, data []byte) (string, error) {
+					db.StreamRequestHandler = func(pid int, data []byte) (string, error) {
 						return "", errors.New("kaboom")
 					}
 				})
 
 				It("successfully calls the provided handler", func() {
-					resp, err := db.SendAdapterRequest(models.AdapterRequest{
+					resp, err := db.SendStreamRequest(models.StreamRequest{
 						StreamID: 123,
 						Data:     "hello",
 					})
@@ -208,11 +208,11 @@ var _ = Describe("Models", func() {
 
 			Context("when the request handler is missing", func() {
 				BeforeEach(func() {
-					db.AdapterRequestHandler = nil
+					db.StreamRequestHandler = nil
 				})
 
 				It("returns an error", func() {
-					resp, err := db.SendAdapterRequest(models.AdapterRequest{
+					resp, err := db.SendStreamRequest(models.StreamRequest{
 						StreamID: 123,
 						Data:     "hello",
 					})

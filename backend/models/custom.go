@@ -20,11 +20,11 @@ import (
 // stream has its own independent state. Querying for any data requires
 // walking down the data hierarchy.
 type DB struct {
-	StreamsMap            map[int]*Stream
-	StreamKeys            []int
-	StreamEventSource     StreamEventSource
-	EntityEventSource     EntityEventSource
-	AdapterRequestHandler func(pid int, data []byte) (resp string, err error)
+	StreamsMap           map[int]*Stream
+	StreamKeys           []int
+	StreamEventSource    StreamEventSource
+	EntityEventSource    EntityEventSource
+	StreamRequestHandler func(pid int, data []byte) (resp string, err error)
 }
 
 // Streams returns all the streams from the internal store.
@@ -82,13 +82,13 @@ func (db *DB) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
 	return ch, nil
 }
 
-// SendAdapterRequest allows a client to send data upstream to configure the
-// adapter (the data source) at runtime.
-func (db *DB) SendAdapterRequest(req AdapterRequest) (string, error) {
-	if db.AdapterRequestHandler == nil {
+// SendStreamRequest allows a client to send data upstream to configure the
+// stream (the data source) at runtime.
+func (db *DB) SendStreamRequest(req StreamRequest) (string, error) {
+	if db.StreamRequestHandler == nil {
 		return "", errors.New("Request handler is missing")
 	}
-	return db.AdapterRequestHandler(req.StreamID, []byte(req.Data))
+	return db.StreamRequestHandler(req.StreamID, []byte(req.Data))
 }
 
 // Stream represents state reconstructed from the live stream of data from a

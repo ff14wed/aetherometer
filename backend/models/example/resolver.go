@@ -20,7 +20,7 @@ func (r *Resolver) Subscription() SubscriptionResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) SendAdapterRequest(ctx context.Context, request models.AdapterRequest) (string, error) {
+func (r *mutationResolver) SendStreamRequest(ctx context.Context, request models.StreamRequest) (string, error) {
 	panic("not implemented")
 }
 
