@@ -1,0 +1,130 @@
+// +build windows
+
+package win32
+
+import (
+	"encoding/binary"
+	"fmt"
+	"net"
+	"time"
+	"unicode/utf16"
+	"unsafe"
+
+	winio "github.com/Microsoft/go-winio"
+	"golang.org/x/sys/windows"
+)
+
+type Provider struct{}
+
+var pe32Size = uint32(unsafe.Sizeof(windows.ProcessEntry32{})) // nolint: gosec
+
+// EnumerateProcesses enumerates all processes running on the system and
+// returns a map of ProcessID -> ProcessName
+//
+// API Methods used:
+// CreateToolhelp32Snapshot https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot
+// Process32First https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32first
+// Process32Next https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32next
+// CloseHandle https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
+func (p Provider) EnumerateProcesses() (map[uint32]string, error) {
+	snapshotHandle, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
+	if err != nil {
+		return nil, fmt.Errorf("CreateToolhelp32Snapshot error: %s", err.Error())
+	}
+	defer func() {
+		_ = windows.CloseHandle(snapshotHandle)
+	}()
+	var pe32 windows.ProcessEntry32
+	pe32.Size = pe32Size
+	err = windows.Process32First(snapshotHandle, &pe32)
+	if err != nil {
+		return nil, fmt.Errorf("Process32First error: %s", err.Error())
+	}
+
+	procMap := make(map[uint32]string)
+	for err == nil {
+		processName := string(utf16.Decode(pe32.ExeFile[:]))
+		procMap[pe32.ProcessID] = processName
+		err = windows.Process32Next(snapshotHandle, &pe32)
+	}
+	return procMap, nil
+}
+
+func getWString(s string) []byte {
+	wChars := utf16.Encode(append([]rune(s), 0))
+	sBytes := make([]byte, len(wChars)*2)
+	for i := 0; i < len(wChars); i++ {
+		binary.LittleEndian.PutUint16(sBytes[i*2:], wChars[i])
+	}
+	return sBytes
+}
+
+// InjectDLL injects a library into another process on the system
+//
+// API Methods used:
+// OpenProcess https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-openprocess
+// VirtualAllocEx https://msdn.microsoft.com/en-us/library/windows/desktop/aa366890(v=vs.85).aspx
+// WriteProcessMemory https://msdn.microsoft.com/en-us/library/windows/desktop/ms681674(v=vs.85).aspx
+// LoadLibraryW https://docs.microsoft.com/en-us/windows/desktop/api/libloaderapi/nf-libloaderapi-loadlibraryw
+// CreateRemoteThread https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-createremotethread
+// WaitForSingleObject https://docs.microsoft.com/en-us/windows/desktop/api/synchapi/nf-synchapi-waitforsingleobject
+// VirtualFreeEx https://msdn.microsoft.com/en-us/library/windows/desktop/aa366894(v=vs.85).aspx
+// CloseHandle https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
+func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
+	pathBytes := getWString(payloadPath)
+	lenPathBytes := int64(len(pathBytes))
+
+	hProcess, err := windows.OpenProcess(
+		windows.PROCESS_QUERY_INFORMATION|
+			PROCESS_CREATE_THREAD|
+			PROCESS_VM_OPERATION|
+			PROCESS_VM_WRITE,
+		false,
+		processID,
+	)
+	if err != nil {
+		return fmt.Errorf("open process pid %d: %s", processID, err)
+	}
+
+	remotePathAddr, err := VirtualAllocEx(hProcess, 0, lenPathBytes, MEM_COMMIT, PAGE_READWRITE)
+	if err != nil {
+		return fmt.Errorf("reserving memory in target pid %d: %s", processID, err)
+	}
+	err = WriteProcessMemory(hProcess, remotePathAddr, pathBytes, lenPathBytes)
+	if err != nil {
+		return fmt.Errorf("writing data into target pid %d memory: %s", processID, err)
+	}
+	// Get the address of LoadLibraryW in our own loaded kernel32... but it should
+	// be the same as any other process
+	loadLibraryAddr := procLoadLibraryW.Addr()
+	hThread, err := CreateRemoteThread(hProcess, 0, 0, loadLibraryAddr, remotePathAddr, 0)
+	if err != nil {
+		return fmt.Errorf("running LoadLibrary in target pid %d: %s", processID, err)
+	}
+
+	// Wait for remote thread to terminate
+	_, err = windows.WaitForSingleObject(hThread, windows.INFINITE)
+	if err != nil {
+		return fmt.Errorf("waiting for remote thread in target pid %d: %s", processID, err)
+	}
+
+	if remotePathAddr != 0 {
+		err = VirtualFreeEx(hProcess, remotePathAddr, 0, MEM_RELEASE)
+		if err != nil {
+			return fmt.Errorf("freeing reserved memory in target pid %d: %s", processID, err)
+		}
+	}
+	if hThread != 0 {
+		_ = windows.CloseHandle(hThread)
+	}
+	if hProcess != 0 {
+		_ = windows.CloseHandle(hProcess)
+	}
+
+	return nil
+}
+
+// DialPipe dials a named pipe on the system for interprocess communication
+func (p Provider) DialPipe(path string, timeout *time.Duration) (net.Conn, error) {
+	return winio.DialPipe(path, timeout)
+}
