@@ -74,8 +74,6 @@ func (s *Scanner) Serve() {
 // Stop closes the process scanner
 func (s *Scanner) Stop() {
 	close(s.stop)
-	close(s.addProcEventChan)
-	close(s.remProcEventChan)
 }
 
 func (s *Scanner) updatePids(pidList []uint32) {
