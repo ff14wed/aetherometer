@@ -5,6 +5,7 @@ import (
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
 	"github.com/ff14wed/xivnet"
 	"github.com/ff14wed/xivnet/datatypes"
@@ -16,9 +17,9 @@ import (
 
 var _ = Describe("Action Update", func() {
 	var (
-		b  *xivnet.Block
-		db *models.DB
-		d  *datasheet.Collection
+		b       *xivnet.Block
+		streams *store.Streams
+		d       *datasheet.Collection
 
 		stream    int
 		subjectID uint64
@@ -35,8 +36,8 @@ var _ = Describe("Action Update", func() {
 
 		entity = &models.Entity{}
 
-		db = &models.DB{
-			StreamsMap: map[int]*models.Stream{
+		streams = &store.Streams{
+			Map: map[int]*models.Stream{
 				stream: &models.Stream{
 					Pid: stream,
 					EntitiesMap: map[uint64]*models.Entity{
@@ -146,7 +147,7 @@ var _ = Describe("Action Update", func() {
 	It("generates an update that sets the entity's last action", func() {
 		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(streamEvents).To(BeEmpty())
 
@@ -165,7 +166,7 @@ var _ = Describe("Action Update", func() {
 		u := generator.Generate(1000, false, b)
 		Expect(u).ToNot(BeNil())
 
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).To(MatchError(update.ErrorStreamNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
@@ -177,7 +178,7 @@ var _ = Describe("Action Update", func() {
 		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
 
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).To(MatchError(update.ErrorEntityNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
@@ -191,7 +192,7 @@ var _ = Describe("Action Update", func() {
 		It("sets the action name to Unknown_X instead", func() {
 			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
-			streamEvents, entityEvents, err := u.ModifyDB(db)
+			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(streamEvents).To(BeEmpty())
 
@@ -210,14 +211,14 @@ var _ = Describe("Action Update", func() {
 
 	Context("when a casting info is present on the entity", func() {
 		BeforeEach(func() {
-			db.StreamsMap[stream].EntitiesMap[subjectID].CastingInfo =
+			streams.Map[stream].EntitiesMap[subjectID].CastingInfo =
 				&models.CastingInfo{ActionID: 1234, ActionName: "Bar"}
 		})
 
 		It("generates update that sets the entity's last action and removes the casting info", func() {
 			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
-			streamEvents, entityEvents, err := u.ModifyDB(db)
+			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(streamEvents).To(BeEmpty())
 

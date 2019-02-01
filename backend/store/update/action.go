@@ -96,8 +96,8 @@ type actionUpdate struct {
 	action models.Action
 }
 
-func (u actionUpdate) ModifyDB(db *models.DB) ([]models.StreamEvent, []models.EntityEvent, error) {
-	stream, found := db.StreamsMap[u.pid]
+func (u actionUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
+	stream, found := streams.Map[u.pid]
 	if !found {
 		return nil, nil, ErrorStreamNotFound
 	}

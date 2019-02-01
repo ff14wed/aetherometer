@@ -57,8 +57,8 @@ type castingUpdate struct {
 	castingInfo *models.CastingInfo
 }
 
-func (u castingUpdate) ModifyDB(db *models.DB) ([]models.StreamEvent, []models.EntityEvent, error) {
-	stream, found := db.StreamsMap[u.pid]
+func (u castingUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
+	stream, found := streams.Map[u.pid]
 	if !found {
 		return nil, nil, ErrorStreamNotFound
 	}

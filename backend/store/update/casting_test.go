@@ -6,6 +6,7 @@ import (
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
 	"github.com/ff14wed/sibyl/backend/testassets"
 	"github.com/ff14wed/xivnet"
@@ -16,9 +17,9 @@ import (
 
 var _ = Describe("Casting Update", func() {
 	var (
-		b  *xivnet.Block
-		db *models.DB
-		d  *datasheet.Collection
+		b       *xivnet.Block
+		streams *store.Streams
+		d       *datasheet.Collection
 
 		stream    int
 		subjectID uint64
@@ -35,8 +36,8 @@ var _ = Describe("Casting Update", func() {
 
 		entity = &models.Entity{}
 
-		db = &models.DB{
-			StreamsMap: map[int]*models.Stream{
+		streams = &store.Streams{
+			Map: map[int]*models.Stream{
 				stream: &models.Stream{
 					Pid: stream,
 					EntitiesMap: map[uint64]*models.Entity{
@@ -101,7 +102,7 @@ var _ = Describe("Casting Update", func() {
 	It("generates an update that sets the entity's casting info", func() {
 		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(streamEvents).To(BeEmpty())
 
@@ -120,7 +121,7 @@ var _ = Describe("Casting Update", func() {
 		u := generator.Generate(1000, false, b)
 		Expect(u).ToNot(BeNil())
 
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).To(MatchError(update.ErrorStreamNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
@@ -132,7 +133,7 @@ var _ = Describe("Casting Update", func() {
 		u := generator.Generate(stream, false, b)
 		Expect(u).ToNot(BeNil())
 
-		streamEvents, entityEvents, err := u.ModifyDB(db)
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).To(MatchError(update.ErrorEntityNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
@@ -146,7 +147,7 @@ var _ = Describe("Casting Update", func() {
 		It("sets the action name to Unknown_X instead", func() {
 			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
-			streamEvents, entityEvents, err := u.ModifyDB(db)
+			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(streamEvents).To(BeEmpty())
 
@@ -172,7 +173,7 @@ var _ = Describe("Casting Update", func() {
 		It("sets a partially blank casting info", func() {
 			u := generator.Generate(stream, false, b)
 			Expect(u).ToNot(BeNil())
-			streamEvents, entityEvents, err := u.ModifyDB(db)
+			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(streamEvents).To(BeEmpty())
 

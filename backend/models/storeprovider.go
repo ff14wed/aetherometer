@@ -3,7 +3,10 @@ package models
 //go:generate counterfeiter . StoreProvider
 
 // StoreProvider describes the expected interface of a datastore that can
-// provide the backing API requests
+// provide the backing API requests.
+// There is no normalization of the data expected in the store, so each
+// stream has its own independent state. Querying for any data requires
+// walking down the data hierarchy.
 type StoreProvider interface {
 	Streams() ([]Stream, error)
 	Stream(streamID int) (Stream, error)

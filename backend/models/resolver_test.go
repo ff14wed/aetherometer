@@ -62,7 +62,7 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("Streams", func() {
-			It("returns all the streams found in the database", func() {
+			It("returns all the streams found in the store", func() {
 				Expect(resolver.Query().Streams(context.Background())).To(Equal(
 					[]models.Stream{stream1, stream2},
 				))
@@ -70,7 +70,7 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("Stream", func() {
-			It("returns the requested stream from the database", func() {
+			It("returns the requested stream from the store", func() {
 				Expect(resolver.Query().Stream(context.Background(), 5678)).To(Equal(stream2))
 			})
 
@@ -81,7 +81,7 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("Entity", func() {
-			It("returns the requested entity from the database", func() {
+			It("returns the requested entity from the store", func() {
 				Expect(resolver.Query().Entity(context.Background(), 1234, 1)).To(Equal(
 					models.Entity{ID: 1, Name: "FooBar", Index: 2},
 				))

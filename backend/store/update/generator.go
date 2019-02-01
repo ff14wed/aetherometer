@@ -29,7 +29,7 @@ func registerEgressHandler(example interface{}, f updateFactory) {
 	egressRegistry[t] = f
 }
 
-// Generator generates database updates for a given process and direction of
+// Generator generates store updates for a given process and direction of
 // data traffic
 type Generator struct {
 	data *datasheet.Collection

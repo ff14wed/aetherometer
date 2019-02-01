@@ -13,15 +13,6 @@ import (
 
 //go:generate go run ../scripts/gqlgen.go -v
 
-// DB encompasses the entire internal store for the current state of all
-// streams. There is no normalization of the data in the store, so each
-// stream has its own independent state. Querying for any data requires
-// walking down the data hierarchy.
-type DB struct {
-	StreamsMap map[int]*Stream
-	StreamKeys []int
-}
-
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
 type Stream struct {
