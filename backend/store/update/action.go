@@ -6,6 +6,7 @@ import (
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/xivnet"
 	"github.com/ff14wed/xivnet/datatypes"
 )
@@ -64,7 +65,7 @@ func processActionEffects(effectsList []datatypes.ActionEffects, targets []uint6
 	return actionEffects
 }
 
-func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) Update {
+func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Action)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)

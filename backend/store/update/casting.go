@@ -5,6 +5,7 @@ import (
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/xivnet"
 	"github.com/ff14wed/xivnet/datatypes"
 )
@@ -13,7 +14,7 @@ func init() {
 	registerIngressHandler(new(datatypes.Casting), newCastingUpdate)
 }
 
-func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) Update {
+func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Casting)
 
 	info := &models.CastingInfo{

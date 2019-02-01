@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
+	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/xivnet"
 )
 
 var ErrorStreamNotFound = errors.New("stream not found")
 var ErrorEntityNotFound = errors.New("entity not found")
 
-type updateFactory func(pid int, b *xivnet.Block, data *datasheet.Collection) Update
+type updateFactory func(pid int, b *xivnet.Block, data *datasheet.Collection) store.Update
 
 var ingressRegistry = make(map[reflect.Type]updateFactory)
 var egressRegistry = make(map[reflect.Type]updateFactory)
@@ -43,7 +44,7 @@ func NewGenerator(data *datasheet.Collection) Generator {
 // Generate creates an update based off the block received
 // - pid is the process ID for which updates are generated
 // - isEgress is true if the input blocks were sent from the client to the server
-func (g *Generator) Generate(pid int, isEgress bool, b *xivnet.Block) Update {
+func (g *Generator) Generate(pid int, isEgress bool, b *xivnet.Block) store.Update {
 	registry := ingressRegistry
 	if isEgress {
 		registry = egressRegistry

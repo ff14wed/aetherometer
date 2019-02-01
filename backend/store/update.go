@@ -1,4 +1,4 @@
-package update
+package store
 
 import "github.com/ff14wed/sibyl/backend/models"
 
