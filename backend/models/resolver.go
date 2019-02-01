@@ -2,20 +2,24 @@ package models
 
 import (
 	"context"
+	"errors"
 )
 
 const SibylAPIVersion = "v0.0.0-beta"
 
+type StreamRequestHandler func(pid int, data []byte) (resp string, err error)
+
 // Resolver is a resolver for the queried data
 type Resolver struct {
-	db *DB
+	sp      StoreProvider
+	handler StreamRequestHandler
 }
 
 // NewResolver creates a new query resolver
-// It takes the db as an argument to use as a backing store for the queried
+// It takes the sp as an argument to use as a backing store for the queried
 // data
-func NewResolver(db *DB) *Resolver {
-	return &Resolver{db: db}
+func NewResolver(sp StoreProvider, streamRequestHandler StreamRequestHandler) *Resolver {
+	return &Resolver{sp: sp, handler: streamRequestHandler}
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -34,8 +38,13 @@ func (r *Resolver) Subscription() SubscriptionResolver {
 
 type mutationResolver struct{ *Resolver }
 
+// SendStreamRequest allows a client to send data upstream to configure the
+// stream (the data source) at runtime.
 func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequest) (string, error) {
-	return r.db.SendStreamRequest(req)
+	if r.handler == nil {
+		return "", errors.New("Request handler is missing")
+	}
+	return r.handler(req.StreamID, []byte(req.Data))
 }
 
 type queryResolver struct{ *Resolver }
@@ -44,20 +53,37 @@ func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
 	return SibylAPIVersion, nil
 }
 func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
-	return r.db.Streams(), nil
+	return r.sp.Streams()
 }
 func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error) {
-	return r.db.Stream(streamID)
+	return r.sp.Stream(streamID)
 }
 func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error) {
-	return r.db.Entity(streamID, entityID)
+	return r.sp.Entity(streamID, entityID)
 }
 
 type subscriptionResolver struct{ *Resolver }
 
+// StreamEvent returns an event channel that can be used for subscriptions to
+// Stream events
 func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEvent, error) {
-	return r.db.StreamEvent(ctx)
+	ses := r.sp.StreamEventSource()
+	ch, id := ses.Subscribe()
+	go func() {
+		<-ctx.Done()
+		ses.Unsubscribe(id)
+	}()
+	return ch, nil
 }
+
+// EntityEvent returns an event channel that can be used for subscriptions to
+// Entity events
 func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
-	return r.db.EntityEvent(ctx)
+	ees := r.sp.EntityEventSource()
+	ch, id := ees.Subscribe()
+	go func() {
+		<-ctx.Done()
+		ees.Unsubscribe(id)
+	}()
+	return ch, nil
 }
