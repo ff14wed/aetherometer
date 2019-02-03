@@ -39,7 +39,7 @@ var _ = Describe("Casting Update", func() {
 		streams = &store.Streams{
 			Map: map[int]*models.Stream{
 				stream: &models.Stream{
-					Pid: stream,
+					PID: stream,
 					EntitiesMap: map[uint64]*models.Entity{
 						subjectID: entity,
 					},

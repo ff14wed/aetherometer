@@ -60,7 +60,7 @@ func (s *Scanner) Serve() {
 		if err != nil {
 			s.logger.Error("Nonfatal error", zap.Error(err))
 		}
-		s.updatePids(pidList)
+		s.updatePIDs(pidList)
 		select {
 		case <-s.stop:
 			s.logger.Info("Stopping...")
@@ -76,7 +76,7 @@ func (s *Scanner) Stop() {
 	close(s.stop)
 }
 
-func (s *Scanner) updatePids(pidList []uint32) {
+func (s *Scanner) updatePIDs(pidList []uint32) {
 	newProcCache := make(map[uint32]struct{})
 	for _, pid := range pidList {
 		newProcCache[pid] = struct{}{}

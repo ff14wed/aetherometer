@@ -26,13 +26,13 @@ var _ = Describe("Models", func() {
 			fakeStoreProvider = new(modelsfakes.FakeStoreProvider)
 
 			stream1 = models.Stream{
-				Pid: 1234,
+				PID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
 					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
 					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
 				},
 			}
-			stream2 = models.Stream{Pid: 5678}
+			stream2 = models.Stream{PID: 5678}
 			fakeStoreProvider.StreamsReturns([]models.Stream{stream1, stream2}, nil)
 
 			fakeStoreProvider.StreamStub = func(streamID int) (models.Stream, error) {
@@ -182,16 +182,16 @@ var _ = Describe("Models", func() {
 
 		Describe("SendStreamRequest", func() {
 			var (
-				requestedPid  int
+				requestedPID  int
 				requestedData []byte
 			)
 
 			Context("when the request handler exists", func() {
 				BeforeEach(func() {
-					requestedPid = 0
+					requestedPID = 0
 					requestedData = nil
 					resolver = models.NewResolver(fakeStoreProvider, func(pid int, data []byte) (string, error) {
-						requestedPid = pid
+						requestedPID = pid
 						requestedData = data
 						return "Success", nil
 					})
@@ -208,7 +208,7 @@ var _ = Describe("Models", func() {
 					Expect(resp).To(Equal("Success"))
 					Expect(err).To(BeNil())
 
-					Expect(requestedPid).To(Equal(123))
+					Expect(requestedPID).To(Equal(123))
 					Expect(requestedData).To(Equal([]byte("hello")))
 				})
 

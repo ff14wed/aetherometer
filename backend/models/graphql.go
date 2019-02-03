@@ -6174,7 +6174,7 @@ func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.Colle
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Pid, nil
+		return obj.PID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
