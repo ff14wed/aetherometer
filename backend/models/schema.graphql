@@ -81,12 +81,12 @@ type NPCInfo {
 }
 
 type Resources {
-	hp: Int!
-	mp: Int!
-	tp: Int!
-	maxHP: Int!
-	maxMP: Int!
-	lastTick: Timestamp!
+  hp: Int!
+  mp: Int!
+  tp: Int!
+  maxHP: Int!
+  maxMP: Int!
+  lastTick: Timestamp!
 }
 
 type Location {
@@ -135,31 +135,32 @@ type Status {
 }
 
 type CastingInfo {
-	actionID: Int!
-	actionName: String!
-	startTime: Timestamp!
-	castTime: Timestamp!
-	targetID: Uint!
+  actionID: Int!
+  actionName: String!
+  startTime: Timestamp!
+  castTime: Timestamp!
+  targetID: Uint!
   location: Location!
 
-	castType: Int!
-	effectRange: Int!
-	xAxisModifier: Int!
-	omen: String!
+  castType: Int!
+  effectRange: Int!
+  xAxisModifier: Int!
+  omen: String!
 }
 
 type CraftingInfo {
-	lastCraftAction: Int!
-	stepNum: Int!
-	totalProgress: Int!
-	progressDelta: Int!
-	totalQuality: Int!
-	qualityDelta: Int!
-	hqChance: Int!
-	durability: Int!
-	durabilityDelta: Int!
-	currentCondition: Int!
-	previousCondition: Int!
+  recipeID: Int!
+  lastCraftAction: Int!
+  stepNum: Int!
+  totalProgress: Int!
+  progressDelta: Int!
+  totalQuality: Int!
+  qualityDelta: Int!
+  hqChance: Int!
+  durability: Int!
+  durabilityDelta: Int!
+  currentCondition: Int!
+  previousCondition: Int!
 }
 
 type Subscription {

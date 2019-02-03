@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 	}
 
 	CraftingInfo struct {
+		RecipeId          func(childComplexity int) int
 		LastCraftAction   func(childComplexity int) int
 		StepNum           func(childComplexity int) int
 		TotalProgress     func(childComplexity int) int
@@ -647,6 +648,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CastingInfo.Omen(childComplexity), true
+
+	case "CraftingInfo.recipeID":
+		if e.complexity.CraftingInfo.RecipeId == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.RecipeId(childComplexity), true
 
 	case "CraftingInfo.lastCraftAction":
 		if e.complexity.CraftingInfo.LastCraftAction == nil {
@@ -2698,6 +2706,11 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CraftingInfo")
+		case "recipeID":
+			out.Values[i] = ec._CraftingInfo_recipeID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "lastCraftAction":
 			out.Values[i] = ec._CraftingInfo_lastCraftAction(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2762,6 +2775,33 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 		return graphql.Null
 	}
 	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_recipeID(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RecipeID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -8816,12 +8856,12 @@ type NPCInfo {
 }
 
 type Resources {
-	hp: Int!
-	mp: Int!
-	tp: Int!
-	maxHP: Int!
-	maxMP: Int!
-	lastTick: Timestamp!
+  hp: Int!
+  mp: Int!
+  tp: Int!
+  maxHP: Int!
+  maxMP: Int!
+  lastTick: Timestamp!
 }
 
 type Location {
@@ -8870,31 +8910,32 @@ type Status {
 }
 
 type CastingInfo {
-	actionID: Int!
-	actionName: String!
-	startTime: Timestamp!
-	castTime: Timestamp!
-	targetID: Uint!
+  actionID: Int!
+  actionName: String!
+  startTime: Timestamp!
+  castTime: Timestamp!
+  targetID: Uint!
   location: Location!
 
-	castType: Int!
-	effectRange: Int!
-	xAxisModifier: Int!
-	omen: String!
+  castType: Int!
+  effectRange: Int!
+  xAxisModifier: Int!
+  omen: String!
 }
 
 type CraftingInfo {
-	lastCraftAction: Int!
-	stepNum: Int!
-	totalProgress: Int!
-	progressDelta: Int!
-	totalQuality: Int!
-	qualityDelta: Int!
-	hqChance: Int!
-	durability: Int!
-	durabilityDelta: Int!
-	currentCondition: Int!
-	previousCondition: Int!
+  recipeID: Int!
+  lastCraftAction: Int!
+  stepNum: Int!
+  totalProgress: Int!
+  progressDelta: Int!
+  totalQuality: Int!
+  qualityDelta: Int!
+  hqChance: Int!
+  durability: Int!
+  durabilityDelta: Int!
+  currentCondition: Int!
+  previousCondition: Int!
 }
 
 type Subscription {

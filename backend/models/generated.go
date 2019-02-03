@@ -59,6 +59,7 @@ type CastingInfo struct {
 }
 
 type CraftingInfo struct {
+	RecipeID          int `json:"recipeID"`
 	LastCraftAction   int `json:"lastCraftAction"`
 	StepNum           int `json:"stepNum"`
 	TotalProgress     int `json:"totalProgress"`
