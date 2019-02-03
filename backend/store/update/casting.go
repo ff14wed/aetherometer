@@ -66,6 +66,9 @@ func (u castingUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent
 	if !found {
 		return nil, nil, ErrorEntityNotFound
 	}
+	if entity == nil {
+		return nil, nil, nil
+	}
 
 	entity.CastingInfo = u.castingInfo
 

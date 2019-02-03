@@ -51,6 +51,7 @@ var _ = Describe("Provider", func() {
 			EntitiesMap: map[uint64]*models.Entity{
 				1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
 				2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
+				3: nil,
 			},
 		}
 		stream2 = models.Stream{PID: 5678}
@@ -145,6 +146,11 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("returns an error if the requested entity does not exist", func() {
+			_, err := provider.Entity(1234, 4)
+			Expect(err).To(MatchError("entity ID 4 not found in stream 1234"))
+		})
+
+		It("returns an error if the requested entity is nil", func() {
 			_, err := provider.Entity(1234, 3)
 			Expect(err).To(MatchError("entity ID 3 not found in stream 1234"))
 		})

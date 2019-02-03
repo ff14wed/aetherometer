@@ -41,7 +41,8 @@ var _ = Describe("Casting Update", func() {
 				stream: &models.Stream{
 					PID: stream,
 					EntitiesMap: map[uint64]*models.Entity{
-						subjectID: entity,
+						subjectID:  entity,
+						0x23456789: nil,
 					},
 				},
 			},
@@ -135,6 +136,18 @@ var _ = Describe("Casting Update", func() {
 
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).To(MatchError(update.ErrorEntityNotFound))
+		Expect(streamEvents).To(BeEmpty())
+		Expect(entityEvents).To(BeEmpty())
+	})
+
+	It("does nothing if the entity is nil", func() {
+		b.Header.SubjectID = 0x23456789
+
+		u := generator.Generate(stream, false, b)
+		Expect(u).ToNot(BeNil())
+
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
+		Expect(err).To(BeNil())
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
 	})

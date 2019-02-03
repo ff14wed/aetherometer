@@ -20,6 +20,7 @@ var _ = Describe("Custom Types", func() {
 				EntitiesMap: map[uint64]*models.Entity{
 					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
 					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
+					3: nil,
 				},
 			}
 		})

@@ -105,6 +105,9 @@ func (u actionUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent,
 	if !found {
 		return nil, nil, ErrorEntityNotFound
 	}
+	if entity == nil {
+		return nil, nil, nil
+	}
 
 	entity.LastAction = &u.action
 

@@ -30,6 +30,9 @@ type Stream struct {
 func (s *Stream) Entities() []Entity {
 	var entities []Entity
 	for _, e := range s.EntitiesMap {
+		if e == nil {
+			continue
+		}
 		entities = append(entities, *e)
 	}
 	sort.SliceStable(entities, func(i, j int) bool {

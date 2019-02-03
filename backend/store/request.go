@@ -53,6 +53,10 @@ func (entityRequest) isInternalRequest() {}
 func (p *Provider) handleEntityRequest(req entityRequest) {
 	if s, found := p.streams.Map[req.streamID]; found {
 		if e, found := s.EntitiesMap[req.entityID]; found {
+			if e == nil {
+				req.respChan <- nil
+				return
+			}
 			eClone := e.Clone()
 			req.respChan <- &eClone
 			return
