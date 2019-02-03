@@ -68,7 +68,7 @@ func (e Entity) Clone() Entity {
 		e.LastAction = &lastActionClone
 	}
 
-	if e.LastAction != nil {
+	if e.CastingInfo != nil {
 		castingInfoClone := *e.CastingInfo
 		e.CastingInfo = &castingInfoClone
 	}
