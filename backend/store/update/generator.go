@@ -36,14 +36,14 @@ type Generator struct {
 }
 
 // NewGenerator returns a new Generator that converts blocks to updates.
-// - data stores the lookup tables for game information needed by
+// 	- data stores the lookup tables for game information needed by
 func NewGenerator(data *datasheet.Collection) Generator {
 	return Generator{data: data}
 }
 
 // Generate creates an update based off the block received
-// - pid is the process ID for which updates are generated
-// - isEgress is true if the input blocks were sent from the client to the server
+// 	- pid is the process ID for which updates are generated
+// 	- isEgress is true if the input blocks were sent from the client to the server
 func (g *Generator) Generate(pid int, isEgress bool, b *xivnet.Block) store.Update {
 	registry := ingressRegistry
 	if isEgress {

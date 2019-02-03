@@ -10,21 +10,21 @@ import (
 
 // EntityHub is responsible for broadcasting Entity events to subscribers
 // Example usage:
-// entityHub := hub.NewEntityHub(20)
-// go func() {
-// 	sub, id := entityHub.Subscribe()
-// 	defer entityHub.Unsubscribe(id)
-// 	for {
-// 		select {
-// 		case payload := <-sub:
-// 			fmt.Printf("%#v\n", payload)
+// 	entityHub := hub.NewEntityHub(20)
+// 	go func() {
+// 		sub, id := entityHub.Subscribe()
+// 		defer entityHub.Unsubscribe(id)
+// 		for {
+// 			select {
+// 			case payload := <-sub:
+// 				fmt.Printf("%#v\n", payload)
+// 			}
 // 		}
 // 	}
-// }
-// entityHub.Broadcast(models.EntityEvent{StreamID: 1})
+// 	entityHub.Broadcast(models.EntityEvent{StreamID: 1})
 //
 // Expected output:
-// models.EntityEvent{StreamID:1, EntityID:0, Type:models.EntityEventType(nil)}
+// 	models.EntityEvent{StreamID:1, EntityID:0, Type:models.EntityEventType(nil)}
 type EntityHub struct {
 	subscribers map[uint64]chan models.EntityEvent
 	baseSubID   uint64

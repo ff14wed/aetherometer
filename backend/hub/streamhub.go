@@ -10,21 +10,21 @@ import (
 
 // StreamHub is responsible for broadcasting Stream events to subscribers
 // Example usage:
-// streamHub := hub.NewStreamHub(20)
-// go func() {
-// 	sub, id := streamHub.Subscribe()
-// 	defer streamHub.Unsubscribe(id)
-// 	for {
-// 		select {
-// 		case payload := <-sub:
-// 			fmt.Printf("%#v\n", payload)
+// 	streamHub := hub.NewStreamHub(20)
+// 	go func() {
+// 		sub, id := streamHub.Subscribe()
+// 		defer streamHub.Unsubscribe(id)
+// 		for {
+// 			select {
+// 			case payload := <-sub:
+// 				fmt.Printf("%#v\n", payload)
+// 			}
 // 		}
 // 	}
-// }
-// streamHub.Broadcast(models.StreamEvent{StreamID: 1})
+// 	streamHub.Broadcast(models.StreamEvent{StreamID: 1})
 //
 // Expected output:
-// models.StreamEvent{StreamID:1, Type:models.StreamEventType(nil)}
+// 	models.StreamEvent{StreamID:1, Type:models.StreamEventType(nil)}
 type StreamHub struct {
 	subscribers map[uint64]chan models.StreamEvent
 	baseSubID   uint64
