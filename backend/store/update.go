@@ -2,6 +2,8 @@ package store
 
 import "github.com/ff14wed/sibyl/backend/models"
 
+// Streams defines the structure of the data store in the store provider and
+// is consumed by updates for modification
 type Streams struct {
 	Map      map[int]*models.Stream
 	KeyOrder []int
