@@ -97,18 +97,10 @@ type actionUpdate struct {
 }
 
 func (u actionUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	stream, found := streams.Map[u.pid]
-	if !found {
-		return nil, nil, ErrorStreamNotFound
-	}
-	entity, found := stream.EntitiesMap[u.subjectID]
-	if !found {
-		return nil, nil, ErrorEntityNotFound
-	}
-	if entity == nil {
-		return nil, nil, nil
-	}
+	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+}
 
+func (u actionUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.LastAction = &u.action
 
 	entityEvents := []models.EntityEvent{models.EntityEvent{

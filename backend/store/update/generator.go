@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/datasheet"
+	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/xivnet"
 )
@@ -63,4 +64,21 @@ func getCanonicalOrientation(d uint32, max uint32) float64 {
 func getTimeForDuration(secs float32) time.Time {
 	nsecDuration := float64(secs) * float64(int64(time.Second)/int64(time.Nanosecond))
 	return time.Unix(0, int64(nsecDuration))
+}
+
+type entityUpdateFunc func(s *models.Stream, e *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error)
+
+func validateEntityUpdate(streams *store.Streams, pid int, entityID uint64, u entityUpdateFunc) ([]models.StreamEvent, []models.EntityEvent, error) {
+	stream, found := streams.Map[pid]
+	if !found {
+		return nil, nil, ErrorStreamNotFound
+	}
+	entity, found := stream.EntitiesMap[entityID]
+	if !found {
+		return nil, nil, ErrorEntityNotFound
+	}
+	if entity == nil {
+		return nil, nil, nil
+	}
+	return u(stream, entity)
 }
