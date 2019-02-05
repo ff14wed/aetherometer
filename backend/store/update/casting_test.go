@@ -17,54 +17,34 @@ import (
 
 var _ = Describe("Casting Update", func() {
 	var (
-		b       *xivnet.Block
-		streams *store.Streams
-		d       *datasheet.Collection
+		testEnv = new(testVars)
 
-		stream    int
+		b         *xivnet.Block
+		streams   *store.Streams
+		d         *datasheet.Collection
+		streamID  int
 		subjectID uint64
 		entity    *models.Entity
-
 		generator update.Generator
 
 		expectedCastingInfo models.CastingInfo
 	)
 
 	BeforeEach(func() {
-		stream = 1234
-		subjectID = 0x12345678
+		*testEnv = genericSetup()
+		b = testEnv.b
+		streams = testEnv.streams
+		d = testEnv.d
+		streamID = testEnv.streamID
+		subjectID = testEnv.subjectID
+		entity = testEnv.entity
+		generator = testEnv.generator
 
-		entity = &models.Entity{}
-
-		streams = &store.Streams{
-			Map: map[int]*models.Stream{
-				stream: &models.Stream{
-					PID: stream,
-					EntitiesMap: map[uint64]*models.Entity{
-						subjectID:  entity,
-						0x23456789: nil,
-					},
-				},
-			},
-		}
-
-		d = new(datasheet.Collection)
 		d.ActionData = datasheet.ActionStore{
 			203:  testassets.ExpectedActionData[203],
 			4238: testassets.ExpectedActionData[4238],
 		}
 
-		generator = update.NewGenerator(d)
-
-		b = &xivnet.Block{
-			Length: 1234,
-			Header: xivnet.BlockHeader{
-				SubjectID: uint32(subjectID),
-				CurrentID: 0x9ABCDEF0,
-				Opcode:    1234,
-				Time:      time.Unix(12, 0),
-			},
-		}
 		castingData := &datatypes.Casting{
 			ActionIDName: 203,
 			U1:           123,
@@ -101,14 +81,14 @@ var _ = Describe("Casting Update", func() {
 	})
 
 	It("generates an update that sets the entity's casting info", func() {
-		u := generator.Generate(stream, false, b)
+		u := generator.Generate(streamID, false, b)
 		Expect(u).ToNot(BeNil())
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(streamEvents).To(BeEmpty())
 
 		Expect(entityEvents).To(ConsistOf(models.EntityEvent{
-			StreamID: stream,
+			StreamID: streamID,
 			EntityID: subjectID,
 			Type: models.UpdateCastingInfo{
 				CastingInfo: &expectedCastingInfo,
@@ -118,47 +98,13 @@ var _ = Describe("Casting Update", func() {
 		Expect(entity.CastingInfo).To(Equal(&expectedCastingInfo))
 	})
 
-	It("errors when the stream doesn't exist", func() {
-		u := generator.Generate(1000, false, b)
-		Expect(u).ToNot(BeNil())
-
-		streamEvents, entityEvents, err := u.ModifyStore(streams)
-		Expect(err).To(MatchError(update.ErrorStreamNotFound))
-		Expect(streamEvents).To(BeEmpty())
-		Expect(entityEvents).To(BeEmpty())
-	})
-
-	It("errors when the entity doesn't exist", func() {
-		b.Header.SubjectID = 0x9ABCDEF0
-
-		u := generator.Generate(stream, false, b)
-		Expect(u).ToNot(BeNil())
-
-		streamEvents, entityEvents, err := u.ModifyStore(streams)
-		Expect(err).To(MatchError(update.ErrorEntityNotFound))
-		Expect(streamEvents).To(BeEmpty())
-		Expect(entityEvents).To(BeEmpty())
-	})
-
-	It("does nothing if the entity is nil", func() {
-		b.Header.SubjectID = 0x23456789
-
-		u := generator.Generate(stream, false, b)
-		Expect(u).ToNot(BeNil())
-
-		streamEvents, entityEvents, err := u.ModifyStore(streams)
-		Expect(err).To(BeNil())
-		Expect(streamEvents).To(BeEmpty())
-		Expect(entityEvents).To(BeEmpty())
-	})
-
 	Context("when the action ID name is not found in the datasheets", func() {
 		BeforeEach(func() {
 			delete(d.ActionData, 203)
 		})
 
 		It("sets the action name to Unknown_X instead", func() {
-			u := generator.Generate(stream, false, b)
+			u := generator.Generate(streamID, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
@@ -167,7 +113,7 @@ var _ = Describe("Casting Update", func() {
 			expectedCastingInfo.ActionName = "Unknown_cb"
 
 			Expect(entityEvents).To(ConsistOf(models.EntityEvent{
-				StreamID: stream,
+				StreamID: streamID,
 				EntityID: subjectID,
 				Type: models.UpdateCastingInfo{
 					CastingInfo: &expectedCastingInfo,
@@ -184,7 +130,7 @@ var _ = Describe("Casting Update", func() {
 		})
 
 		It("sets a partially blank casting info", func() {
-			u := generator.Generate(stream, false, b)
+			u := generator.Generate(streamID, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
@@ -196,7 +142,7 @@ var _ = Describe("Casting Update", func() {
 			expectedCastingInfo.Omen = ""
 
 			Expect(entityEvents).To(ConsistOf(models.EntityEvent{
-				StreamID: stream,
+				StreamID: streamID,
 				EntityID: subjectID,
 				Type: models.UpdateCastingInfo{
 					CastingInfo: &expectedCastingInfo,
@@ -206,4 +152,6 @@ var _ = Describe("Casting Update", func() {
 			Expect(entity.CastingInfo).To(Equal(&expectedCastingInfo))
 		})
 	})
+
+	entityValidationTests(testEnv)
 })
