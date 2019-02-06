@@ -197,5 +197,5 @@ var _ = Describe("Action Update", func() {
 		})
 	})
 
-	entityValidationTests(testEnv)
+	entityValidationTests(testEnv, false)
 })

@@ -58,13 +58,13 @@ func genericSetup() (testEnv testVars) {
 	return
 }
 
-func entityValidationTests(testEnv *testVars) {
+func entityValidationTests(testEnv *testVars, isEgress bool) {
 	It("errors when the stream doesn't exist", func() {
 		generator := testEnv.generator
 		b := testEnv.b
 		streams := testEnv.streams
 
-		u := generator.Generate(1000, false, b)
+		u := generator.Generate(1000, isEgress, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
@@ -81,7 +81,7 @@ func entityValidationTests(testEnv *testVars) {
 
 		b.Header.SubjectID = 0x9ABCDEF0
 
-		u := generator.Generate(streamID, false, b)
+		u := generator.Generate(streamID, isEgress, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
@@ -98,7 +98,7 @@ func entityValidationTests(testEnv *testVars) {
 
 		b.Header.SubjectID = 0x23456789
 
-		u := generator.Generate(streamID, false, b)
+		u := generator.Generate(streamID, isEgress, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyStore(streams)

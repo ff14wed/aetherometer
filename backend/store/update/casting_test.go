@@ -153,5 +153,5 @@ var _ = Describe("Casting Update", func() {
 		})
 	})
 
-	entityValidationTests(testEnv)
+	entityValidationTests(testEnv, false)
 })
