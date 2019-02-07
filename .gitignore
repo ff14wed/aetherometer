@@ -5,6 +5,6 @@
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
-.vscode/*
+.vscode
 node_modules
-vendor/*
+vendor
