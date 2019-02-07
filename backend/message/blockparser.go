@@ -3,8 +3,8 @@ package message
 import (
 	"bufio"
 
-	"github.com/ff14wed/xivnet"
-	"github.com/ff14wed/xivnet/datatypes"
+	"github.com/ff14wed/xivnet/v2"
+	"github.com/ff14wed/xivnet/v2/datatypes"
 )
 
 // FrameDecoder defines any decoder that can read frames from the input reader
@@ -22,12 +22,14 @@ func ExtractBlocks(buf *bufio.Reader, d FrameDecoder) ([]*xivnet.Block, error) {
 	var blocks []*xivnet.Block
 	for {
 		frame, err := d.Decode(buf)
-		switch err {
-		case nil:
+		if err == nil {
 			blocks = append(blocks, frame.Blocks...)
-		case xivnet.ErrInvalidHeader:
+			continue
+		}
+		switch err.(type) {
+		case xivnet.InvalidHeaderError:
 			d.DiscardDataUntilValid(buf)
-		case xivnet.ErrNotEnoughData:
+		case xivnet.EOFError:
 			return blocks, nil
 		default:
 			return nil, err

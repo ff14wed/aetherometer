@@ -7,10 +7,8 @@ import (
 	"io"
 
 	"github.com/ff14wed/sibyl/backend/message"
-	"github.com/ff14wed/xivnet/datatypes"
-
-	"github.com/ff14wed/xivnet"
-
+	"github.com/ff14wed/xivnet/v2"
+	"github.com/ff14wed/xivnet/v2/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -46,10 +44,10 @@ type testFrameDecoder struct{}
 func (d *testFrameDecoder) Decode(buf *bufio.Reader) (*xivnet.Frame, error) {
 	token, err := buf.Peek(7)
 	if err != nil {
-		return nil, xivnet.ErrNotEnoughData
+		return nil, xivnet.EOFError{}
 	}
 	if string(token[0:4]) != "PRE-" {
-		return nil, xivnet.ErrInvalidHeader
+		return nil, xivnet.InvalidHeaderError{}
 	}
 	key := token[4:7]
 	_, _ = buf.Discard(7)

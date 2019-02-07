@@ -9,7 +9,7 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet"
+	"github.com/ff14wed/xivnet/v2"
 )
 
 var ErrorStreamNotFound = errors.New("stream not found")

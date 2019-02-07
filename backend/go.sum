@@ -8,8 +8,8 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNg
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/ff14wed/xivnet v1.45.2 h1:fNGxgsgurrxmt06vWxhjuODcjospPmWdDHkV+UNx+kY=
-github.com/ff14wed/xivnet v1.45.2/go.mod h1:W2eq19nbMDeNzuDWyr13YuMybQfIFffm7qtsalIyDoo=
+github.com/ff14wed/xivnet/v2 v2.0.0 h1:joh57sOzCWhC/ucQh7qwCvr8niOM9dIgl1gILmv7H58=
+github.com/ff14wed/xivnet/v2 v2.0.0/go.mod h1:ujo9pjv0/3Lhqbg7VjO6k225B8qp3soNAN2lSMEJ5iw=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
