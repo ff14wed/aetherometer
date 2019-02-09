@@ -90,6 +90,12 @@ type ComplexityRoot struct {
 		Omen          func(childComplexity int) int
 	}
 
+	ClassJob struct {
+		Id           func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Abbreviation func(childComplexity int) int
+	}
+
 	CraftingInfo struct {
 		RecipeId          func(childComplexity int) int
 		LastCraftAction   func(childComplexity int) int
@@ -117,7 +123,7 @@ type ComplexityRoot struct {
 		TargetId         func(childComplexity int) int
 		OwnerId          func(childComplexity int) int
 		Level            func(childComplexity int) int
-		Class            func(childComplexity int) int
+		ClassJob         func(childComplexity int) int
 		IsNpc            func(childComplexity int) int
 		IsEnemy          func(childComplexity int) int
 		IsPet            func(childComplexity int) int
@@ -251,7 +257,7 @@ type ComplexityRoot struct {
 	}
 
 	UpdateClass struct {
-		Class func(childComplexity int) int
+		ClassJob func(childComplexity int) int
 	}
 
 	UpdateCraftingInfo struct {
@@ -649,6 +655,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CastingInfo.Omen(childComplexity), true
 
+	case "ClassJob.id":
+		if e.complexity.ClassJob.Id == nil {
+			break
+		}
+
+		return e.complexity.ClassJob.Id(childComplexity), true
+
+	case "ClassJob.name":
+		if e.complexity.ClassJob.Name == nil {
+			break
+		}
+
+		return e.complexity.ClassJob.Name(childComplexity), true
+
+	case "ClassJob.abbreviation":
+		if e.complexity.ClassJob.Abbreviation == nil {
+			break
+		}
+
+		return e.complexity.ClassJob.Abbreviation(childComplexity), true
+
 	case "CraftingInfo.recipeID":
 		if e.complexity.CraftingInfo.RecipeId == nil {
 			break
@@ -789,12 +816,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.Level(childComplexity), true
 
-	case "Entity.class":
-		if e.complexity.Entity.Class == nil {
+	case "Entity.classJob":
+		if e.complexity.Entity.ClassJob == nil {
 			break
 		}
 
-		return e.complexity.Entity.Class(childComplexity), true
+		return e.complexity.Entity.ClassJob(childComplexity), true
 
 	case "Entity.isNPC":
 		if e.complexity.Entity.IsNpc == nil {
@@ -1322,12 +1349,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateCastingInfo.CastingInfo(childComplexity), true
 
-	case "UpdateClass.class":
-		if e.complexity.UpdateClass.Class == nil {
+	case "UpdateClass.classJob":
+		if e.complexity.UpdateClass.ClassJob == nil {
 			break
 		}
 
-		return e.complexity.UpdateClass.Class(childComplexity), true
+		return e.complexity.UpdateClass.ClassJob(childComplexity), true
 
 	case "UpdateCraftingInfo.craftingInfo":
 		if e.complexity.UpdateCraftingInfo.CraftingInfo == nil {
@@ -2692,6 +2719,127 @@ func (ec *executionContext) _CastingInfo_omen(ctx context.Context, field graphql
 	return graphql.MarshalString(res)
 }
 
+var classJobImplementors = []string{"ClassJob"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ClassJob(ctx context.Context, sel ast.SelectionSet, obj *ClassJob) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, classJobImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClassJob")
+		case "id":
+			out.Values[i] = ec._ClassJob_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._ClassJob_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "abbreviation":
+			out.Values[i] = ec._ClassJob_abbreviation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ClassJob_id(ctx context.Context, field graphql.CollectedField, obj *ClassJob) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ClassJob",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ClassJob_name(ctx context.Context, field graphql.CollectedField, obj *ClassJob) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ClassJob",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ClassJob_abbreviation(ctx context.Context, field graphql.CollectedField, obj *ClassJob) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ClassJob",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Abbreviation, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
 var craftingInfoImplementors = []string{"CraftingInfo"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -3300,8 +3448,8 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "class":
-			out.Values[i] = ec._Entity_class(ctx, field, obj)
+		case "classJob":
+			out.Values[i] = ec._Entity_classJob(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -3525,7 +3673,7 @@ func (ec *executionContext) _Entity_level(ctx context.Context, field graphql.Col
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Entity_class(ctx context.Context, field graphql.CollectedField, obj *Entity) graphql.Marshaler {
+func (ec *executionContext) _Entity_classJob(ctx context.Context, field graphql.CollectedField, obj *Entity) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -3537,7 +3685,7 @@ func (ec *executionContext) _Entity_class(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Class, nil
+		return obj.ClassJob, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3545,10 +3693,11 @@ func (ec *executionContext) _Entity_class(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(ClassJob)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._ClassJob(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -6593,8 +6742,8 @@ func (ec *executionContext) _UpdateClass(ctx context.Context, sel ast.SelectionS
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateClass")
-		case "class":
-			out.Values[i] = ec._UpdateClass_class(ctx, field, obj)
+		case "classJob":
+			out.Values[i] = ec._UpdateClass_classJob(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -6610,7 +6759,7 @@ func (ec *executionContext) _UpdateClass(ctx context.Context, sel ast.SelectionS
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _UpdateClass_class(ctx context.Context, field graphql.CollectedField, obj *UpdateClass) graphql.Marshaler {
+func (ec *executionContext) _UpdateClass_classJob(ctx context.Context, field graphql.CollectedField, obj *UpdateClass) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -6622,7 +6771,7 @@ func (ec *executionContext) _UpdateClass_class(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Class, nil
+		return obj.ClassJob, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -6630,10 +6779,11 @@ func (ec *executionContext) _UpdateClass_class(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(ClassJob)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._ClassJob(ctx, field.Selections, &res)
 }
 
 var updateCraftingInfoImplementors = []string{"UpdateCraftingInfo"}
@@ -8820,7 +8970,7 @@ type Entity {
   targetID: Uint!
   ownerID: Uint!
   level: Int!
-  class: Int!
+  classJob: ClassJob!
   isNPC: Boolean!
   isEnemy: Boolean!
   isPet: Boolean!
@@ -8853,6 +9003,12 @@ type NPCInfo {
   name: String
   size: Float
   error: Int!
+}
+
+type ClassJob {
+  id: Int!
+  name: String!
+  abbreviation: String!
 }
 
 type Resources {
@@ -9012,7 +9168,7 @@ type UpdateTarget {
 }
 
 type UpdateClass {
-  class: Int!
+  classJob: ClassJob!
 }
 
 type UpdateLastAction {

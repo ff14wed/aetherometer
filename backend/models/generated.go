@@ -58,6 +58,12 @@ type CastingInfo struct {
 	Omen          string    `json:"omen"`
 }
 
+type ClassJob struct {
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Abbreviation string `json:"abbreviation"`
+}
+
 type CraftingInfo struct {
 	RecipeID          int `json:"recipeID"`
 	LastCraftAction   int `json:"lastCraftAction"`
@@ -85,7 +91,7 @@ type Entity struct {
 	TargetID         uint64       `json:"targetID"`
 	OwnerID          uint64       `json:"ownerID"`
 	Level            int          `json:"level"`
-	Class            int          `json:"class"`
+	ClassJob         ClassJob     `json:"classJob"`
 	IsNPC            bool         `json:"isNPC"`
 	IsEnemy          bool         `json:"isEnemy"`
 	IsPet            bool         `json:"isPet"`
@@ -217,7 +223,7 @@ type UpdateCastingInfo struct {
 func (UpdateCastingInfo) IsEntityEventType() {}
 
 type UpdateClass struct {
-	Class int `json:"class"`
+	ClassJob ClassJob `json:"classJob"`
 }
 
 func (UpdateClass) IsEntityEventType() {}
