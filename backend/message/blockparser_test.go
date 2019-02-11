@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"time"
 
 	"github.com/ff14wed/sibyl/backend/message"
 	"github.com/ff14wed/xivnet/v2"
@@ -15,6 +16,7 @@ import (
 
 var testFrames = map[string]*xivnet.Frame{
 	"abc": &xivnet.Frame{
+		Time: time.Unix(12, 0),
 		Blocks: []*xivnet.Block{
 			&xivnet.Block{
 				Length: 123,
@@ -98,6 +100,14 @@ var _ = Describe("Block Parser", func() {
 				_, err := message.ExtractBlocks(reader, new(testFrameDecoder))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(reader.Peek(6)).To(Equal([]byte("PRE-de")))
+			})
+
+			It("sets the frame's timestamp on all blocks", func() {
+				blocks, err := message.ExtractBlocks(reader, new(testFrameDecoder))
+				Expect(err).ToNot(HaveOccurred())
+				for _, b := range blocks {
+					Expect(b.Header.Time).To(Equal(time.Unix(12, 0)))
+				}
 			})
 		})
 

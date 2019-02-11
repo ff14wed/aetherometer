@@ -18,11 +18,20 @@ type FrameDecoder interface {
 // not enough data in the reader to read a full block, it does not consume the
 // remaining data in the reader. However if the data in the reader is invalid,
 // it discards the bytes in the reader until it is valid.
+//
+// This helper is intended to be called whenever a provider knows it has just
+// filled the buffer with data and expects ExtractBlocks to deterministically
+// return. Buffers that block on awaiting more data and only return EOF when
+// the buffer is closed should not be used with this helper. These buffers
+// can use the more Golang-friendly pattern of spawning new goroutines that
+// loop on the call to d.Decode(buf) and are expected to block when waiting
+// for new data.
 func ExtractBlocks(buf *bufio.Reader, d FrameDecoder) ([]*xivnet.Block, error) {
 	var blocks []*xivnet.Block
 	for {
 		frame, err := d.Decode(buf)
 		if err == nil {
+			frame.CorrectTimestamps(frame.Time)
 			blocks = append(blocks, frame.Blocks...)
 			continue
 		}
