@@ -27,6 +27,7 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 			X:           float64(data.Position.X.Float()),
 			Y:           float64(data.Position.Y.Float()),
 			Z:           float64(data.Position.Z.Float()),
+			LastUpdated: b.Header.Time,
 		},
 	}
 

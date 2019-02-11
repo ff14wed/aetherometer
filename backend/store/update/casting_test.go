@@ -71,6 +71,7 @@ var _ = Describe("Casting Update", func() {
 				X:           1000,
 				Y:           -1000,
 				Z:           -1000,
+				LastUpdated: time.Unix(12, 0),
 			},
 			ActionName:    "Skyshard",
 			CastType:      4,
