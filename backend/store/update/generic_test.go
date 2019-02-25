@@ -33,7 +33,8 @@ func genericSetup() (testEnv testVars) {
 	testEnv.streams = &store.Streams{
 		Map: map[int]*models.Stream{
 			testEnv.streamID: &models.Stream{
-				PID: testEnv.streamID,
+				PID:         testEnv.streamID,
+				CharacterID: testEnv.subjectID,
 				EntitiesMap: map[uint64]*models.Entity{
 					testEnv.subjectID: testEnv.entity,
 					0x23456789:        nil,
@@ -97,6 +98,23 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		streamID := testEnv.streamID
 
 		b.Header.SubjectID = 0x23456789
+
+		u := generator.Generate(streamID, isEgress, b)
+		Expect(u).ToNot(BeNil())
+
+		streamEvents, entityEvents, err := u.ModifyStore(streams)
+		Expect(err).To(BeNil())
+		Expect(streamEvents).To(BeEmpty())
+		Expect(entityEvents).To(BeEmpty())
+	})
+
+	It("does nothing if the stream's CharacterID is 0", func() {
+		generator := testEnv.generator
+		b := testEnv.b
+		streams := testEnv.streams
+		streamID := testEnv.streamID
+
+		streams.Map[streamID].CharacterID = 0
 
 		u := generator.Generate(streamID, isEgress, b)
 		Expect(u).ToNot(BeNil())

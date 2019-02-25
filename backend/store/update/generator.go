@@ -73,6 +73,9 @@ func validateEntityUpdate(streams *store.Streams, pid int, entityID uint64, u en
 	if !found {
 		return nil, nil, ErrorStreamNotFound
 	}
+	if stream.CharacterID == 0 {
+		return nil, nil, nil
+	}
 	entity, found := stream.EntitiesMap[entityID]
 	if !found {
 		return nil, nil, ErrorEntityNotFound
