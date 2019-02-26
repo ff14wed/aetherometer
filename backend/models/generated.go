@@ -229,7 +229,7 @@ type UpdateClass struct {
 func (UpdateClass) IsEntityEventType() {}
 
 type UpdateCraftingInfo struct {
-	CraftingInfo CraftingInfo `json:"craftingInfo"`
+	CraftingInfo *CraftingInfo `json:"craftingInfo"`
 }
 
 func (UpdateCraftingInfo) IsStreamEventType() {}

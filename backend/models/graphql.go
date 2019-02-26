@@ -6802,9 +6802,6 @@ func (ec *executionContext) _UpdateCraftingInfo(ctx context.Context, sel ast.Sel
 			out.Values[i] = graphql.MarshalString("UpdateCraftingInfo")
 		case "craftingInfo":
 			out.Values[i] = ec._UpdateCraftingInfo_craftingInfo(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6832,16 +6829,17 @@ func (ec *executionContext) _UpdateCraftingInfo_craftingInfo(ctx context.Context
 		return obj.CraftingInfo, nil
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(CraftingInfo)
+	res := resTmp.(*CraftingInfo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._CraftingInfo(ctx, field.Selections, &res)
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._CraftingInfo(ctx, field.Selections, res)
 }
 
 var updateEnmityImplementors = []string{"UpdateEnmity"}
@@ -9124,7 +9122,7 @@ type UpdateMap {
 }
 
 type UpdateCraftingInfo {
-  craftingInfo: CraftingInfo!
+  craftingInfo: CraftingInfo
 }
 
 type UpdateEnmity {

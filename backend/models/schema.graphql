@@ -199,7 +199,7 @@ type UpdateMap {
 }
 
 type UpdateCraftingInfo {
-  craftingInfo: CraftingInfo!
+  craftingInfo: CraftingInfo
 }
 
 type UpdateEnmity {
