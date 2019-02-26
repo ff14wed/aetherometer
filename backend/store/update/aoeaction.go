@@ -4,8 +4,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 )
 
 func init() {
@@ -18,7 +18,7 @@ func init() {
 func newAoEAction8Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction8)
 
-	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)
+	action := actionFromHeader(data.ActionHeader, d, b.Time)
 
 	var actionEffects []models.ActionEffect
 	numAffected := data.NumAffected
@@ -32,7 +32,7 @@ func newAoEAction8Update(pid int, b *xivnet.Block, d *datasheet.Collection) stor
 
 	return actionUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
@@ -40,7 +40,7 @@ func newAoEAction8Update(pid int, b *xivnet.Block, d *datasheet.Collection) stor
 func newAoEAction16Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction16)
 
-	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)
+	action := actionFromHeader(data.ActionHeader, d, b.Time)
 
 	var actionEffects []models.ActionEffect
 	numAffected := data.NumAffected
@@ -54,7 +54,7 @@ func newAoEAction16Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 
 	return actionUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
@@ -62,7 +62,7 @@ func newAoEAction16Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 func newAoEAction24Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction24)
 
-	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)
+	action := actionFromHeader(data.ActionHeader, d, b.Time)
 
 	var actionEffects []models.ActionEffect
 	numAffected := data.NumAffected
@@ -76,7 +76,7 @@ func newAoEAction24Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 
 	return actionUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
@@ -84,7 +84,7 @@ func newAoEAction24Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 func newAoEAction32Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction32)
 
-	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)
+	action := actionFromHeader(data.ActionHeader, d, b.Time)
 
 	var actionEffects []models.ActionEffect
 	numAffected := data.NumAffected
@@ -98,7 +98,7 @@ func newAoEAction32Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 
 	return actionUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }

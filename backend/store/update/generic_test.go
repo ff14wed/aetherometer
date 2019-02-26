@@ -7,7 +7,7 @@ import (
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
-	"github.com/ff14wed/xivnet/v2"
+	"github.com/ff14wed/xivnet/v3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -48,14 +48,15 @@ func genericSetup() (testEnv testVars) {
 	testEnv.generator = update.NewGenerator(testEnv.d)
 
 	testEnv.b = &xivnet.Block{
-		Length: 1234,
-		Header: xivnet.BlockHeader{
-			SubjectID: uint32(testEnv.subjectID),
-			CurrentID: 0x9ABCDEF0,
-			Opcode:    1234,
-			Time:      time.Unix(12, 0),
+		Length:    1234,
+		SubjectID: uint32(testEnv.subjectID),
+		CurrentID: 0x9ABCDEF0,
+		IPCHeader: xivnet.IPCHeader{
+			Opcode: 1234,
+			Time:   time.Unix(12, 0),
 		},
 	}
+
 	return
 }
 
@@ -80,7 +81,7 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		streams := testEnv.streams
 		streamID := testEnv.streamID
 
-		b.Header.SubjectID = 0x9ABCDEF0
+		b.SubjectID = 0x9ABCDEF0
 
 		u := generator.Generate(streamID, isEgress, b)
 		Expect(u).ToNot(BeNil())
@@ -97,7 +98,7 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		streams := testEnv.streams
 		streamID := testEnv.streamID
 
-		b.Header.SubjectID = 0x23456789
+		b.SubjectID = 0x23456789
 
 		u := generator.Generate(streamID, isEgress, b)
 		Expect(u).ToNot(BeNil())

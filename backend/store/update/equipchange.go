@@ -4,8 +4,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func newEquipChangeUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 
 	return equipChangeUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 
 		classJob: models.ClassJob{
 			ID: int(data.ClassJob),

@@ -7,8 +7,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 )
 
 func init() {
@@ -68,7 +68,7 @@ func processActionEffects(effectsList []datatypes.ActionEffects, targets []uint6
 func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Action)
 
-	action := actionFromHeader(data.ActionHeader, d, b.Header.Time)
+	action := actionFromHeader(data.ActionHeader, d, b.Time)
 
 	var actionEffects []models.ActionEffect
 
@@ -83,7 +83,7 @@ func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Up
 
 	return actionUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 
 		action: action,
 	}

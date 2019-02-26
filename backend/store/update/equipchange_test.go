@@ -4,8 +4,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

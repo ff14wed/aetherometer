@@ -7,15 +7,15 @@ import (
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
 )
 
-var _ = Describe("MyMovement Update", func() {
+var _ = Describe("EgressMovement Update", func() {
 	var (
 		testEnv = new(testVars)
 
@@ -46,7 +46,7 @@ var _ = Describe("MyMovement Update", func() {
 			"LastUpdated": Equal(time.Unix(12, 0)),
 		})
 
-		movementData := &datatypes.MyMovement{
+		movementData := &datatypes.EgressMovement{
 			Direction: 0,
 			U1:        1,
 			U2:        2,

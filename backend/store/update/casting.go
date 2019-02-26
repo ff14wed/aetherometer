@@ -6,8 +6,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 )
 
 func init() {
@@ -19,7 +19,7 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 
 	info := &models.CastingInfo{
 		ActionID:  int(data.ActionID),
-		StartTime: b.Header.Time,
+		StartTime: b.Time,
 		CastTime:  getTimeForDuration(data.CastTime),
 		TargetID:  uint64(data.TargetID),
 		Location: models.Location{
@@ -27,7 +27,7 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 			X:           float64(data.Position.X.Float()),
 			Y:           float64(data.Position.Y.Float()),
 			Z:           float64(data.Position.Z.Float()),
-			LastUpdated: b.Header.Time,
+			LastUpdated: b.Time,
 		},
 	}
 
@@ -45,7 +45,7 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 
 	return castingUpdate{
 		pid:       pid,
-		subjectID: uint64(b.Header.SubjectID),
+		subjectID: uint64(b.SubjectID),
 
 		castingInfo: info,
 	}

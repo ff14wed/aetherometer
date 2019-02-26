@@ -4,22 +4,22 @@ import (
 	"github.com/ff14wed/sibyl/backend/datasheet"
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.Notify4), newNotify4Update)
+	registerIngressHandler(new(datatypes.Notify144), newNotify144Update)
 }
 
-func newNotify4Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.Notify4)
+func newNotify144Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.Notify144)
 
 	switch data.Type {
 	case 0x32:
 		return targetUpdate{
 			pid:       pid,
-			subjectID: uint64(b.Header.SubjectID),
+			subjectID: uint64(b.SubjectID),
 
 			targetID: uint64(data.TargetID),
 		}

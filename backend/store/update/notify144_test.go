@@ -4,13 +4,13 @@ import (
 	"github.com/ff14wed/sibyl/backend/models"
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
-	"github.com/ff14wed/xivnet/v2"
-	"github.com/ff14wed/xivnet/v2/datatypes"
+	"github.com/ff14wed/xivnet/v3"
+	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Notify4 Update", func() {
+var _ = Describe("Notify144 Update", func() {
 	Describe("type 0x32", func() {
 		var (
 			testEnv = new(testVars)
@@ -36,7 +36,7 @@ var _ = Describe("Notify4 Update", func() {
 
 			expectedTarget = 0xABCDEF01
 
-			notify4Data := &datatypes.Notify4{
+			notify4Data := &datatypes.Notify144{
 				Type:     0x32,
 				TargetID: uint32(expectedTarget),
 			}
