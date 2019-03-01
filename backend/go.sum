@@ -11,6 +11,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ff14wed/xivnet/v3 v3.0.0 h1:1WGnO5FpOh8rTHpfQT7jknQN2Tf2R6Vn2dltm7fB1RE=
 github.com/ff14wed/xivnet/v3 v3.0.0/go.mod h1:FGS79n9D0Il6w+Df+m+8rHJrgwpDFRPWQxtOFAa0dQA=
+github.com/ff14wed/xivnet/v3 v3.0.1 h1:ce38dEQRK5+ZjIxApbzmhOWO/Wyf28QXx0ipXxJm1qA=
+github.com/ff14wed/xivnet/v3 v3.0.1/go.mod h1:FGS79n9D0Il6w+Df+m+8rHJrgwpDFRPWQxtOFAa0dQA=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=

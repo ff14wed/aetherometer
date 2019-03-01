@@ -4,7 +4,7 @@ require (
 	github.com/99designs/gqlgen v0.7.1
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/ff14wed/xivnet/v3 v3.0.0
+	github.com/ff14wed/xivnet/v3 v3.0.1
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect

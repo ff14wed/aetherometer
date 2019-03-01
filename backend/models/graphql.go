@@ -97,18 +97,22 @@ type ComplexityRoot struct {
 	}
 
 	CraftingInfo struct {
-		RecipeId          func(childComplexity int) int
-		LastCraftAction   func(childComplexity int) int
-		StepNum           func(childComplexity int) int
-		TotalProgress     func(childComplexity int) int
-		ProgressDelta     func(childComplexity int) int
-		TotalQuality      func(childComplexity int) int
-		QualityDelta      func(childComplexity int) int
-		HqChance          func(childComplexity int) int
-		Durability        func(childComplexity int) int
-		DurabilityDelta   func(childComplexity int) int
-		CurrentCondition  func(childComplexity int) int
-		PreviousCondition func(childComplexity int) int
+		RecipeId            func(childComplexity int) int
+		LastCraftActionId   func(childComplexity int) int
+		LastCraftActionName func(childComplexity int) int
+		StepNum             func(childComplexity int) int
+		Progress            func(childComplexity int) int
+		Difficulty          func(childComplexity int) int
+		ProgressDelta       func(childComplexity int) int
+		Quality             func(childComplexity int) int
+		MaxQuality          func(childComplexity int) int
+		QualityDelta        func(childComplexity int) int
+		HqChance            func(childComplexity int) int
+		Durability          func(childComplexity int) int
+		MaxDurability       func(childComplexity int) int
+		DurabilityDelta     func(childComplexity int) int
+		CurrentCondition    func(childComplexity int) int
+		PreviousCondition   func(childComplexity int) int
 	}
 
 	Enmity struct {
@@ -683,12 +687,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CraftingInfo.RecipeId(childComplexity), true
 
-	case "CraftingInfo.lastCraftAction":
-		if e.complexity.CraftingInfo.LastCraftAction == nil {
+	case "CraftingInfo.lastCraftActionID":
+		if e.complexity.CraftingInfo.LastCraftActionId == nil {
 			break
 		}
 
-		return e.complexity.CraftingInfo.LastCraftAction(childComplexity), true
+		return e.complexity.CraftingInfo.LastCraftActionId(childComplexity), true
+
+	case "CraftingInfo.lastCraftActionName":
+		if e.complexity.CraftingInfo.LastCraftActionName == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.LastCraftActionName(childComplexity), true
 
 	case "CraftingInfo.stepNum":
 		if e.complexity.CraftingInfo.StepNum == nil {
@@ -697,12 +708,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CraftingInfo.StepNum(childComplexity), true
 
-	case "CraftingInfo.totalProgress":
-		if e.complexity.CraftingInfo.TotalProgress == nil {
+	case "CraftingInfo.progress":
+		if e.complexity.CraftingInfo.Progress == nil {
 			break
 		}
 
-		return e.complexity.CraftingInfo.TotalProgress(childComplexity), true
+		return e.complexity.CraftingInfo.Progress(childComplexity), true
+
+	case "CraftingInfo.difficulty":
+		if e.complexity.CraftingInfo.Difficulty == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.Difficulty(childComplexity), true
 
 	case "CraftingInfo.progressDelta":
 		if e.complexity.CraftingInfo.ProgressDelta == nil {
@@ -711,12 +729,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CraftingInfo.ProgressDelta(childComplexity), true
 
-	case "CraftingInfo.totalQuality":
-		if e.complexity.CraftingInfo.TotalQuality == nil {
+	case "CraftingInfo.quality":
+		if e.complexity.CraftingInfo.Quality == nil {
 			break
 		}
 
-		return e.complexity.CraftingInfo.TotalQuality(childComplexity), true
+		return e.complexity.CraftingInfo.Quality(childComplexity), true
+
+	case "CraftingInfo.maxQuality":
+		if e.complexity.CraftingInfo.MaxQuality == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.MaxQuality(childComplexity), true
 
 	case "CraftingInfo.qualityDelta":
 		if e.complexity.CraftingInfo.QualityDelta == nil {
@@ -738,6 +763,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CraftingInfo.Durability(childComplexity), true
+
+	case "CraftingInfo.maxDurability":
+		if e.complexity.CraftingInfo.MaxDurability == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.MaxDurability(childComplexity), true
 
 	case "CraftingInfo.durabilityDelta":
 		if e.complexity.CraftingInfo.DurabilityDelta == nil {
@@ -2859,8 +2891,13 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "lastCraftAction":
-			out.Values[i] = ec._CraftingInfo_lastCraftAction(ctx, field, obj)
+		case "lastCraftActionID":
+			out.Values[i] = ec._CraftingInfo_lastCraftActionID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "lastCraftActionName":
+			out.Values[i] = ec._CraftingInfo_lastCraftActionName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2869,8 +2906,13 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "totalProgress":
-			out.Values[i] = ec._CraftingInfo_totalProgress(ctx, field, obj)
+		case "progress":
+			out.Values[i] = ec._CraftingInfo_progress(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "difficulty":
+			out.Values[i] = ec._CraftingInfo_difficulty(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2879,8 +2921,13 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "totalQuality":
-			out.Values[i] = ec._CraftingInfo_totalQuality(ctx, field, obj)
+		case "quality":
+			out.Values[i] = ec._CraftingInfo_quality(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "maxQuality":
+			out.Values[i] = ec._CraftingInfo_maxQuality(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2896,6 +2943,11 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			}
 		case "durability":
 			out.Values[i] = ec._CraftingInfo_durability(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "maxDurability":
+			out.Values[i] = ec._CraftingInfo_maxDurability(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2953,7 +3005,7 @@ func (ec *executionContext) _CraftingInfo_recipeID(ctx context.Context, field gr
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_lastCraftAction(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+func (ec *executionContext) _CraftingInfo_lastCraftActionID(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -2965,7 +3017,7 @@ func (ec *executionContext) _CraftingInfo_lastCraftAction(ctx context.Context, f
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastCraftAction, nil
+		return obj.LastCraftActionID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2977,6 +3029,33 @@ func (ec *executionContext) _CraftingInfo_lastCraftAction(ctx context.Context, f
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_lastCraftActionName(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastCraftActionName, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
 }
 
 // nolint: vetshadow
@@ -3007,7 +3086,7 @@ func (ec *executionContext) _CraftingInfo_stepNum(ctx context.Context, field gra
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_totalProgress(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+func (ec *executionContext) _CraftingInfo_progress(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -3019,7 +3098,34 @@ func (ec *executionContext) _CraftingInfo_totalProgress(ctx context.Context, fie
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalProgress, nil
+		return obj.Progress, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_difficulty(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Difficulty, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3061,7 +3167,7 @@ func (ec *executionContext) _CraftingInfo_progressDelta(ctx context.Context, fie
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_totalQuality(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+func (ec *executionContext) _CraftingInfo_quality(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -3073,7 +3179,34 @@ func (ec *executionContext) _CraftingInfo_totalQuality(ctx context.Context, fiel
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalQuality, nil
+		return obj.Quality, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_maxQuality(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxQuality, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3155,6 +3288,33 @@ func (ec *executionContext) _CraftingInfo_durability(ctx context.Context, field 
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Durability, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_maxDurability(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxDurability, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -9079,15 +9239,24 @@ type CastingInfo {
 
 type CraftingInfo {
   recipeID: Int!
-  lastCraftAction: Int!
+  lastCraftActionID: Int!
+  lastCraftActionName: String!
   stepNum: Int!
-  totalProgress: Int!
+
+  progress: Int!
+  difficulty: Int!
   progressDelta: Int!
-  totalQuality: Int!
+
+  quality: Int!
+  maxQuality: Int!
   qualityDelta: Int!
+
   hqChance: Int!
+
   durability: Int!
+  maxDurability: Int!
   durabilityDelta: Int!
+
   currentCondition: Int!
   previousCondition: Int!
 }

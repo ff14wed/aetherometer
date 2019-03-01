@@ -48,9 +48,6 @@ var _ = Describe("Movement Update", func() {
 
 		movementData := &datatypes.Movement{
 			Direction: 128,
-			U1:        1,
-			U2:        2,
-			U3:        3,
 		}
 		movementData.Position.X.SetFloat(100.1)
 		movementData.Position.Y.SetFloat(200.2)

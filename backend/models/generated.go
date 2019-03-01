@@ -65,18 +65,22 @@ type ClassJob struct {
 }
 
 type CraftingInfo struct {
-	RecipeID          int `json:"recipeID"`
-	LastCraftAction   int `json:"lastCraftAction"`
-	StepNum           int `json:"stepNum"`
-	TotalProgress     int `json:"totalProgress"`
-	ProgressDelta     int `json:"progressDelta"`
-	TotalQuality      int `json:"totalQuality"`
-	QualityDelta      int `json:"qualityDelta"`
-	HqChance          int `json:"hqChance"`
-	Durability        int `json:"durability"`
-	DurabilityDelta   int `json:"durabilityDelta"`
-	CurrentCondition  int `json:"currentCondition"`
-	PreviousCondition int `json:"previousCondition"`
+	RecipeID            int    `json:"recipeID"`
+	LastCraftActionID   int    `json:"lastCraftActionID"`
+	LastCraftActionName string `json:"lastCraftActionName"`
+	StepNum             int    `json:"stepNum"`
+	Progress            int    `json:"progress"`
+	Difficulty          int    `json:"difficulty"`
+	ProgressDelta       int    `json:"progressDelta"`
+	Quality             int    `json:"quality"`
+	MaxQuality          int    `json:"maxQuality"`
+	QualityDelta        int    `json:"qualityDelta"`
+	HqChance            int    `json:"hqChance"`
+	Durability          int    `json:"durability"`
+	MaxDurability       int    `json:"maxDurability"`
+	DurabilityDelta     int    `json:"durabilityDelta"`
+	CurrentCondition    int    `json:"currentCondition"`
+	PreviousCondition   int    `json:"previousCondition"`
 }
 
 type Enmity struct {

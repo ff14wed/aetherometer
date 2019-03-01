@@ -156,15 +156,24 @@ type CastingInfo {
 
 type CraftingInfo {
   recipeID: Int!
-  lastCraftAction: Int!
+  lastCraftActionID: Int!
+  lastCraftActionName: String!
   stepNum: Int!
-  totalProgress: Int!
+
+  progress: Int!
+  difficulty: Int!
   progressDelta: Int!
-  totalQuality: Int!
+
+  quality: Int!
+  maxQuality: Int!
   qualityDelta: Int!
+
   hqChance: Int!
+
   durability: Int!
+  maxDurability: Int!
   durabilityDelta: Int!
+
   currentCondition: Int!
   previousCondition: Int!
 }
