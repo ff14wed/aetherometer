@@ -21,6 +21,7 @@ var _ = Describe("FileReader", func() {
 		})
 		Expect(f.Error()).ToNot(HaveOccurred())
 	})
+
 	It("errors if the file doesn't exist", func() {
 		f := new(datasheet.FileReader)
 		f.ReadFile("nonexistent-12345.go", func(r io.Reader) error {
@@ -33,6 +34,7 @@ var _ = Describe("FileReader", func() {
 		})
 		Expect(f.Error()).To(HaveOccurred())
 	})
+
 	It("errors if the callback returns an error", func() {
 		f := new(datasheet.FileReader)
 		f.ReadFile("filereader.go", func(r io.Reader) error {

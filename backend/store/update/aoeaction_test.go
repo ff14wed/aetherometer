@@ -41,7 +41,9 @@ var _ = Describe("AoEAction8 Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			456: datasheet.Action{ID: 456, Name: "Foo"},
+			Actions: map[uint32]datasheet.Action{
+				456: datasheet.Action{Key: 456, Name: "Foo"},
+			},
 		}
 
 		b.Data = &datatypes.AoEAction8{
@@ -204,7 +206,9 @@ var _ = Describe("AoEAction16 Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			456: datasheet.Action{ID: 456, Name: "Foo"},
+			Actions: map[uint32]datasheet.Action{
+				456: datasheet.Action{Key: 456, Name: "Foo"},
+			},
 		}
 
 		b.Data = &datatypes.AoEAction16{
@@ -367,7 +371,9 @@ var _ = Describe("AoEAction24 Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			456: datasheet.Action{ID: 456, Name: "Foo"},
+			Actions: map[uint32]datasheet.Action{
+				456: datasheet.Action{Key: 456, Name: "Foo"},
+			},
 		}
 
 		b.Data = &datatypes.AoEAction24{
@@ -530,7 +536,9 @@ var _ = Describe("AoEAction32 Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			456: datasheet.Action{ID: 456, Name: "Foo"},
+			Actions: map[uint32]datasheet.Action{
+				456: datasheet.Action{Key: 456, Name: "Foo"},
+			},
 		}
 
 		b.Data = &datatypes.AoEAction32{

@@ -32,11 +32,14 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 	}
 
 	info.ActionName = fmt.Sprintf("Unknown_%x", data.ActionIDName)
-	if actionInfo, ok := d.ActionData[uint32(data.ActionIDName)]; ok {
+
+	actionInfo := d.ActionData.GetAction(uint32(data.ActionIDName))
+	if actionInfo.Key != 0 {
 		info.ActionName = actionInfo.Name
 	}
 
-	if actionInfo, ok := d.ActionData[uint32(data.ActionID)]; ok {
+	actionInfo = d.ActionData.GetAction(data.ActionID)
+	if actionInfo.Key != 0 {
 		info.CastType = int(actionInfo.CastType)
 		info.EffectRange = int(actionInfo.EffectRange)
 		info.XAxisModifier = int(actionInfo.XAxisModifier)

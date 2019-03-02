@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var InvalidJSON = `[{"Invalid"]`
+const InvalidCSV = "key,0,1\n#,Singular"
 
 func TestDatasheet(t *testing.T) {
 	RegisterFailHandler(Fail)

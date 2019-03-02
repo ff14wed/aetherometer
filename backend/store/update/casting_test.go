@@ -41,8 +41,11 @@ var _ = Describe("Casting Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			203:  testassets.ExpectedActionData[203],
-			4238: testassets.ExpectedActionData[4238],
+			Actions: map[uint32]datasheet.Action{
+				203:  testassets.ExpectedActionData[203],
+				4238: testassets.ExpectedActionData[4238],
+			},
+			Omens: testassets.ExpectedOmenData,
 		}
 
 		castingData := &datatypes.Casting{
@@ -101,7 +104,7 @@ var _ = Describe("Casting Update", func() {
 
 	Context("when the action ID name is not found in the datasheets", func() {
 		BeforeEach(func() {
-			delete(d.ActionData, 203)
+			delete(d.ActionData.Actions, 203)
 		})
 
 		It("sets the action name to Unknown_X instead", func() {
@@ -127,7 +130,7 @@ var _ = Describe("Casting Update", func() {
 
 	Context("when the action ID is not found in the datasheets", func() {
 		BeforeEach(func() {
-			delete(d.ActionData, 4238)
+			delete(d.ActionData.Actions, 4238)
 		})
 
 		It("sets a partially blank casting info", func() {

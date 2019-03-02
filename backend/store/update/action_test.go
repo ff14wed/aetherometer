@@ -41,7 +41,9 @@ var _ = Describe("Action Update", func() {
 		generator = testEnv.generator
 
 		d.ActionData = datasheet.ActionStore{
-			456: datasheet.Action{ID: 456, Name: "Foo"},
+			Actions: map[uint32]datasheet.Action{
+				456: datasheet.Action{Key: 456, Name: "Foo"},
+			},
 		}
 
 		b.Data = &datatypes.Action{
@@ -145,7 +147,7 @@ var _ = Describe("Action Update", func() {
 
 	Context("when the action ID name is not found in the datasheets", func() {
 		BeforeEach(func() {
-			delete(d.ActionData, 456)
+			delete(d.ActionData.Actions, 456)
 		})
 
 		It("sets the action name to Unknown_X instead", func() {

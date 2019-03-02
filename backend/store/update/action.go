@@ -18,7 +18,8 @@ func init() {
 func actionFromHeader(h datatypes.ActionHeader, d *datasheet.Collection, t time.Time) models.Action {
 	id := int(h.ActionID)
 	actionName := fmt.Sprintf("Unknown_%x", h.ActionIDName)
-	if actionData, found := d.ActionData[(uint32(h.ActionIDName))]; found {
+	actionData := d.ActionData.GetAction(h.ActionIDName)
+	if actionData.Key != 0 {
 		actionName = actionData.Name
 	}
 	return models.Action{
