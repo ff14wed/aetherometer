@@ -20,11 +20,13 @@ var _ = Describe("Action", func() {
 				Expect(d).To(Equal(testassets.ExpectedActionData[k]))
 			}
 		})
+
 		It("returns an error if the datasheet is blank", func() {
 			var a datasheet.ActionStore
 			err := a.PopulateActions(bytes.NewReader([]byte("")))
 			Expect(err).To(HaveOccurred())
 		})
+
 		It("returns an error if the datasheet is invalid", func() {
 			var a datasheet.ActionStore
 			err := a.PopulateActions(bytes.NewReader([]byte(InvalidCSV)))
@@ -42,11 +44,13 @@ var _ = Describe("Action", func() {
 				Expect(d).To(Equal(testassets.ExpectedOmenData[k]))
 			}
 		})
+
 		It("returns an error if the datasheet is blank", func() {
 			var a datasheet.ActionStore
 			err := a.PopulateOmens(bytes.NewReader([]byte("")))
 			Expect(err).To(HaveOccurred())
 		})
+
 		It("returns an error if the datasheet is invalid", func() {
 			var a datasheet.ActionStore
 			err := a.PopulateOmens(bytes.NewReader([]byte(InvalidCSV)))
@@ -56,6 +60,7 @@ var _ = Describe("Action", func() {
 
 	Describe("GetAction", func() {
 		var a *datasheet.ActionStore
+
 		BeforeEach(func() {
 			a = new(datasheet.ActionStore)
 			Expect(a.PopulateActions(bytes.NewReader([]byte(testassets.ActionCSV)))).To(Succeed())
