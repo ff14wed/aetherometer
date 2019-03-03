@@ -134,6 +134,7 @@ type Status {
   id: Int!
   extra: Int!
   name: String!
+  description: String!
   startedTime: Timestamp!
   duration: Timestamp!
   actorID: Uint!

@@ -118,3 +118,12 @@ int32,str,str,byte,PlaceName,PlaceName,PlaceName,Map,byte,byte,byte,uint16,bit&0
 293,"s1fa_2","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,403,2,2,10,60,False,23,False,0,True,False,False,False,1001,122001,124009,0,0,0,-1,6,-1,False,0,0,0,0,False
 296,"s1fa_3","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,403,2,2,10,64,False,23,False,0,True,False,False,False,1001,122001,124010,0,0,0,-1,16,-1,False,0,0,0,0,False
 `
+
+const StatusCSV = `
+key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+#,Name,Description,Icon,MaxStacks,Category,HitEffect,VFX,LockMovement,,LockActions,LockControl,Transfiguration,,CanDispel,InflictedByActor,IsPermanent,,,,,,IsFcBuff,Invisibility,,,
+int32,str,str,Image,byte,byte,StatusHitEffect,StatusLoopVFX,bit&01,bit&02,bit&04,bit&08,bit&10,bit&20,bit&40,bit&80,bit&01,byte,bit&02,byte,bit&04,uint16,bit&08,bit&10,byte,byte,bit&20
+0,"","",0,0,0,0,0,False,False,False,False,False,False,False,False,False,0,False,0,False,0,False,False,0,0,False
+1,"Petrification","Stone-like rigidity is preventing the execution of actions.",15001,0,2,6,1,True,False,True,False,False,False,False,False,False,100,False,0,False,0,False,False,0,32,True
+2,"Stun","Unable to execute actions.",15004,0,2,3,2,True,False,True,False,False,False,True,False,False,100,False,0,False,0,False,False,0,0,False
+`

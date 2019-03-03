@@ -5,4 +5,5 @@ type Collection struct {
 	MapData    MapStore
 	BNPCData   BNPCStore
 	ActionData ActionStore
+	StatusData StatusStore
 }

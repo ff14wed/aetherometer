@@ -231,6 +231,7 @@ type ComplexityRoot struct {
 		Id          func(childComplexity int) int
 		Extra       func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Description func(childComplexity int) int
 		StartedTime func(childComplexity int) int
 		Duration    func(childComplexity int) int
 		ActorId     func(childComplexity int) int
@@ -1275,6 +1276,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Status.Name(childComplexity), true
+
+	case "Status.description":
+		if e.complexity.Status.Description == nil {
+			break
+		}
+
+		return e.complexity.Status.Description(childComplexity), true
 
 	case "Status.startedTime":
 		if e.complexity.Status.StartedTime == nil {
@@ -6198,6 +6206,11 @@ func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "description":
+			out.Values[i] = ec._Status_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "startedTime":
 			out.Values[i] = ec._Status_startedTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6297,6 +6310,33 @@ func (ec *executionContext) _Status_name(ctx context.Context, field graphql.Coll
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Status_description(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Status",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -9217,6 +9257,7 @@ type Status {
   id: Int!
   extra: Int!
   name: String!
+  description: String!
   startedTime: Timestamp!
   duration: Timestamp!
   actorID: Uint!

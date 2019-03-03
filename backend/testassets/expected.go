@@ -122,3 +122,9 @@ var ExpectedTerritoryInfo = map[uint16]datasheet.TerritoryInfo{
 	293: datasheet.TerritoryInfo{Key: 293, Name: "s1fa_2", Map: 403},
 	296: datasheet.TerritoryInfo{Key: 296, Name: "s1fa_3", Map: 403},
 }
+
+var ExpectedStatusData = map[uint32]datasheet.Status{
+	0: datasheet.Status{Key: 0},
+	1: datasheet.Status{Key: 1, Name: "Petrification", Description: "Stone-like rigidity is preventing the execution of actions."},
+	2: datasheet.Status{Key: 2, Name: "Stun", Description: "Unable to execute actions."},
+}

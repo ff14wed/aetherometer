@@ -200,6 +200,7 @@ type Status struct {
 	ID          int       `json:"id"`
 	Extra       int       `json:"extra"`
 	Name        string    `json:"name"`
+	Description string    `json:"description"`
 	StartedTime time.Time `json:"startedTime"`
 	Duration    time.Time `json:"duration"`
 	ActorID     uint64    `json:"actorID"`
