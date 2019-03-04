@@ -15,12 +15,21 @@ func init() {
 func newEquipChangeUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.EquipChange)
 
+	var className, classAbbrev string
+
+	if cj, found := d.ClassJobData[data.ClassJob]; found {
+		className = cj.Name
+		classAbbrev = cj.Abbreviation
+	}
+
 	return equipChangeUpdate{
 		pid:       pid,
 		subjectID: uint64(b.SubjectID),
 
 		classJob: models.ClassJob{
-			ID: int(data.ClassJob),
+			ID:           int(data.ClassJob),
+			Name:         className,
+			Abbreviation: classAbbrev,
 		},
 	}
 }

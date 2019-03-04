@@ -128,3 +128,9 @@ var ExpectedStatusData = map[uint32]datasheet.Status{
 	1: datasheet.Status{Key: 1, Name: "Petrification", Description: "Stone-like rigidity is preventing the execution of actions."},
 	2: datasheet.Status{Key: 2, Name: "Stun", Description: "Unable to execute actions."},
 }
+
+var ExpectedClassJobData = map[byte]datasheet.ClassJob{
+	0: datasheet.ClassJob{Key: 0, Name: "adventurer", Abbreviation: "ADV"},
+	1: datasheet.ClassJob{Key: 1, Name: "gladiator", Abbreviation: "GLA"},
+	2: datasheet.ClassJob{Key: 2, Name: "pugilist", Abbreviation: "PGL"},
+}
