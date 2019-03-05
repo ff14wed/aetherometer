@@ -17,6 +17,7 @@ import (
 // running FFXIV instance.
 type Stream struct {
 	PID         int    `json:"pid"`
+	ServerID    int    `json:"serverID"`
 	CharacterID uint64 `json:"characterID"`
 
 	Place        Place         `json:"place"`

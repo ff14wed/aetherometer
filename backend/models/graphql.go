@@ -240,6 +240,7 @@ type ComplexityRoot struct {
 
 	Stream struct {
 		Pid          func(childComplexity int) int
+		ServerId     func(childComplexity int) int
 		CharacterId  func(childComplexity int) int
 		Place        func(childComplexity int) int
 		Enmity       func(childComplexity int) int
@@ -1318,6 +1319,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Stream.Pid(childComplexity), true
+
+	case "Stream.serverID":
+		if e.complexity.Stream.ServerId == nil {
+			break
+		}
+
+		return e.complexity.Stream.ServerId(childComplexity), true
 
 	case "Stream.characterID":
 		if e.complexity.Stream.CharacterId == nil {
@@ -6477,6 +6485,11 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "serverID":
+			out.Values[i] = ec._Stream_serverID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "characterID":
 			out.Values[i] = ec._Stream_characterID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6524,6 +6537,33 @@ func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.Colle
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Stream_serverID(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Stream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -9130,6 +9170,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 
 type Stream {
   pid: Int!
+  serverID: Int!
   characterID: Uint!
 
   place: Place!
