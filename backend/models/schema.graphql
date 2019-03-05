@@ -193,6 +193,7 @@ type StreamEvent {
 union StreamEventType =
   AddStream |
   RemoveStream |
+  UpdateIDs |
   UpdateMap |
   UpdateCraftingInfo |
   UpdateEnmity
@@ -203,6 +204,11 @@ type AddStream {
 
 type RemoveStream {
   id: Int!
+}
+
+type UpdateIDs {
+  serverID: Int!
+  characterID: Uint!
 }
 
 type UpdateMap {

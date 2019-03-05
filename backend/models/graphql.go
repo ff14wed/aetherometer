@@ -274,6 +274,11 @@ type ComplexityRoot struct {
 		Enmity func(childComplexity int) int
 	}
 
+	UpdateIds struct {
+		ServerId    func(childComplexity int) int
+		CharacterId func(childComplexity int) int
+	}
+
 	UpdateLastAction struct {
 		Action func(childComplexity int) int
 	}
@@ -1417,6 +1422,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateEnmity.Enmity(childComplexity), true
+
+	case "UpdateIDs.serverID":
+		if e.complexity.UpdateIds.ServerId == nil {
+			break
+		}
+
+		return e.complexity.UpdateIds.ServerId(childComplexity), true
+
+	case "UpdateIDs.characterID":
+		if e.complexity.UpdateIds.CharacterId == nil {
+			break
+		}
+
+		return e.complexity.UpdateIds.CharacterId(childComplexity), true
 
 	case "UpdateLastAction.action":
 		if e.complexity.UpdateLastAction.Action == nil {
@@ -7140,6 +7159,95 @@ func (ec *executionContext) _UpdateEnmity_enmity(ctx context.Context, field grap
 	return ec._Enmity(ctx, field.Selections, &res)
 }
 
+var updateIDsImplementors = []string{"UpdateIDs"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UpdateIDs(ctx context.Context, sel ast.SelectionSet, obj *UpdateIDs) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, updateIDsImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateIDs")
+		case "serverID":
+			out.Values[i] = ec._UpdateIDs_serverID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "characterID":
+			out.Values[i] = ec._UpdateIDs_characterID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateIDs_serverID(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateIDs",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ServerID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateIDs_characterID(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateIDs",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
+}
+
 var updateLastActionImplementors = []string{"UpdateLastAction"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -9090,6 +9198,10 @@ func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.Select
 		return ec._RemoveStream(ctx, sel, &obj)
 	case *RemoveStream:
 		return ec._RemoveStream(ctx, sel, obj)
+	case UpdateIDs:
+		return ec._UpdateIDs(ctx, sel, &obj)
+	case *UpdateIDs:
+		return ec._UpdateIDs(ctx, sel, obj)
 	case UpdateMap:
 		return ec._UpdateMap(ctx, sel, &obj)
 	case *UpdateMap:
@@ -9356,6 +9468,7 @@ type StreamEvent {
 union StreamEventType =
   AddStream |
   RemoveStream |
+  UpdateIDs |
   UpdateMap |
   UpdateCraftingInfo |
   UpdateEnmity
@@ -9366,6 +9479,11 @@ type AddStream {
 
 type RemoveStream {
   id: Int!
+}
+
+type UpdateIDs {
+  serverID: Int!
+  characterID: Uint!
 }
 
 type UpdateMap {
