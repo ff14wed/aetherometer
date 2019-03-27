@@ -7,4 +7,5 @@ type Collection struct {
 	ActionData   ActionStore
 	StatusData   StatusStore
 	ClassJobData ClassJobStore
+	RecipeData   RecipeStore
 }

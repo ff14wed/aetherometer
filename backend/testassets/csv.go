@@ -136,3 +136,32 @@ int32,str,str,str,ClassJobCategory,sbyte,sbyte,byte,byte,sbyte,uint16,uint16,uin
 1,"gladiator","GLA","剣",30,1,0,1,0,-1,110,49,95,100,90,50,95,100,100,100,100,100,100,100,0,0,0,1,"Gladiator",1601,0,1,3,0,3,197,198,199,2,0,0,0,0,1,1,False
 2,"pugilist","PGL","格",30,0,1,2,0,-1,105,34,100,95,100,45,85,100,100,100,100,100,100,100,0,0,0,2,"Pugilist",1680,0,2,3,1,1,200,201,202,22,0,0,0,0,1,3,False
 `
+
+const RecipeCSV = `
+key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44
+#,,CraftType,RecipeLevelTable,Item{Result},Amount{Result},Item{Ingredient}[0],Amount{Ingredient}[0],Item{Ingredient}[1],Amount{Ingredient}[1],Item{Ingredient}[2],Amount{Ingredient}[2],Item{Ingredient}[3],Amount{Ingredient}[3],Item{Ingredient}[4],Amount{Ingredient}[4],Item{Ingredient}[5],Amount{Ingredient}[5],Item{Ingredient}[6],Amount{Ingredient}[6],Item{Ingredient}[7],Amount{Ingredient}[7],Item{Ingredient}[8],Amount{Ingredient}[8],Item{Ingredient}[9],Amount{Ingredient}[9],RecipeElement,,IsSecondary,DifficultyFactor,QualityFactor,DurabilityFactor,,RequiredCraftsmanship,RequiredControl,QuickSynthCraftsmanship,QuickSynthControl,SecretRecipeBook,CanQuickSynth,CanHq,ExpRewarded,Status{Required},Item{Required},IsSpecializationRequired,,PatchNumber
+int32,int32,CraftType,RecipeLevelTable,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,Item,byte,RecipeElement,uint16,bit&01,uint16,uint16,uint16,uint16,uint16,uint16,uint16,uint16,SecretRecipeBook,bit&02,bit&04,bit&08,Status,Item,bit&10,bit&20,uint16
+1,10001,1,1,5056,1,5106,2,5107,1,0,0,0,0,0,0,0,0,0,0,0,0,2,1,-1,0,0,0,False,50,100,67,0,0,0,0,0,0,True,True,True,0,0,False,False,0
+33067,13547,5,320,23002,1,23375,2,22493,2,19988,1,0,0,0,0,0,0,0,0,0,0,18,2,16,2,0,1045,False,100,100,100,0,1320,1220,0,0,61,False,True,True,0,0,False,False,430
+33068,12504,4,320,23374,1,23376,2,22430,1,19946,1,19988,1,0,0,0,0,0,0,0,0,17,2,16,2,0,1044,False,100,100,100,0,1320,1220,0,0,60,False,True,True,0,0,False,False,430
+33073,10665,1,380,23768,1,24250,2,19943,1,24258,2,0,0,0,0,0,0,0,0,0,0,14,2,17,2,0,1041,False,90,140,100,0,1650,1600,0,0,57,False,True,True,0,0,False,False,440
+33074,10669,1,380,23769,1,24250,3,24251,1,19943,1,24256,3,0,0,0,0,0,0,0,0,14,2,17,2,0,1041,False,90,140,100,0,1650,1600,0,0,57,False,True,True,0,0,False,False,440
+`
+
+const RecipeLevelTableCSV = `
+key,0,1,2,3,4,5
+#,ClassJobLevel,Stars,SuggestedCraftsmanship,Difficulty,Quality,Durability
+int32,byte,byte,uint16,uint16,int16,uint16
+320,70,2,1320,3543,15837,70
+380,70,4,1650,4143,21137,70
+`
+
+const ItemCSV = `
+key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88
+#,Singular,Adjective,Plural,PossessivePronoun,StartsWithVowel,,Pronoun,Article,Description,Name,Icon,Level{Item},Rarity,FilterGroup,AdditionalData,ItemUICategory,ItemSearchCategory,EquipSlotCategory,,StackSize,IsUnique,IsUntradable,IsIndisposable,,Price{Mid},Price{Low},CanBeHq,IsDyeable,IsCrestWorthy,ItemAction,,Cooldown<s>,ClassJob{Repair},Item{Repair},Item{Glamour},Salvage,IsCollectable,AetherialReduce,Level{Equip},,EquipRestriction,ClassJobCategory,GrandCompany,ItemSeries,BaseParamModifier,Model{Main},Model{Sub},ClassJob{Use},,Damage{Phys},Damage{Mag},Delay<ms>,,BlockRate,Block,Defense{Phys},Defense{Mag},,,,,,,,,,,,,ItemSpecialBonus,ItemSpecialBonus{Param},,,,,,,,,,,,,MaterializeType,MateriaSlotCount,IsAdvancedMeldingPermitted,IsPvP,,IsGlamourous
+int32,str,sbyte,str,sbyte,sbyte,sbyte,sbyte,sbyte,str,str,Image,ItemLevel,byte,byte,Row,ItemUICategory,ItemSearchCategory,EquipSlotCategory,uint16,uint32,bit&01,bit&02,bit&04,bit&08,uint32,uint32,bit&10,bit&20,bit&40,ItemAction,byte,uint16,ClassJob,Item,Item,Salvage,bit&80,uint16,byte,byte,byte,ClassJobCategory,GrandCompany,ItemSeries,byte,int64,int64,ClassJob,byte,uint16,uint16,uint16,byte,uint16,uint16,uint16,uint16,byte,int16,byte,int16,byte,int16,byte,int16,byte,int16,byte,int16,ItemSpecialBonus,byte,byte,int16,byte,int16,byte,int16,byte,int16,byte,int16,byte,int16,byte,byte,bit&01,bit&02,byte,bit&04
+5056,"bronze ingot",0,"bronze ingots",0,0,1,0,0,"An ingot of smelted bronze.","Bronze Ingot",20803,1,1,12,0,49,48,0,5001,999,False,False,False,False,9,1,True,False,False,0,2,0,0,0,0,0,False,0,1,0,0,0,0,0,0,"0, 0, 0, 0","0, 0, 0, 0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,False,False,0,False
+23374,"pair of quaintrelle's dress shoes",0,"pairs of quaintrelle's dress shoes",0,0,1,0,0,"Fits: All ♀","Quaintrelle's Dress Shoes",46071,1,1,4,0,38,37,8,44000,1,False,False,False,False,94,2,True,True,False,0,2,0,12,5594,21800,12497,False,0,1,0,3,1,0,0,0,"6070, 1, 0, 0","0, 0, 0, 0",0,0,0,0,0,0,0,0,4,9,0,0,0,0,0,0,0,0,0,0,0,0,1,0,21,2,24,2,0,0,0,0,0,0,0,0,0,0,False,False,0,True
+23768,"rakshasa blade",0,"rakshasa blades",0,0,1,0,0,"","Rakshasa Blade",30592,380,2,1,0,2,10,1,32000,1,False,False,False,False,71640,1208,True,True,False,0,2,0,9,17837,21800,13024,False,0,70,0,1,38,0,0,1,"201, 64, 3, 0","0, 0, 0, 0",1,1,95,64,2080,3,0,0,0,0,1,233,3,259,45,208,44,146,0,0,0,0,1,0,12,10,13,7,1,26,3,28,45,23,44,16,3,2,True,False,0,True
+23769,"pair of rakshasa knuckles",0,"pairs of rakshasa knuckles",0,0,1,0,0,"","Rakshasa Knuckles",31158,380,2,1,0,1,9,13,32000,1,False,False,False,False,107460,1812,True,True,False,0,2,0,9,17837,21800,13025,False,0,70,0,1,41,0,0,3,"323, 29, 1, 0","373, 29, 1, 0",2,3,95,64,2560,3,0,0,0,0,1,327,3,362,45,292,22,204,0,0,0,0,1,0,12,10,13,7,1,36,3,40,45,32,22,23,5,2,True,False,0,True
+`

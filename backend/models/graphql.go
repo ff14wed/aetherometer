@@ -97,19 +97,16 @@ type ComplexityRoot struct {
 	}
 
 	CraftingInfo struct {
-		RecipeId            func(childComplexity int) int
+		Recipe              func(childComplexity int) int
 		LastCraftActionId   func(childComplexity int) int
 		LastCraftActionName func(childComplexity int) int
 		StepNum             func(childComplexity int) int
 		Progress            func(childComplexity int) int
-		Difficulty          func(childComplexity int) int
 		ProgressDelta       func(childComplexity int) int
 		Quality             func(childComplexity int) int
-		MaxQuality          func(childComplexity int) int
 		QualityDelta        func(childComplexity int) int
 		HqChance            func(childComplexity int) int
 		Durability          func(childComplexity int) int
-		MaxDurability       func(childComplexity int) int
 		DurabilityDelta     func(childComplexity int) int
 		CurrentCondition    func(childComplexity int) int
 		PreviousCondition   func(childComplexity int) int
@@ -200,6 +197,17 @@ type ComplexityRoot struct {
 		Streams    func(childComplexity int) int
 		Stream     func(childComplexity int, streamID int) int
 		Entity     func(childComplexity int, streamID int, entityID uint64) int
+	}
+
+	RecipeInfo struct {
+		Id          func(childComplexity int) int
+		Name        func(childComplexity int) int
+		RecipeLevel func(childComplexity int) int
+		Element     func(childComplexity int) int
+		CanHq       func(childComplexity int) int
+		Difficulty  func(childComplexity int) int
+		Quality     func(childComplexity int) int
+		Durability  func(childComplexity int) int
 	}
 
 	RemoveEntity struct {
@@ -687,12 +695,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ClassJob.Abbreviation(childComplexity), true
 
-	case "CraftingInfo.recipeID":
-		if e.complexity.CraftingInfo.RecipeId == nil {
+	case "CraftingInfo.recipe":
+		if e.complexity.CraftingInfo.Recipe == nil {
 			break
 		}
 
-		return e.complexity.CraftingInfo.RecipeId(childComplexity), true
+		return e.complexity.CraftingInfo.Recipe(childComplexity), true
 
 	case "CraftingInfo.lastCraftActionID":
 		if e.complexity.CraftingInfo.LastCraftActionId == nil {
@@ -722,13 +730,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CraftingInfo.Progress(childComplexity), true
 
-	case "CraftingInfo.difficulty":
-		if e.complexity.CraftingInfo.Difficulty == nil {
-			break
-		}
-
-		return e.complexity.CraftingInfo.Difficulty(childComplexity), true
-
 	case "CraftingInfo.progressDelta":
 		if e.complexity.CraftingInfo.ProgressDelta == nil {
 			break
@@ -742,13 +743,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CraftingInfo.Quality(childComplexity), true
-
-	case "CraftingInfo.maxQuality":
-		if e.complexity.CraftingInfo.MaxQuality == nil {
-			break
-		}
-
-		return e.complexity.CraftingInfo.MaxQuality(childComplexity), true
 
 	case "CraftingInfo.qualityDelta":
 		if e.complexity.CraftingInfo.QualityDelta == nil {
@@ -770,13 +764,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CraftingInfo.Durability(childComplexity), true
-
-	case "CraftingInfo.maxDurability":
-		if e.complexity.CraftingInfo.MaxDurability == nil {
-			break
-		}
-
-		return e.complexity.CraftingInfo.MaxDurability(childComplexity), true
 
 	case "CraftingInfo.durabilityDelta":
 		if e.complexity.CraftingInfo.DurabilityDelta == nil {
@@ -1191,6 +1178,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Entity(childComplexity, args["streamID"].(int), args["entityID"].(uint64)), true
+
+	case "RecipeInfo.id":
+		if e.complexity.RecipeInfo.Id == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Id(childComplexity), true
+
+	case "RecipeInfo.name":
+		if e.complexity.RecipeInfo.Name == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Name(childComplexity), true
+
+	case "RecipeInfo.recipeLevel":
+		if e.complexity.RecipeInfo.RecipeLevel == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.RecipeLevel(childComplexity), true
+
+	case "RecipeInfo.element":
+		if e.complexity.RecipeInfo.Element == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Element(childComplexity), true
+
+	case "RecipeInfo.canHQ":
+		if e.complexity.RecipeInfo.CanHq == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.CanHq(childComplexity), true
+
+	case "RecipeInfo.difficulty":
+		if e.complexity.RecipeInfo.Difficulty == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Difficulty(childComplexity), true
+
+	case "RecipeInfo.quality":
+		if e.complexity.RecipeInfo.Quality == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Quality(childComplexity), true
+
+	case "RecipeInfo.durability":
+		if e.complexity.RecipeInfo.Durability == nil {
+			break
+		}
+
+		return e.complexity.RecipeInfo.Durability(childComplexity), true
 
 	case "RemoveEntity.id":
 		if e.complexity.RemoveEntity.Id == nil {
@@ -2921,8 +2964,8 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CraftingInfo")
-		case "recipeID":
-			out.Values[i] = ec._CraftingInfo_recipeID(ctx, field, obj)
+		case "recipe":
+			out.Values[i] = ec._CraftingInfo_recipe(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2946,11 +2989,6 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "difficulty":
-			out.Values[i] = ec._CraftingInfo_difficulty(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		case "progressDelta":
 			out.Values[i] = ec._CraftingInfo_progressDelta(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2958,11 +2996,6 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			}
 		case "quality":
 			out.Values[i] = ec._CraftingInfo_quality(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "maxQuality":
-			out.Values[i] = ec._CraftingInfo_maxQuality(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2978,11 +3011,6 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			}
 		case "durability":
 			out.Values[i] = ec._CraftingInfo_durability(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "maxDurability":
-			out.Values[i] = ec._CraftingInfo_maxDurability(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -3013,7 +3041,7 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_recipeID(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+func (ec *executionContext) _CraftingInfo_recipe(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -3025,7 +3053,7 @@ func (ec *executionContext) _CraftingInfo_recipeID(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.RecipeID, nil
+		return obj.Recipe, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3033,10 +3061,11 @@ func (ec *executionContext) _CraftingInfo_recipeID(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(RecipeInfo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._RecipeInfo(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -3148,33 +3177,6 @@ func (ec *executionContext) _CraftingInfo_progress(ctx context.Context, field gr
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_difficulty(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "CraftingInfo",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Difficulty, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
 func (ec *executionContext) _CraftingInfo_progressDelta(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -3215,33 +3217,6 @@ func (ec *executionContext) _CraftingInfo_quality(ctx context.Context, field gra
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Quality, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_maxQuality(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "CraftingInfo",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MaxQuality, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -3323,33 +3298,6 @@ func (ec *executionContext) _CraftingInfo_durability(ctx context.Context, field 
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Durability, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _CraftingInfo_maxDurability(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "CraftingInfo",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MaxDurability, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -5724,6 +5672,287 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	}
 
 	return ec.___Schema(ctx, field.Selections, res)
+}
+
+var recipeInfoImplementors = []string{"RecipeInfo"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _RecipeInfo(ctx context.Context, sel ast.SelectionSet, obj *RecipeInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, recipeInfoImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RecipeInfo")
+		case "id":
+			out.Values[i] = ec._RecipeInfo_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._RecipeInfo_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "recipeLevel":
+			out.Values[i] = ec._RecipeInfo_recipeLevel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "element":
+			out.Values[i] = ec._RecipeInfo_element(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "canHQ":
+			out.Values[i] = ec._RecipeInfo_canHQ(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "difficulty":
+			out.Values[i] = ec._RecipeInfo_difficulty(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "quality":
+			out.Values[i] = ec._RecipeInfo_quality(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "durability":
+			out.Values[i] = ec._RecipeInfo_durability(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_id(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_name(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_recipeLevel(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RecipeLevel, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_element(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Element, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_canHQ(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CanHQ, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_difficulty(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Difficulty, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_quality(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Quality, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _RecipeInfo_durability(ctx context.Context, field graphql.CollectedField, obj *RecipeInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "RecipeInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Durability, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 var removeEntityImplementors = []string{"RemoveEntity"}
@@ -9432,27 +9661,36 @@ type CastingInfo {
 }
 
 type CraftingInfo {
-  recipeID: Int!
+  recipe: RecipeInfo!
+
   lastCraftActionID: Int!
   lastCraftActionName: String!
   stepNum: Int!
 
   progress: Int!
-  difficulty: Int!
   progressDelta: Int!
 
   quality: Int!
-  maxQuality: Int!
   qualityDelta: Int!
 
   hqChance: Int!
 
   durability: Int!
-  maxDurability: Int!
   durabilityDelta: Int!
 
   currentCondition: Int!
   previousCondition: Int!
+}
+
+type RecipeInfo {
+  id: Int!
+  name: String!
+  recipeLevel: Int!
+  element: Int!
+  canHQ: Boolean!
+  difficulty: Int!
+  quality: Int!
+  durability: Int!
 }
 
 type Subscription {

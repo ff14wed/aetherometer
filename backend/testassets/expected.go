@@ -134,3 +134,68 @@ var ExpectedClassJobData = map[byte]datasheet.ClassJob{
 	1: datasheet.ClassJob{Key: 1, Name: "gladiator", Abbreviation: "GLA"},
 	2: datasheet.ClassJob{Key: 2, Name: "pugilist", Abbreviation: "PGL"},
 }
+
+var ExpectedRecipeData = map[uint32]datasheet.Recipe{
+	1: datasheet.Recipe{
+		Key:              1,
+		RecipeLevel:      1,
+		ItemID:           5056,
+		RecipeElement:    0,
+		DifficultyFactor: 50,
+		QualityFactor:    100,
+		DurabilityFactor: 67,
+		CanHQ:            true,
+	},
+	33067: datasheet.Recipe{
+		Key:              33067,
+		RecipeLevel:      320,
+		ItemID:           23002,
+		RecipeElement:    0,
+		DifficultyFactor: 100,
+		QualityFactor:    100,
+		DurabilityFactor: 100,
+		CanHQ:            true,
+	},
+	33068: datasheet.Recipe{
+		Key:              33068,
+		RecipeLevel:      320,
+		ItemID:           23374,
+		RecipeElement:    0,
+		DifficultyFactor: 100,
+		QualityFactor:    100,
+		DurabilityFactor: 100,
+		CanHQ:            true,
+	},
+	33073: datasheet.Recipe{
+		Key:              33073,
+		RecipeLevel:      380,
+		ItemID:           23768,
+		RecipeElement:    0,
+		DifficultyFactor: 90,
+		QualityFactor:    140,
+		DurabilityFactor: 100,
+		CanHQ:            true,
+	},
+	33074: datasheet.Recipe{
+		Key:              33074,
+		RecipeLevel:      380,
+		ItemID:           23769,
+		RecipeElement:    0,
+		DifficultyFactor: 90,
+		QualityFactor:    140,
+		DurabilityFactor: 100,
+		CanHQ:            true,
+	},
+}
+
+var ExpectedRecipeLevelTableData = map[uint16]datasheet.RecipeLevel{
+	320: datasheet.RecipeLevel{Key: 320, Difficulty: 3543, Quality: 15837, Durability: 70},
+	380: datasheet.RecipeLevel{Key: 380, Difficulty: 4143, Quality: 21137, Durability: 70},
+}
+
+var ExpectedItemData = map[uint32]datasheet.Item{
+	5056:  datasheet.Item{Key: 5056, Name: "Bronze Ingot"},
+	23374: datasheet.Item{Key: 23374, Name: "Quaintrelle's Dress Shoes"},
+	23768: datasheet.Item{Key: 23768, Name: "Rakshasa Blade"},
+	23769: datasheet.Item{Key: 23769, Name: "Rakshasa Knuckles"},
+}

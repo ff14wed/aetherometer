@@ -33,7 +33,7 @@ var _ = Describe("Stream Clone", func() {
 			},
 
 			CraftingInfo: &models.CraftingInfo{
-				RecipeID: 900,
+				StepNum: 900,
 			},
 			EntitiesMap: map[uint64]*models.Entity{
 				1: &models.Entity{
@@ -81,7 +81,7 @@ var _ = Describe("Stream Clone", func() {
 			s.Enmity.NearbyEnemyHate[0].HatePercent = 100
 		}),
 		Entry("stream.CraftingInfo", func(s *models.Stream) {
-			s.CraftingInfo.RecipeID = 200
+			s.CraftingInfo.StepNum = 200
 		}),
 		Entry("stream.EntitiesMap", func(s *models.Stream) {
 			s.EntitiesMap[2] = &models.Entity{ID: 2, Name: "Baah", Index: 1}

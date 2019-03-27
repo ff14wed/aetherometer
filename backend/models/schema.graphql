@@ -157,27 +157,36 @@ type CastingInfo {
 }
 
 type CraftingInfo {
-  recipeID: Int!
+  recipe: RecipeInfo!
+
   lastCraftActionID: Int!
   lastCraftActionName: String!
   stepNum: Int!
 
   progress: Int!
-  difficulty: Int!
   progressDelta: Int!
 
   quality: Int!
-  maxQuality: Int!
   qualityDelta: Int!
 
   hqChance: Int!
 
   durability: Int!
-  maxDurability: Int!
   durabilityDelta: Int!
 
   currentCondition: Int!
   previousCondition: Int!
+}
+
+type RecipeInfo {
+  id: Int!
+  name: String!
+  recipeLevel: Int!
+  element: Int!
+  canHQ: Boolean!
+  difficulty: Int!
+  quality: Int!
+  durability: Int!
 }
 
 type Subscription {

@@ -65,22 +65,19 @@ type ClassJob struct {
 }
 
 type CraftingInfo struct {
-	RecipeID            int    `json:"recipeID"`
-	LastCraftActionID   int    `json:"lastCraftActionID"`
-	LastCraftActionName string `json:"lastCraftActionName"`
-	StepNum             int    `json:"stepNum"`
-	Progress            int    `json:"progress"`
-	Difficulty          int    `json:"difficulty"`
-	ProgressDelta       int    `json:"progressDelta"`
-	Quality             int    `json:"quality"`
-	MaxQuality          int    `json:"maxQuality"`
-	QualityDelta        int    `json:"qualityDelta"`
-	HqChance            int    `json:"hqChance"`
-	Durability          int    `json:"durability"`
-	MaxDurability       int    `json:"maxDurability"`
-	DurabilityDelta     int    `json:"durabilityDelta"`
-	CurrentCondition    int    `json:"currentCondition"`
-	PreviousCondition   int    `json:"previousCondition"`
+	Recipe              RecipeInfo `json:"recipe"`
+	LastCraftActionID   int        `json:"lastCraftActionID"`
+	LastCraftActionName string     `json:"lastCraftActionName"`
+	StepNum             int        `json:"stepNum"`
+	Progress            int        `json:"progress"`
+	ProgressDelta       int        `json:"progressDelta"`
+	Quality             int        `json:"quality"`
+	QualityDelta        int        `json:"qualityDelta"`
+	HqChance            int        `json:"hqChance"`
+	Durability          int        `json:"durability"`
+	DurabilityDelta     int        `json:"durabilityDelta"`
+	CurrentCondition    int        `json:"currentCondition"`
+	PreviousCondition   int        `json:"previousCondition"`
 }
 
 type Enmity struct {
@@ -161,6 +158,17 @@ type Place struct {
 	MapID       int       `json:"mapID"`
 	TerritoryID int       `json:"territoryID"`
 	Maps        []MapInfo `json:"maps"`
+}
+
+type RecipeInfo struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	RecipeLevel int    `json:"recipeLevel"`
+	Element     int    `json:"element"`
+	CanHQ       bool   `json:"canHQ"`
+	Difficulty  int    `json:"difficulty"`
+	Quality     int    `json:"quality"`
+	Durability  int    `json:"durability"`
 }
 
 type RemoveEntity struct {
