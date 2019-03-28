@@ -26,6 +26,13 @@ var ExpectedOmenData = map[uint16]datasheet.Omen{
 	2: datasheet.Omen{Key: 2, Name: "general02f"},
 }
 
+// ExpectedCraftActionData derives from CraftActionCSV
+var ExpectedCraftActionData = map[uint32]datasheet.CraftAction{
+	100000: datasheet.CraftAction{Key: 100000, Name: ""},
+	100001: datasheet.CraftAction{Key: 100001, Name: "Basic Synthesis"},
+	100002: datasheet.CraftAction{Key: 100002, Name: "Basic Touch"},
+}
+
 // ExpectedBNPCBases derives from BNPCBaseCSV
 var ExpectedBNPCBases = map[uint32]datasheet.BNPCBase{
 	0: datasheet.BNPCBase{Key: 0, Scale: 1},

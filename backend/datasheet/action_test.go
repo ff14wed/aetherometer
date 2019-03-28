@@ -58,6 +58,30 @@ var _ = Describe("Action", func() {
 		})
 	})
 
+	Describe("PopulateCraftActions", func() {
+		It("correctly populates the CraftActions store", func() {
+			var a datasheet.ActionStore
+			err := a.PopulateCraftActions(bytes.NewReader([]byte(testassets.CraftActionCSV)))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(a.CraftActions).To(HaveLen(len(testassets.ExpectedCraftActionData)))
+			for k, d := range a.CraftActions {
+				Expect(d).To(Equal(testassets.ExpectedCraftActionData[k]))
+			}
+		})
+
+		It("returns an error if the datasheet is blank", func() {
+			var a datasheet.ActionStore
+			err := a.PopulateCraftActions(bytes.NewReader([]byte("")))
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("returns an error if the datasheet is invalid", func() {
+			var a datasheet.ActionStore
+			err := a.PopulateCraftActions(bytes.NewReader([]byte(InvalidCSV)))
+			Expect(err).To(HaveOccurred())
+		})
+	})
+
 	Describe("GetAction", func() {
 		var a *datasheet.ActionStore
 
@@ -65,6 +89,7 @@ var _ = Describe("Action", func() {
 			a = new(datasheet.ActionStore)
 			Expect(a.PopulateActions(bytes.NewReader([]byte(testassets.ActionCSV)))).To(Succeed())
 			Expect(a.PopulateOmens(bytes.NewReader([]byte(testassets.OmenCSV)))).To(Succeed())
+			Expect(a.PopulateCraftActions(bytes.NewReader([]byte(testassets.CraftActionCSV)))).To(Succeed())
 		})
 
 		It("gets the action", func() {
@@ -82,6 +107,16 @@ var _ = Describe("Action", func() {
 				expectedAc := testassets.ExpectedActionData[203]
 				expectedAc.Omen = testassets.ExpectedOmenData[1].Name
 				Expect(ac).To(Equal(expectedAc))
+			})
+		})
+
+		Context("when the action is a CraftAction", func() {
+			It("returns the CraftAction", func() {
+				ac := a.GetAction(100002)
+				Expect(ac).To(Equal(datasheet.Action{
+					Key:  100002,
+					Name: "Basic Touch",
+				}))
 			})
 		})
 	})

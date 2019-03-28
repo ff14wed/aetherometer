@@ -28,6 +28,19 @@ int32,str,str,byte,bit&01,bit&02,sbyte
 2,"general02f","general02_pf",0,True,False,0
 `
 
+const CraftActionCSV = `
+key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+#,Name,Description,Animation{Start},Animation{End},Icon,ClassJob,ClassJobCategory,ClassJobLevel,QuestRequirement,Specialist,,Cost,CRP,BSM,ARM,GSM,LTW,WVR,ALC,CUL
+int32,str,str,ActionTimeline,ActionTimeline,Image,ClassJob,ClassJobCategory,byte,Quest,bit&01,uint16,byte,CraftAction,CraftAction,CraftAction,CraftAction,CraftAction,CraftAction,CraftAction,CraftAction
+100000,"","",0,0,0,0,0,0,0,False,0,0,0,0,0,0,0,0,0,0
+100001,"Basic Synthesis","Increases progress.
+<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Efficiency:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> 100%
+<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Success Rate:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> 90%",239,246,1501,8,9,1,0,False,0,0,100001,100015,100030,100075,100045,100060,100090,100105
+100002,"Basic Touch","Increases quality.
+<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Efficiency:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> 100%
+<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Success Rate:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> 70%",240,247,1502,8,9,5,0,False,0,18,100002,100016,100031,100076,100046,100061,100091,100106
+`
+
 const BNPCBaseCSV = `
 key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 #,Behavior,ActionTimelineMove,,,Scale,ModelChara,BNpcCustomize,NpcEquip,,,,ArrayEventHandler,BNpcParts,,,,,,
