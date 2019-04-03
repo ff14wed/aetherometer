@@ -6,6 +6,8 @@ import (
 	"github.com/ff14wed/sibyl/backend/models"
 )
 
+// ErrRequestTimedOut is returned if the store is taking too long to return from
+// query
 var ErrRequestTimedOut = errors.New("request timed out")
 
 type internalRequest interface {

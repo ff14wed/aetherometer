@@ -19,6 +19,7 @@ type MapInfo struct {
 	TerritoryType uint16 `datasheet:"TerritoryType"`
 }
 
+// PlaceName stores information about the name of the region
 type PlaceName struct {
 	Key  uint16 `datasheet:"key"`
 	Name string `datasheet:"Name"`

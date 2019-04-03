@@ -12,7 +12,12 @@ import (
 	"github.com/ff14wed/xivnet/v3"
 )
 
+// ErrorStreamNotFound is returned if the given stream ID is not found in the
+// list of streams
 var ErrorStreamNotFound = errors.New("stream not found")
+
+// ErrorEntityNotFound is returned if the given entity ID is not found in the
+// list of entities for the given stream
 var ErrorEntityNotFound = errors.New("entity not found")
 
 type updateFactory func(pid int, b *xivnet.Block, data *datasheet.Collection) store.Update

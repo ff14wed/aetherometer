@@ -61,6 +61,8 @@ func MarshalUint(u uint64) graphql.Marshaler {
 	})
 }
 
+// UnmarshalUint converts the string representation for an unsigned integer to a
+// uint64.
 func UnmarshalUint(v interface{}) (uint64, error) {
 	switch v := v.(type) {
 	case string:

@@ -130,18 +130,21 @@ var ExpectedTerritoryInfo = map[uint16]datasheet.TerritoryInfo{
 	296: datasheet.TerritoryInfo{Key: 296, Name: "s1fa_3", Map: 403},
 }
 
+// ExpectedStatusData derives from StatusCSV
 var ExpectedStatusData = map[uint32]datasheet.Status{
 	0: datasheet.Status{Key: 0},
 	1: datasheet.Status{Key: 1, Name: "Petrification", Description: "Stone-like rigidity is preventing the execution of actions."},
 	2: datasheet.Status{Key: 2, Name: "Stun", Description: "Unable to execute actions."},
 }
 
+// ExpectedClassJobData derives from ClassJobCSV
 var ExpectedClassJobData = map[byte]datasheet.ClassJob{
 	0: datasheet.ClassJob{Key: 0, Name: "adventurer", Abbreviation: "ADV"},
 	1: datasheet.ClassJob{Key: 1, Name: "gladiator", Abbreviation: "GLA"},
 	2: datasheet.ClassJob{Key: 2, Name: "pugilist", Abbreviation: "PGL"},
 }
 
+// ExpectedRecipeData derives from RecipeCSV
 var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 	1: datasheet.Recipe{
 		Key:              1,
@@ -195,11 +198,13 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 	},
 }
 
+// ExpectedRecipeLevelTableData derives from RecipeLevelTableCSV
 var ExpectedRecipeLevelTableData = map[uint16]datasheet.RecipeLevel{
 	320: datasheet.RecipeLevel{Key: 320, Difficulty: 3543, Quality: 15837, Durability: 70},
 	380: datasheet.RecipeLevel{Key: 380, Difficulty: 4143, Quality: 21137, Durability: 70},
 }
 
+// ExpectedItemData derives from ItemCSV
 var ExpectedItemData = map[uint32]datasheet.Item{
 	5056:  datasheet.Item{Key: 5056, Name: "Bronze Ingot"},
 	23374: datasheet.Item{Key: 23374, Name: "Quaintrelle's Dress Shoes"},

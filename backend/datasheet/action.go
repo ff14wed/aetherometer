@@ -33,6 +33,7 @@ type Omen struct {
 	Name string `datasheet:"FileName"`
 }
 
+// CraftAction stores the data for a game crafting Action
 type CraftAction struct {
 	Key  uint32 `datasheet:"key"`
 	Name string `datasheet:"Name"`

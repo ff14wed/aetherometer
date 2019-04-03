@@ -26,6 +26,8 @@ type Recipe struct {
 	CanHQ            bool   `datasheet:"CanHq"`
 }
 
+// RecipeLevel stores information about the difficulty of the recipe to
+// improve quality and and increase progress
 type RecipeLevel struct {
 	Key        uint16 `datasheet:"key"`
 	Difficulty uint16 `datasheet:"Difficulty"`
@@ -33,6 +35,7 @@ type RecipeLevel struct {
 	Durability uint16 `datasheet:"Durability"`
 }
 
+// Item maps the ID of the item with the name
 type Item struct {
 	Key  uint32 `datasheet:"key"`
 	Name string `datasheet:"Name"`
@@ -86,6 +89,7 @@ func (r *RecipeStore) PopulateItems(dataReader io.Reader) error {
 	return nil
 }
 
+// GetInfo returns the normalized information about the recipe
 func (r *RecipeStore) GetInfo(key uint32) models.RecipeInfo {
 	recipe, found := r.Recipes[key]
 	if !found {
