@@ -9,11 +9,15 @@ import (
 
 // Config stores configuration values for the Sibyl backend
 type Config struct {
-	HookDLL      string `toml:"hook_dll" validate:"file"`
-	FFXIVProcess string `toml:"ffxiv_process" validate:"nonempty"`
-	APIPort      uint16 `toml:"api_port" validate:"nonempty"`
-
+	APIPort uint16     `toml:"api_port" validate:"nonempty"`
 	Sources SourceDirs `toml:"sources"`
+
+	Adapters Adapters `toml:"adapters"`
+}
+
+// Adapters stores configuration structs for adapters
+type Adapters struct {
+	Hook HookConfig `toml:"hook"`
 }
 
 // SourceDirs is a table of directories that provide data used to interpret
@@ -84,6 +88,11 @@ func validateField(name, validation string, ctx []string, val reflect.Value) err
 func validateStruct(rs reflect.Value, ctx []string) error {
 	if rs.Kind() != reflect.Struct {
 		panic("BUG: improper type passed into validateStruct")
+	}
+
+	enabledField := rs.FieldByName("Enabled")
+	if enabledField.IsValid() && enabledField.Bool() == false {
+		return nil
 	}
 	numFields := rs.Type().NumField()
 

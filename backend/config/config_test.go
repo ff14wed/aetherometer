@@ -27,9 +27,7 @@ var _ = Describe("Config", func() {
 
 		It("is successful on a correct config", func() {
 			c = &config.Config{
-				HookDLL:      dummyFile,
-				FFXIVProcess: "ffxiv_dx11.exe",
-				APIPort:      9000,
+				APIPort: 9000,
 				Sources: config.SourceDirs{
 					MapsDir: dummyPath,
 					DataDir: dummyPath,
@@ -37,54 +35,10 @@ var _ = Describe("Config", func() {
 			}
 			Expect(c.Validate()).To(Succeed())
 		})
-		Describe("hook_dll", func() {
-			var hookDLL string
-			JustBeforeEach(func() {
-				c = &config.Config{
-					HookDLL: hookDLL,
-				}
-			})
-			Context("when hook_dll is empty", func() {
-				BeforeEach(func() {
-					hookDLL = ""
-				})
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError("config error: hook_dll must be provided"))
-				})
-			})
-			Context("when hook_dll does not exist", func() {
-				BeforeEach(func() {
-					hookDLL = `Z:\foo\does\not\exist`
-				})
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(`config error: hook_dll file ("Z:\foo\does\not\exist") does not exist`))
-				})
-			})
-			Context("when hook_dll is not a file", func() {
-				BeforeEach(func() {
-					hookDLL = dummyPath
-				})
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error: hook_dll ("%s") must be a file`, dummyPath)))
-				})
-			})
-		})
-		Describe("ffxiv_process", func() {
-			BeforeEach(func() {
-				c = &config.Config{
-					HookDLL: dummyFile,
-				}
-			})
-			It("errors when empty", func() {
-				Expect(c.Validate()).To(MatchError("config error: ffxiv_process must be provided"))
-			})
-		})
+
 		Describe("api_port", func() {
 			BeforeEach(func() {
-				c = &config.Config{
-					HookDLL:      dummyFile,
-					FFXIVProcess: "ffxiv_dx11.exe",
-				}
+				c = &config.Config{}
 			})
 			It("errors when zero", func() {
 				Expect(c.Validate()).To(MatchError("config error: api_port must be provided"))
@@ -94,9 +48,7 @@ var _ = Describe("Config", func() {
 			var mapsDir string
 			JustBeforeEach(func() {
 				c = &config.Config{
-					HookDLL:      dummyFile,
-					FFXIVProcess: "ffxiv_dx11.exe",
-					APIPort:      9000,
+					APIPort: 9000,
 					Sources: config.SourceDirs{
 						MapsDir: mapsDir,
 					},
@@ -131,9 +83,7 @@ var _ = Describe("Config", func() {
 			var dataDir string
 			JustBeforeEach(func() {
 				c = &config.Config{
-					HookDLL:      dummyFile,
-					FFXIVProcess: "ffxiv_dx11.exe",
-					APIPort:      9000,
+					APIPort: 9000,
 					Sources: config.SourceDirs{
 						MapsDir: dummyPath,
 						DataDir: dataDir,
