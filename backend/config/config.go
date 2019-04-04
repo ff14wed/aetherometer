@@ -104,7 +104,7 @@ func validateStruct(rs reflect.Value, ctx []string) error {
 	}
 
 	enabledField := rs.FieldByName("Enabled")
-	if enabledField.IsValid() && enabledField.Bool() == false {
+	if enabledField.IsValid() && !enabledField.Bool() {
 		return nil
 	}
 	numFields := rs.Type().NumField()
