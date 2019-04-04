@@ -20,6 +20,19 @@ type Adapters struct {
 	Hook HookConfig `toml:"hook"`
 }
 
+// IsEnabled returns whether or not the provided adapter name is enabled
+func (a Adapters) IsEnabled(adapterName string) bool {
+	rs := reflect.ValueOf(a)
+	adapterConfig := rs.FieldByName(adapterName)
+	if !adapterConfig.IsValid() {
+		panic(fmt.Sprintf("ERROR: Adapter config for %s does not exist", adapterName))
+	}
+	if f := adapterConfig.FieldByName("Enabled"); f.IsValid() {
+		return f.Bool()
+	}
+	return false
+}
+
 // SourceDirs is a table of directories that provide data used to interpret
 // indexes sent over the network
 type SourceDirs struct {

@@ -116,4 +116,41 @@ var _ = Describe("Config", func() {
 			})
 		})
 	})
+
+	Describe("Adapters", func() {
+		var a config.Adapters
+		Describe("IsEnabled", func() {
+			Context("when the adapter is not enabled", func() {
+				BeforeEach(func() {
+					a.Hook.Enabled = false
+				})
+				It("returns false if the adapter is not enabled", func() {
+					Expect(a.IsEnabled("Hook")).To(BeFalse())
+				})
+			})
+
+			Context("when the adapter is enabled", func() {
+				BeforeEach(func() {
+					a.Hook.Enabled = true
+				})
+				It("returns true", func() {
+					Expect(a.IsEnabled("Hook")).To(BeTrue())
+				})
+			})
+
+			It("panics if the adapter config does not exist", func() {
+				var panicMsg interface{}
+				Expect(func() {
+					defer func() {
+						if err := recover(); err != nil {
+							panicMsg = err
+							panic(panicMsg)
+						}
+					}()
+					_ = a.IsEnabled("Unknown")
+				}).To(Panic())
+				Expect(panicMsg).To(Equal("ERROR: Adapter config for Unknown does not exist"))
+			})
+		})
+	})
 })
