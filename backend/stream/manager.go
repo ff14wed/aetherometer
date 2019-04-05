@@ -20,9 +20,14 @@ type HandlerFactoryArgs struct {
 	Logger      *zap.Logger
 }
 
+// IHandler defines the interface that a Handler must implement
+type IHandler interface {
+	suture.Service
+}
+
 // HandlerFactory defines a factory for creating a handler capable of processing
 // updates from the stream provider
-type HandlerFactory func(h HandlerFactoryArgs) suture.Service
+type HandlerFactory func(h HandlerFactoryArgs) IHandler
 
 // Manager is a process responsible for watching stream created or stream
 // closed events from all adapters

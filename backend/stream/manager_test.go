@@ -79,7 +79,7 @@ var _ = Describe("Manager", func() {
 		generator = update.NewGenerator(nil)
 		updateChan = make(chan store.Update)
 		fakeHandler = &FakeHandler{stop: make(chan struct{})}
-		handlerFactory := func(args stream.HandlerFactoryArgs) suture.Service {
+		handlerFactory := func(args stream.HandlerFactoryArgs) stream.IHandler {
 			handlerFactoryArgs = args
 			return fakeHandler
 		}
