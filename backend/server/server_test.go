@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"sync/atomic"
 
 	"github.com/ff14wed/sibyl/backend/config"
@@ -23,13 +24,18 @@ var _ = Describe("Server", func() {
 		s      *server.Server
 		buf    *testhelpers.LogBuffer
 		logger *zap.Logger
+
+		once sync.Once
 	)
-	buf = new(testhelpers.LogBuffer)
-	err := zap.RegisterSink("servertest", func(*url.URL) (zap.Sink, error) {
-		return buf, nil
-	})
 
 	BeforeEach(func() {
+		var err error
+		once.Do(func() {
+			buf = new(testhelpers.LogBuffer)
+			err = zap.RegisterSink("servertest", func(*url.URL) (zap.Sink, error) {
+				return buf, nil
+			})
+		})
 		buf.Reset()
 		Expect(err).ToNot(HaveOccurred())
 		zapCfg := zap.NewDevelopmentConfig()

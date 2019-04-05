@@ -3,6 +3,7 @@ package store_test
 import (
 	"errors"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/ff14wed/sibyl/backend/models"
@@ -32,14 +33,18 @@ var _ = Describe("Provider", func() {
 		logger *zap.Logger
 
 		supervisor *suture.Supervisor
+
+		once sync.Once
 	)
 
-	logBuf = new(testhelpers.LogBuffer)
-	err := zap.RegisterSink("providertest", func(*url.URL) (zap.Sink, error) {
-		return logBuf, nil
-	})
-
 	BeforeEach(func() {
+		var err error
+		once.Do(func() {
+			logBuf = new(testhelpers.LogBuffer)
+			err = zap.RegisterSink("providertest", func(*url.URL) (zap.Sink, error) {
+				return logBuf, nil
+			})
+		})
 		logBuf.Reset()
 		Expect(err).ToNot(HaveOccurred())
 		zapCfg := zap.NewDevelopmentConfig()
@@ -88,7 +93,7 @@ var _ = Describe("Provider", func() {
 	})
 
 	It(`logs "Running" on startup`, func() {
-		Expect(logBuf).To(gbytes.Say("store-provider.*Running"))
+		Eventually(logBuf).Should(gbytes.Say("store-provider.*Running"))
 	})
 
 	It(`logs "Stopping..." on shutdown`, func() {
