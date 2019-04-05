@@ -25,6 +25,7 @@ type Provider struct {
 	updatesChan         chan Update
 	internalRequestChan chan internalRequest
 	stop                chan struct{}
+	stopDone            chan struct{}
 }
 
 // NewProvider creates a new store provider. It will also initialize the
@@ -61,6 +62,7 @@ func NewProvider(
 		updatesChan:         make(chan Update, cfg.updateBufferSize),
 		internalRequestChan: make(chan internalRequest, cfg.requestBufferSize),
 		stop:                make(chan struct{}),
+		stopDone:            make(chan struct{}),
 	}
 }
 
@@ -84,14 +86,16 @@ func (p *Provider) Serve() {
 			}
 		case <-p.stop:
 			p.logger.Info("Stopping...")
+			close(p.stopDone)
 			return
 		}
 	}
 }
 
-// Stop will shutdown this service eventually, but will not wait on it to stop
+// Stop will shutdown this service and wait on it to stop before returning
 func (p *Provider) Stop() {
 	close(p.stop)
+	<-p.stopDone
 }
 
 // UpdatesChan returns a channel on which other services can send store updates
@@ -121,7 +125,7 @@ func (p *Provider) handleUpdate(u Update) {
 // Streams returns all the streams from the internal store. This query will
 // return an error if the request exceeds the timeout duration.
 func (p *Provider) Streams() ([]models.Stream, error) {
-	streamsChan := make(chan []models.Stream)
+	streamsChan := make(chan []models.Stream, 1)
 	p.internalRequestChan <- streamsRequest{respChan: streamsChan}
 	select {
 	case resp := <-streamsChan:
@@ -138,7 +142,7 @@ func (p *Provider) Streams() ([]models.Stream, error) {
 // Stream returns a specific stream from the store, queried by streamID. This
 // query will return an error if the request exceeds the timeout duration.
 func (p *Provider) Stream(streamID int) (models.Stream, error) {
-	streamChan := make(chan *models.Stream)
+	streamChan := make(chan *models.Stream, 1)
 	p.internalRequestChan <- streamRequest{
 		respChan: streamChan,
 		streamID: streamID,
@@ -164,7 +168,7 @@ func (p *Provider) Stream(streamID int) (models.Stream, error) {
 // if the entityID is not found in the stream. This query will return an error
 // if the request exceeds the timeout duration.
 func (p *Provider) Entity(streamID int, entityID uint64) (models.Entity, error) {
-	entityChan := make(chan *models.Entity)
+	entityChan := make(chan *models.Entity, 1)
 	p.internalRequestChan <- entityRequest{
 		respChan: entityChan,
 		streamID: streamID,

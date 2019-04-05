@@ -83,6 +83,10 @@ var _ = Describe("Provider", func() {
 		Eventually(provider.Streams).Should(HaveLen(2))
 	})
 
+	AfterEach(func() {
+		supervisor.Stop()
+	})
+
 	It(`logs "Running" on startup`, func() {
 		Expect(logBuf).To(gbytes.Say("store-provider.*Running"))
 	})
@@ -102,9 +106,11 @@ var _ = Describe("Provider", func() {
 			provider.UpdatesChan() <- testUpdate(func(s *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 				By("blocking the provider service loop")
 				<-blockCh
+				<-blockCh
 				return nil, nil, nil
 			})
 
+			Eventually(blockCh).Should(BeSent(struct{}{}))
 			_, err := provider.Streams()
 			Expect(err).To(MatchError(store.ErrRequestTimedOut))
 			close(blockCh)
@@ -126,9 +132,11 @@ var _ = Describe("Provider", func() {
 			provider.UpdatesChan() <- testUpdate(func(s *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 				By("blocking the provider service loop")
 				<-blockCh
+				<-blockCh
 				return nil, nil, nil
 			})
 
+			Eventually(blockCh).Should(BeSent(struct{}{}))
 			_, err := provider.Stream(2345)
 			Expect(err).To(MatchError(store.ErrRequestTimedOut))
 			close(blockCh)
@@ -160,9 +168,11 @@ var _ = Describe("Provider", func() {
 			provider.UpdatesChan() <- testUpdate(func(s *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 				By("blocking the provider service loop")
 				<-blockCh
+				<-blockCh
 				return nil, nil, nil
 			})
 
+			Eventually(blockCh).Should(BeSent(struct{}{}))
 			_, err := provider.Entity(1234, 3)
 			Expect(err).To(MatchError(store.ErrRequestTimedOut))
 			close(blockCh)
