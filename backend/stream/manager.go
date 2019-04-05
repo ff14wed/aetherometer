@@ -2,6 +2,7 @@ package stream
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/ff14wed/sibyl/backend/store"
 	"github.com/ff14wed/sibyl/backend/store/update"
@@ -32,9 +33,12 @@ type Manager struct {
 	handlerFactory   HandlerFactory
 	logger           *zap.Logger
 
-	stop         chan struct{}
-	streamTokens map[int]suture.ServiceToken
-	providers    map[int]Provider
+	stop     chan struct{}
+	stopDone chan struct{}
+
+	streamTokens  map[int]suture.ServiceToken
+	providers     map[int]Provider
+	providersLock sync.Mutex
 
 	streamUp   chan Provider
 	streamDown chan int
@@ -55,7 +59,9 @@ func NewManager(
 		handlerFactory:   handlerFactory,
 		logger:           logger.Named("stream-manager"),
 
-		stop:         make(chan struct{}),
+		stop:     make(chan struct{}),
+		stopDone: make(chan struct{}),
+
 		streamTokens: make(map[int]suture.ServiceToken),
 		providers:    make(map[int]Provider),
 
@@ -85,16 +91,23 @@ func (m *Manager) Serve() {
 			})
 			token := m.streamSupervisor.Add(sh)
 			m.streamTokens[pid] = token
+
+			m.providersLock.Lock()
 			m.providers[pid] = sp
+			m.providersLock.Unlock()
 		case pid := <-m.streamDown:
 			err := m.streamSupervisor.Remove(m.streamTokens[pid])
 			if err != nil {
 				m.logger.Error("Error removing stream", zap.Int("streamID", pid), zap.Error(err))
 			}
 			delete(m.streamTokens, pid)
+
+			m.providersLock.Lock()
 			delete(m.providers, pid)
+			m.providersLock.Unlock()
 		case <-m.stop:
 			m.logger.Info("Stopping...")
+			close(m.stopDone)
 			return
 		}
 	}
@@ -103,12 +116,17 @@ func (m *Manager) Serve() {
 // Stop will shutdown this service eventually, but will not wait on it to stop
 func (m *Manager) Stop() {
 	close(m.stop)
+	<-m.stopDone
 }
 
 // SendRequest forwards a request for a given stream ID to the correct stream
 // Provider.
 func (m *Manager) SendRequest(pid int, req []byte) ([]byte, error) {
-	if provider, found := m.providers[pid]; found {
+	m.providersLock.Lock()
+	provider, found := m.providers[pid]
+	m.providersLock.Unlock()
+
+	if found {
 		return provider.SendRequest(req)
 	}
 	return nil, fmt.Errorf("stream provider %d not found", pid)
