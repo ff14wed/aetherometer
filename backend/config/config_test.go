@@ -138,6 +138,12 @@ var _ = Describe("Config", func() {
 				})
 			})
 
+			Context("when the adapter has no Enabled option", func() {
+				It("returns true", func() {
+					Expect(a.IsEnabled("Test")).To(BeTrue())
+				})
+			})
+
 			It("panics if the adapter config does not exist", func() {
 				var panicMsg interface{}
 				Expect(func() {

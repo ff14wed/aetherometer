@@ -18,6 +18,7 @@ type Config struct {
 // Adapters stores configuration structs for adapters
 type Adapters struct {
 	Hook HookConfig `toml:"hook"`
+	Test struct{}
 }
 
 // IsEnabled returns whether or not the provided adapter name is enabled
@@ -30,7 +31,7 @@ func (a Adapters) IsEnabled(adapterName string) bool {
 	if f := adapterConfig.FieldByName("Enabled"); f.IsValid() {
 		return f.Bool()
 	}
-	return false
+	return true
 }
 
 // SourceDirs is a table of directories that provide data used to interpret
