@@ -16,7 +16,7 @@ var _ = Describe("Custom Types", func() {
 
 		BeforeEach(func() {
 			stream = &models.Stream{
-				PID: 1234,
+				ID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
 					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
 					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},

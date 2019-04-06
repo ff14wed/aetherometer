@@ -14,7 +14,7 @@ const SibylAPIVersion = "v0.0.0-beta"
 
 // StreamRequestHandler defines the type of a client request handler that can
 // be attached to the resolver.
-type StreamRequestHandler func(pid int, data []byte) (resp string, err error)
+type StreamRequestHandler func(streamID int, data []byte) (resp string, err error)
 
 // Resolver is a resolver for the queried data
 type Resolver struct {

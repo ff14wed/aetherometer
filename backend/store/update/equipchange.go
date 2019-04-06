@@ -12,7 +12,7 @@ func init() {
 	registerIngressHandler(new(datatypes.EquipChange), newEquipChangeUpdate)
 }
 
-func newEquipChangeUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newEquipChangeUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.EquipChange)
 
 	var className, classAbbrev string
@@ -23,7 +23,7 @@ func newEquipChangeUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 	}
 
 	return equipChangeUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 
 		classJob: models.ClassJob{
@@ -35,21 +35,21 @@ func newEquipChangeUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 }
 
 type equipChangeUpdate struct {
-	pid       int
+	streamID  int
 	subjectID uint64
 
 	classJob models.ClassJob
 }
 
 func (u equipChangeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
 func (u equipChangeUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.ClassJob = u.classJob
 
 	return nil, []models.EntityEvent{models.EntityEvent{
-		StreamID: u.pid,
+		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateClass{
 			ClassJob: u.classJob,

@@ -2,9 +2,9 @@
 package modelsfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	models "github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/sibyl/backend/models"
 )
 
 type FakeStreamEventSource struct {

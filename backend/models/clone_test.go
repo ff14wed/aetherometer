@@ -15,7 +15,7 @@ var _ = Describe("Stream Clone", func() {
 		bNPCInfoSize := 1.5
 
 		stream = &models.Stream{
-			PID:         1234,
+			ID:          1234,
 			CharacterID: 4567,
 			Place: models.Place{
 				MapID: 20,
@@ -117,7 +117,7 @@ var _ = Describe("Stream Clone", func() {
 	Describe("with a minimal stream", func() {
 		BeforeEach(func() {
 			stream = &models.Stream{
-				PID: 1234,
+				ID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
 					1: &models.Entity{ID: 1, Index: 2, Name: "FooBar"},
 					2: &models.Entity{ID: 1, Index: 2, Name: "FooBar", BNPCInfo: &models.NPCInfo{}},
@@ -134,7 +134,7 @@ var _ = Describe("Stream Clone", func() {
 
 	Describe("with an empty stream", func() {
 		BeforeEach(func() {
-			stream = &models.Stream{PID: 1234}
+			stream = &models.Stream{ID: 1234}
 		})
 
 		It("produces an identical copy of the original struct", func() {

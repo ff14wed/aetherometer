@@ -66,7 +66,7 @@ func processActionEffects(effectsList []datatypes.ActionEffects, targets []uint6
 	return actionEffects
 }
 
-func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newActionUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Action)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Time)
@@ -83,7 +83,7 @@ func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Up
 	action.EffectFlags = int(data.EffectFlags)
 
 	return actionUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 
 		action: action,
@@ -91,21 +91,21 @@ func newActionUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Up
 }
 
 type actionUpdate struct {
-	pid       int
+	streamID  int
 	subjectID uint64
 
 	action models.Action
 }
 
 func (u actionUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
 func (u actionUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.LastAction = &u.action
 
 	entityEvents := []models.EntityEvent{models.EntityEvent{
-		StreamID: u.pid,
+		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLastAction{
 			Action: *entity.LastAction,
@@ -115,7 +115,7 @@ func (u actionUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) (
 	if entity.CastingInfo != nil {
 		entity.CastingInfo = nil
 		entityEvents = append(entityEvents, models.EntityEvent{
-			StreamID: u.pid,
+			StreamID: u.streamID,
 			EntityID: u.subjectID,
 			Type: models.UpdateCastingInfo{
 				CastingInfo: nil,

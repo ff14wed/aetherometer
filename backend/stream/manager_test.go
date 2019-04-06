@@ -135,7 +135,7 @@ var _ = Describe("Manager", func() {
 
 		BeforeEach(func() {
 			fakeProvider = new(streamfakes.FakeProvider)
-			fakeProvider.PIDReturns(1234)
+			fakeProvider.StreamIDReturns(1234)
 			ingressChan = make(chan *xivnet.Frame)
 			egressChan = make(chan *xivnet.Frame)
 			fakeProvider.SubscribeIngressReturns(ingressChan)
@@ -146,7 +146,7 @@ var _ = Describe("Manager", func() {
 
 		It("creates a new Handler for the stream", func() {
 			Eventually(fakeHandler.ServeCalled).Should(BeTrue())
-			Expect(handlerFactoryArgs.PID).To(Equal(1234))
+			Expect(handlerFactoryArgs.StreamID).To(Equal(1234))
 			Expect(handlerFactoryArgs.IngressChan).To(Equal(ingressChan))
 			Expect(handlerFactoryArgs.EgressChan).To(Equal(egressChan))
 			Expect(handlerFactoryArgs.UpdateChan).To(Equal(updateChan))

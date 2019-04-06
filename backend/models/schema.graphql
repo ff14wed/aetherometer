@@ -6,7 +6,7 @@ type Query {
 }
 
 type Stream {
-  pid: Int!
+  id: Int!
   serverID: Int!
   characterID: Uint!
 

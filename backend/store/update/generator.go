@@ -20,7 +20,7 @@ var ErrorStreamNotFound = errors.New("stream not found")
 // list of entities for the given stream
 var ErrorEntityNotFound = errors.New("entity not found")
 
-type updateFactory func(pid int, b *xivnet.Block, data *datasheet.Collection) store.Update
+type updateFactory func(streamID int, b *xivnet.Block, data *datasheet.Collection) store.Update
 
 var ingressRegistry = make(map[reflect.Type]updateFactory)
 var egressRegistry = make(map[reflect.Type]updateFactory)
@@ -35,7 +35,7 @@ func registerEgressHandler(example interface{}, f updateFactory) {
 	egressRegistry[t] = f
 }
 
-// Generator generates store updates for a given process and direction of
+// Generator generates store updates for a given stream and direction of
 // data traffic
 type Generator struct {
 	data *datasheet.Collection
@@ -48,15 +48,15 @@ func NewGenerator(data *datasheet.Collection) Generator {
 }
 
 // Generate creates an update based off the block received
-// 	- pid is the process ID for which updates are generated
+// 	- streamID is the stream ID for which updates are generated
 // 	- isEgress is true if the input blocks were sent from the client to the server
-func (g *Generator) Generate(pid int, isEgress bool, b *xivnet.Block) store.Update {
+func (g *Generator) Generate(streamID int, isEgress bool, b *xivnet.Block) store.Update {
 	registry := ingressRegistry
 	if isEgress {
 		registry = egressRegistry
 	}
 	if factory, found := registry[reflect.TypeOf(b.Data)]; found {
-		return factory(pid, b, g.data)
+		return factory(streamID, b, g.data)
 	}
 	return nil
 }
@@ -73,8 +73,8 @@ func getTimeForDuration(secs float32) time.Time {
 
 type entityUpdateFunc func(s *models.Stream, e *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error)
 
-func validateEntityUpdate(streams *store.Streams, pid int, entityID uint64, u entityUpdateFunc) ([]models.StreamEvent, []models.EntityEvent, error) {
-	stream, found := streams.Map[pid]
+func validateEntityUpdate(streams *store.Streams, streamID int, entityID uint64, u entityUpdateFunc) ([]models.StreamEvent, []models.EntityEvent, error) {
+	stream, found := streams.Map[streamID]
 	if !found {
 		return nil, nil, ErrorStreamNotFound
 	}

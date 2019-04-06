@@ -9,16 +9,6 @@ import (
 )
 
 type FakeProvider struct {
-	PIDStub        func() int
-	pIDMutex       sync.RWMutex
-	pIDArgsForCall []struct {
-	}
-	pIDReturns struct {
-		result1 int
-	}
-	pIDReturnsOnCall map[int]struct {
-		result1 int
-	}
 	SendRequestStub        func([]byte) ([]byte, error)
 	sendRequestMutex       sync.RWMutex
 	sendRequestArgsForCall []struct {
@@ -31,6 +21,16 @@ type FakeProvider struct {
 	sendRequestReturnsOnCall map[int]struct {
 		result1 []byte
 		result2 error
+	}
+	StreamIDStub        func() int
+	streamIDMutex       sync.RWMutex
+	streamIDArgsForCall []struct {
+	}
+	streamIDReturns struct {
+		result1 int
+	}
+	streamIDReturnsOnCall map[int]struct {
+		result1 int
 	}
 	SubscribeEgressStub        func() <-chan *xivnet.Frame
 	subscribeEgressMutex       sync.RWMutex
@@ -54,58 +54,6 @@ type FakeProvider struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeProvider) PID() int {
-	fake.pIDMutex.Lock()
-	ret, specificReturn := fake.pIDReturnsOnCall[len(fake.pIDArgsForCall)]
-	fake.pIDArgsForCall = append(fake.pIDArgsForCall, struct {
-	}{})
-	fake.recordInvocation("PID", []interface{}{})
-	fake.pIDMutex.Unlock()
-	if fake.PIDStub != nil {
-		return fake.PIDStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.pIDReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeProvider) PIDCallCount() int {
-	fake.pIDMutex.RLock()
-	defer fake.pIDMutex.RUnlock()
-	return len(fake.pIDArgsForCall)
-}
-
-func (fake *FakeProvider) PIDCalls(stub func() int) {
-	fake.pIDMutex.Lock()
-	defer fake.pIDMutex.Unlock()
-	fake.PIDStub = stub
-}
-
-func (fake *FakeProvider) PIDReturns(result1 int) {
-	fake.pIDMutex.Lock()
-	defer fake.pIDMutex.Unlock()
-	fake.PIDStub = nil
-	fake.pIDReturns = struct {
-		result1 int
-	}{result1}
-}
-
-func (fake *FakeProvider) PIDReturnsOnCall(i int, result1 int) {
-	fake.pIDMutex.Lock()
-	defer fake.pIDMutex.Unlock()
-	fake.PIDStub = nil
-	if fake.pIDReturnsOnCall == nil {
-		fake.pIDReturnsOnCall = make(map[int]struct {
-			result1 int
-		})
-	}
-	fake.pIDReturnsOnCall[i] = struct {
-		result1 int
-	}{result1}
 }
 
 func (fake *FakeProvider) SendRequest(arg1 []byte) ([]byte, error) {
@@ -174,6 +122,58 @@ func (fake *FakeProvider) SendRequestReturnsOnCall(i int, result1 []byte, result
 		result1 []byte
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeProvider) StreamID() int {
+	fake.streamIDMutex.Lock()
+	ret, specificReturn := fake.streamIDReturnsOnCall[len(fake.streamIDArgsForCall)]
+	fake.streamIDArgsForCall = append(fake.streamIDArgsForCall, struct {
+	}{})
+	fake.recordInvocation("StreamID", []interface{}{})
+	fake.streamIDMutex.Unlock()
+	if fake.StreamIDStub != nil {
+		return fake.StreamIDStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.streamIDReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeProvider) StreamIDCallCount() int {
+	fake.streamIDMutex.RLock()
+	defer fake.streamIDMutex.RUnlock()
+	return len(fake.streamIDArgsForCall)
+}
+
+func (fake *FakeProvider) StreamIDCalls(stub func() int) {
+	fake.streamIDMutex.Lock()
+	defer fake.streamIDMutex.Unlock()
+	fake.StreamIDStub = stub
+}
+
+func (fake *FakeProvider) StreamIDReturns(result1 int) {
+	fake.streamIDMutex.Lock()
+	defer fake.streamIDMutex.Unlock()
+	fake.StreamIDStub = nil
+	fake.streamIDReturns = struct {
+		result1 int
+	}{result1}
+}
+
+func (fake *FakeProvider) StreamIDReturnsOnCall(i int, result1 int) {
+	fake.streamIDMutex.Lock()
+	defer fake.streamIDMutex.Unlock()
+	fake.StreamIDStub = nil
+	if fake.streamIDReturnsOnCall == nil {
+		fake.streamIDReturnsOnCall = make(map[int]struct {
+			result1 int
+		})
+	}
+	fake.streamIDReturnsOnCall[i] = struct {
+		result1 int
+	}{result1}
 }
 
 func (fake *FakeProvider) SubscribeEgress() <-chan *xivnet.Frame {
@@ -283,10 +283,10 @@ func (fake *FakeProvider) SubscribeIngressReturnsOnCall(i int, result1 <-chan *x
 func (fake *FakeProvider) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.pIDMutex.RLock()
-	defer fake.pIDMutex.RUnlock()
 	fake.sendRequestMutex.RLock()
 	defer fake.sendRequestMutex.RUnlock()
+	fake.streamIDMutex.RLock()
+	defer fake.streamIDMutex.RUnlock()
 	fake.subscribeEgressMutex.RLock()
 	defer fake.subscribeEgressMutex.RUnlock()
 	fake.subscribeIngressMutex.RLock()

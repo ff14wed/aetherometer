@@ -52,14 +52,14 @@ var _ = Describe("Provider", func() {
 		logger, err = zapCfg.Build()
 
 		stream1 = models.Stream{
-			PID: 1234,
+			ID: 1234,
 			EntitiesMap: map[uint64]*models.Entity{
 				1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
 				2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
 				3: nil,
 			},
 		}
-		stream2 = models.Stream{PID: 5678}
+		stream2 = models.Stream{ID: 5678}
 		provider = store.NewProvider(
 			logger,
 			store.WithQueryTimeout(10*time.Millisecond),
@@ -193,7 +193,7 @@ var _ = Describe("Provider", func() {
 			Eventually(func() models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{PID: 5678, CharacterID: 2345}))
+			}).Should(Equal(models.Stream{ID: 5678, CharacterID: 2345}))
 		})
 
 		It("ignores nil updates", func() {
@@ -201,7 +201,7 @@ var _ = Describe("Provider", func() {
 			Consistently(func() models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{PID: 5678}))
+			}).Should(Equal(models.Stream{ID: 5678}))
 			Expect(logBuf).To(gbytes.Say("Running"))
 			Consistently(logBuf).ShouldNot(gbytes.Say("store-provider"))
 		})
@@ -217,9 +217,9 @@ var _ = Describe("Provider", func() {
 			Eventually(func() models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{PID: 5678, CharacterID: 2345}))
+			}).Should(Equal(models.Stream{ID: 5678, CharacterID: 2345}))
 
-			Expect(queriedStream).To(Equal(models.Stream{PID: 5678}))
+			Expect(queriedStream).To(Equal(models.Stream{ID: 5678}))
 
 		})
 

@@ -12,11 +12,11 @@ func init() {
 	registerIngressHandler(new(datatypes.SetPos), newSetPosUpdate)
 }
 
-func newSetPosUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newSetPosUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.SetPos)
 
 	return locationUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		location: models.Location{
 			Orientation: getCanonicalOrientation(uint32(data.Direction), 0x100),

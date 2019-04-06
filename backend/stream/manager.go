@@ -12,7 +12,7 @@ import (
 )
 
 type HandlerFactoryArgs struct {
-	PID         int
+	StreamID    int
 	IngressChan <-chan *xivnet.Frame
 	EgressChan  <-chan *xivnet.Frame
 	UpdateChan  chan<- store.Update
@@ -83,11 +83,11 @@ func (m *Manager) Serve() {
 	for {
 		select {
 		case sp := <-m.streamUp:
-			pid := sp.PID()
+			streamID := sp.StreamID()
 			ingressChan := sp.SubscribeIngress()
 			egressChan := sp.SubscribeEgress()
 			sh := m.handlerFactory(HandlerFactoryArgs{
-				PID:         pid,
+				StreamID:    streamID,
 				IngressChan: ingressChan,
 				EgressChan:  egressChan,
 				UpdateChan:  m.updateChan,
@@ -95,20 +95,20 @@ func (m *Manager) Serve() {
 				Logger:      m.logger,
 			})
 			token := m.streamSupervisor.Add(sh)
-			m.streamTokens[pid] = token
+			m.streamTokens[streamID] = token
 
 			m.providersLock.Lock()
-			m.providers[pid] = sp
+			m.providers[streamID] = sp
 			m.providersLock.Unlock()
-		case pid := <-m.streamDown:
-			err := m.streamSupervisor.Remove(m.streamTokens[pid])
+		case streamID := <-m.streamDown:
+			err := m.streamSupervisor.Remove(m.streamTokens[streamID])
 			if err != nil {
-				m.logger.Error("Error removing stream", zap.Int("streamID", pid), zap.Error(err))
+				m.logger.Error("Error removing stream", zap.Int("streamID", streamID), zap.Error(err))
 			}
-			delete(m.streamTokens, pid)
+			delete(m.streamTokens, streamID)
 
 			m.providersLock.Lock()
-			delete(m.providers, pid)
+			delete(m.providers, streamID)
 			m.providersLock.Unlock()
 		case <-m.stop:
 			m.logger.Info("Stopping...")
@@ -126,15 +126,15 @@ func (m *Manager) Stop() {
 
 // SendRequest forwards a request for a given stream ID to the correct stream
 // Provider.
-func (m *Manager) SendRequest(pid int, req []byte) ([]byte, error) {
+func (m *Manager) SendRequest(streamID int, req []byte) ([]byte, error) {
 	m.providersLock.Lock()
-	provider, found := m.providers[pid]
+	provider, found := m.providers[streamID]
 	m.providersLock.Unlock()
 
 	if found {
 		return provider.SendRequest(req)
 	}
-	return nil, fmt.Errorf("stream provider %d not found", pid)
+	return nil, fmt.Errorf("stream provider %d not found", streamID)
 }
 
 // StreamUp returns a channel that allows an upstream service to notify the

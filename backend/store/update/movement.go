@@ -12,11 +12,11 @@ func init() {
 	registerIngressHandler(new(datatypes.Movement), newMovementUpdate)
 }
 
-func newMovementUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newMovementUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Movement)
 
 	return locationUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		location: models.Location{
 			Orientation: getCanonicalOrientation(uint32(data.Direction), 0x100),
@@ -29,21 +29,21 @@ func newMovementUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.
 }
 
 type locationUpdate struct {
-	pid       int
+	streamID  int
 	subjectID uint64
 
 	location models.Location
 }
 
 func (u locationUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
 func (u locationUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.Location = u.location
 
 	return nil, []models.EntityEvent{models.EntityEvent{
-		StreamID: u.pid,
+		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLocation{
 			Location: u.location,

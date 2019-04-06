@@ -12,14 +12,14 @@ func init() {
 	registerIngressHandler(new(datatypes.Notify142), newNotify142Update)
 }
 
-func newNotify142Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newNotify142Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Notify142)
 
 	switch data.Type {
 	case 0xF:
 		if data.P1 == 538 {
 			return castingUpdate{
-				pid:       pid,
+				streamID:  streamID,
 				subjectID: uint64(b.SubjectID),
 
 				castingInfo: nil,
@@ -27,7 +27,7 @@ func newNotify142Update(pid int, b *xivnet.Block, d *datasheet.Collection) store
 		}
 	case 0x22:
 		return lockonUpdate{
-			pid:       pid,
+			streamID:  streamID,
 			subjectID: uint64(b.SubjectID),
 
 			lockonMarker: int(data.P1),
@@ -37,21 +37,21 @@ func newNotify142Update(pid int, b *xivnet.Block, d *datasheet.Collection) store
 }
 
 type lockonUpdate struct {
-	pid       int
+	streamID  int
 	subjectID uint64
 
 	lockonMarker int
 }
 
 func (u lockonUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
 func (u lockonUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.LockonMarker = u.lockonMarker
 
 	return nil, []models.EntityEvent{models.EntityEvent{
-		StreamID: u.pid,
+		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLockonMarker{
 			LockonMarker: u.lockonMarker,

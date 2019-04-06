@@ -14,11 +14,11 @@ func init() {
 	registerEgressHandler(new(datatypes.EgressMovement), newEgressMovementUpdate)
 }
 
-func newEgressMovementUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newEgressMovementUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.EgressMovement)
 
 	return locationUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		location: models.Location{
 			Orientation: math.Pi + float64(data.Direction),

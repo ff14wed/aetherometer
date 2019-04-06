@@ -17,9 +17,9 @@ import (
 // already parsed into the correct xivnet datatype. This is to ensure backwards
 // compatibility with older data when the datatype opcodes are updated.
 type Provider interface {
-	// PID returns a unique identifier for the stream. This identifier
+	// StreamID returns a unique identifier for the stream. This identifier
 	// must be unique across all adapters.
-	PID() int
+	StreamID() int
 	// SubscribeIngress notifies the backend of network packets in the ingress
 	// direction from this stream.
 	SubscribeIngress() <-chan *xivnet.Frame
@@ -37,10 +37,9 @@ type Provider interface {
 // operate on them.
 //
 // The backend server is capable of handling multiple streams of data
-// from multiple sources, and they are uniquely identified by process IDs.
-// These process IDs do not necessarily correspond to OS processes, though
-// this is one possibility. Generally, a process is just any service or cluster
-// of services that make up a process group managed by the adapter.
+// from multiple sources, and they are uniquely identified by stream IDs.
+// These stream IDs can correspond to anything to OS processes or just a unique
+// identifier for a service or a cluster of services.
 //
 // Adapters must implement the suture.Service interface so that it can itself be
 // started as a long running goroutine. If the adapter must itself parent some
@@ -73,10 +72,10 @@ type AdapterBuilder interface {
 	LoadConfig(config.Config) error
 
 	// Build must return an adapter that is capable of notifying the backend
-	// with StreamProviders whenever a new process is to be created. The adapter
-	// should also be capable of notifying the backend with process IDs whenever
-	// a process is closed.
-	// These StreamProviders should provide the stream's process ID and channels
+	// with StreamProviders whenever a new stream is to be created. The adapter
+	// should also be capable of notifying the backend with stream IDs whenever
+	// a stream is closed.
+	// These StreamProviders should provide the stream's ID and channels
 	// that allow the backend to consume data from the stream.
 	Build(streamUp chan<- Provider, streamDown chan<- int, logger *zap.Logger) Adapter
 }

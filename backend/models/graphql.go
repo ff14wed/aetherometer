@@ -247,7 +247,7 @@ type ComplexityRoot struct {
 	}
 
 	Stream struct {
-		Pid          func(childComplexity int) int
+		Id           func(childComplexity int) int
 		ServerId     func(childComplexity int) int
 		CharacterId  func(childComplexity int) int
 		Place        func(childComplexity int) int
@@ -1361,12 +1361,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Status.LastTick(childComplexity), true
 
-	case "Stream.pid":
-		if e.complexity.Stream.Pid == nil {
+	case "Stream.id":
+		if e.complexity.Stream.Id == nil {
 			break
 		}
 
-		return e.complexity.Stream.Pid(childComplexity), true
+		return e.complexity.Stream.Id(childComplexity), true
 
 	case "Stream.serverID":
 		if e.complexity.Stream.ServerId == nil {
@@ -6728,8 +6728,8 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Stream")
-		case "pid":
-			out.Values[i] = ec._Stream_pid(ctx, field, obj)
+		case "id":
+			out.Values[i] = ec._Stream_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -6772,7 +6772,7 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+func (ec *executionContext) _Stream_id(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -6784,7 +6784,7 @@ func (ec *executionContext) _Stream_pid(ctx context.Context, field graphql.Colle
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PID, nil
+		return obj.ID, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -9510,7 +9510,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 }
 
 type Stream {
-  pid: Int!
+  id: Int!
   serverID: Int!
   characterID: Uint!
 

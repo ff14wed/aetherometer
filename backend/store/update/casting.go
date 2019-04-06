@@ -14,7 +14,7 @@ func init() {
 	registerIngressHandler(new(datatypes.Casting), newCastingUpdate)
 }
 
-func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newCastingUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Casting)
 
 	info := &models.CastingInfo{
@@ -47,7 +47,7 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 	}
 
 	return castingUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 
 		castingInfo: info,
@@ -55,21 +55,21 @@ func newCastingUpdate(pid int, b *xivnet.Block, d *datasheet.Collection) store.U
 }
 
 type castingUpdate struct {
-	pid       int
+	streamID  int
 	subjectID uint64
 
 	castingInfo *models.CastingInfo
 }
 
 func (u castingUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	return validateEntityUpdate(streams, u.pid, u.subjectID, u.modifyFunc)
+	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
 func (u castingUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.CastingInfo = u.castingInfo
 
 	return nil, []models.EntityEvent{models.EntityEvent{
-		StreamID: u.pid,
+		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateCastingInfo{
 			CastingInfo: u.castingInfo,

@@ -15,7 +15,7 @@ func init() {
 	registerIngressHandler(new(datatypes.AoEAction32), newAoEAction32Update)
 }
 
-func newAoEAction8Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newAoEAction8Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction8)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Time)
@@ -31,13 +31,13 @@ func newAoEAction8Update(pid int, b *xivnet.Block, d *datasheet.Collection) stor
 	action.Effects = actionEffects
 
 	return actionUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
 
-func newAoEAction16Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newAoEAction16Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction16)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Time)
@@ -53,13 +53,13 @@ func newAoEAction16Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 	action.Effects = actionEffects
 
 	return actionUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
 
-func newAoEAction24Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newAoEAction24Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction24)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Time)
@@ -75,13 +75,13 @@ func newAoEAction24Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 	action.Effects = actionEffects
 
 	return actionUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
 }
 
-func newAoEAction32Update(pid int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+func newAoEAction32Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.AoEAction32)
 
 	action := actionFromHeader(data.ActionHeader, d, b.Time)
@@ -97,7 +97,7 @@ func newAoEAction32Update(pid int, b *xivnet.Block, d *datasheet.Collection) sto
 	action.Effects = actionEffects
 
 	return actionUpdate{
-		pid:       pid,
+		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 		action:    action,
 	}
