@@ -9,15 +9,37 @@ import (
 
 // Config stores configuration values for the Sibyl backend
 type Config struct {
-	APIPort uint16     `toml:"api_port" validate:"nonempty"`
-	Sources SourceDirs `toml:"sources"`
+	// APIPort provides the port on which the backend API is served.
+	APIPort uint16 `toml:"api_port" validate:"nonempty"`
 
+	// DataPath provides the path to the folder with raw EXD files (in CSV format)
+	// containing game data.
+	DataPath string `toml:"data_path" validate:"directory"`
+
+	// Maps provides the configuration for the Map endpoint of the API.
+	Maps MapConfig `toml:"maps"`
+
+	// Adapters contains the configuration for all the adapters enabled for
+	// the backend API.
 	Adapters Adapters `toml:"adapters"`
+}
+
+// Maps sets the configuration for the Map endpoint of the API.
+type MapConfig struct {
+	// Cache provides the path of the maps on the local disk.
+	Cache string `toml:"cache" validate:"directory"`
+
+	// APIPath provides the URL of an xivapi environment serving the maps if the
+	// map could not be found on the local disk. Defaults to https://xivapi.com.
+	APIPath string `toml:"api_path"`
 }
 
 // Adapters stores configuration structs for adapters
 type Adapters struct {
+	// Hook provides the configuration for the Hook adapter.
 	Hook HookConfig `toml:"hook"`
+
+	// Test is for testing purposes only. Do not use.
 	Test struct{}
 }
 
@@ -38,7 +60,6 @@ func (a Adapters) IsEnabled(adapterName string) bool {
 // indexes sent over the network
 type SourceDirs struct {
 	MapsDir string `toml:"maps_dir" validate:"directory"`
-	DataDir string `toml:"data_dir" validate:"directory"`
 }
 
 func buildError(ctx []string, msg string) error {

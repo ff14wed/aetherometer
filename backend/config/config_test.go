@@ -17,6 +17,7 @@ var _ = Describe("Config", func() {
 		dummyFile string
 		dummyPath string
 	)
+
 	Describe("Validate", func() {
 		BeforeEach(func() {
 			var err error
@@ -27,10 +28,10 @@ var _ = Describe("Config", func() {
 
 		It("is successful on a correct config", func() {
 			c = &config.Config{
-				APIPort: 9000,
-				Sources: config.SourceDirs{
-					MapsDir: dummyPath,
-					DataDir: dummyPath,
+				APIPort:  9000,
+				DataPath: dummyPath,
+				Maps: config.MapConfig{
+					Cache: dummyPath,
 				},
 			}
 			Expect(c.Validate()).To(Succeed())
@@ -40,78 +41,94 @@ var _ = Describe("Config", func() {
 			BeforeEach(func() {
 				c = &config.Config{}
 			})
+
 			It("errors when zero", func() {
 				Expect(c.Validate()).To(MatchError("config error: api_port must be provided"))
 			})
 		})
-		Describe("maps_dir", func() {
+
+		Describe("Maps", func() {
 			var mapsDir string
+
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort: 9000,
-					Sources: config.SourceDirs{
-						MapsDir: mapsDir,
+					APIPort:  9000,
+					DataPath: dummyPath,
+					Maps: config.MapConfig{
+						Cache: mapsDir,
 					},
 				}
 			})
-			Context("when maps_dir is empty", func() {
+
+			Context("when cache is empty", func() {
 				BeforeEach(func() {
 					mapsDir = ""
 				})
+
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError("config error in [sources]: maps_dir must be provided"))
+					Expect(c.Validate()).To(MatchError("config error in [maps]: cache must be provided"))
 				})
 			})
-			Context("when maps_dir does not exist", func() {
+
+			Context("when cache does not exist", func() {
 				BeforeEach(func() {
 					mapsDir = `Z:\foo\does\not\exist`
 				})
+
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(`config error in [sources]: maps_dir directory ("Z:\foo\does\not\exist") does not exist`))
+					Expect(c.Validate()).To(MatchError(`config error in [maps]: cache directory ("Z:\foo\does\not\exist") does not exist`))
 				})
 			})
-			Context("when maps_dir is not a directory", func() {
+
+			Context("when cache is not a directory", func() {
 				BeforeEach(func() {
 					mapsDir = dummyFile
 				})
+
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error in [sources]: maps_dir ("%s") must be a directory`, dummyFile)))
+					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error in [maps]: cache ("%s") must be a directory`, dummyFile)))
 				})
 			})
 		})
-		Describe("data_dir", func() {
+
+		Describe("data_path", func() {
 			var dataDir string
+
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort: 9000,
-					Sources: config.SourceDirs{
-						MapsDir: dummyPath,
-						DataDir: dataDir,
+					APIPort:  9000,
+					DataPath: dataDir,
+					Maps: config.MapConfig{
+						Cache: dummyPath,
 					},
 				}
 			})
-			Context("when data_dir is empty", func() {
+
+			Context("when data_path is empty", func() {
 				BeforeEach(func() {
 					dataDir = ""
 				})
+
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError("config error in [sources]: data_dir must be provided"))
+					Expect(c.Validate()).To(MatchError("config error: data_path must be provided"))
 				})
 			})
-			Context("when data_dir does not exist", func() {
+
+			Context("when data_path does not exist", func() {
 				BeforeEach(func() {
 					dataDir = `Z:\foo\does\not\exist`
 				})
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(`config error in [sources]: data_dir directory ("Z:\foo\does\not\exist") does not exist`))
+					Expect(c.Validate()).To(MatchError(`config error: data_path directory ("Z:\foo\does\not\exist") does not exist`))
 				})
 			})
-			Context("when data_dir is not a directory", func() {
+
+			Context("when data_path is not a directory", func() {
 				BeforeEach(func() {
 					dataDir = dummyFile
 				})
 				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error in [sources]: data_dir ("%s") must be a directory`, dummyFile)))
+					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error: data_path ("%s") must be a directory`, dummyFile)))
 				})
 			})
 		})
@@ -119,11 +136,13 @@ var _ = Describe("Config", func() {
 
 	Describe("Adapters", func() {
 		var a config.Adapters
+
 		Describe("IsEnabled", func() {
 			Context("when the adapter is not enabled", func() {
 				BeforeEach(func() {
 					a.Hook.Enabled = false
 				})
+
 				It("returns false if the adapter is not enabled", func() {
 					Expect(a.IsEnabled("Hook")).To(BeFalse())
 				})
@@ -133,6 +152,7 @@ var _ = Describe("Config", func() {
 				BeforeEach(func() {
 					a.Hook.Enabled = true
 				})
+
 				It("returns true", func() {
 					Expect(a.IsEnabled("Hook")).To(BeTrue())
 				})

@@ -28,10 +28,10 @@ var _ = Describe("HookConfig", func() {
 
 		It("is successful on a correct config", func() {
 			c = &config.Config{
-				APIPort: 9000,
-				Sources: config.SourceDirs{
-					MapsDir: dummyPath,
-					DataDir: dummyPath,
+				APIPort:  9000,
+				DataPath: dummyPath,
+				Maps: config.MapConfig{
+					Cache: dummyPath,
 				},
 				Adapters: config.Adapters{
 					Hook: config.HookConfig{
@@ -49,10 +49,10 @@ var _ = Describe("HookConfig", func() {
 
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort: 9000,
-					Sources: config.SourceDirs{
-						MapsDir: dummyPath,
-						DataDir: dummyPath,
+					APIPort:  9000,
+					DataPath: dummyPath,
+					Maps: config.MapConfig{
+						Cache: dummyPath,
 					},
 					Adapters: config.Adapters{
 						Hook: config.HookConfig{
@@ -94,10 +94,10 @@ var _ = Describe("HookConfig", func() {
 		Describe("ffxiv_process", func() {
 			BeforeEach(func() {
 				c = &config.Config{
-					APIPort: 9000,
-					Sources: config.SourceDirs{
-						MapsDir: dummyPath,
-						DataDir: dummyPath,
+					APIPort:  9000,
+					DataPath: dummyPath,
+					Maps: config.MapConfig{
+						Cache: dummyPath,
 					},
 					Adapters: config.Adapters{
 						Hook: config.HookConfig{
