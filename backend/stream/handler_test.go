@@ -33,24 +33,22 @@ var _ = Describe("Handler", func() {
 		generator   update.Generator
 
 		logBuf *testhelpers.LogBuffer
-		logger *zap.Logger
-
-		once sync.Once
+		once   sync.Once
 	)
 
 	BeforeEach(func() {
 		var err error
 		once.Do(func() {
 			logBuf = new(testhelpers.LogBuffer)
-			err = zap.RegisterSink("handlertest", func(*url.URL) (zap.Sink, error) {
+			err := zap.RegisterSink("handlertest", func(*url.URL) (zap.Sink, error) {
 				return logBuf, nil
 			})
+			Expect(err).ToNot(HaveOccurred())
 		})
 		logBuf.Reset()
-		Expect(err).ToNot(HaveOccurred())
 		zapCfg := zap.NewDevelopmentConfig()
 		zapCfg.OutputPaths = []string{"handlertest://"}
-		logger, err = zapCfg.Build()
+		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
 		ingressChan = make(chan *xivnet.Frame)

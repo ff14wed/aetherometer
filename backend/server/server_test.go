@@ -21,26 +21,24 @@ import (
 
 var _ = Describe("Server", func() {
 	var (
-		s      *server.Server
-		buf    *testhelpers.LogBuffer
-		logger *zap.Logger
+		s *server.Server
 
-		once sync.Once
+		logBuf *testhelpers.LogBuffer
+		once   sync.Once
 	)
 
 	BeforeEach(func() {
-		var err error
 		once.Do(func() {
-			buf = new(testhelpers.LogBuffer)
-			err = zap.RegisterSink("servertest", func(*url.URL) (zap.Sink, error) {
-				return buf, nil
+			logBuf = new(testhelpers.LogBuffer)
+			err := zap.RegisterSink("servertest", func(*url.URL) (zap.Sink, error) {
+				return logBuf, nil
 			})
+			Expect(err).ToNot(HaveOccurred())
 		})
-		buf.Reset()
-		Expect(err).ToNot(HaveOccurred())
+		logBuf.Reset()
 		zapCfg := zap.NewDevelopmentConfig()
 		zapCfg.OutputPaths = []string{"servertest://"}
-		logger, err = zapCfg.Build()
+		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 		cfg := config.Config{}
 		s = server.New(cfg, logger)
@@ -76,8 +74,8 @@ var _ = Describe("Server", func() {
 		})
 
 		It("logs the port the server started on", func() {
-			Expect(buf).To(gbytes.Say(`http-server.*Running`))
-			Expect(buf).To(gbytes.Say(s.Address().String()))
+			Expect(logBuf).To(gbytes.Say(`http-server.*Running`))
+			Expect(logBuf).To(gbytes.Say(s.Address().String()))
 		})
 
 		Context("when no handlers have been added to the server", func() {
@@ -193,7 +191,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("logs that it is shutting down", func() {
-				Expect(buf).To(gbytes.Say(`http-server.*Stopping...`))
+				Expect(logBuf).To(gbytes.Say(`http-server.*Stopping...`))
 			})
 		})
 	})

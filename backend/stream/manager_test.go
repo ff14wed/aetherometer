@@ -56,24 +56,22 @@ var _ = Describe("Manager", func() {
 		fakeHandler        *FakeHandler
 
 		logBuf *testhelpers.LogBuffer
-		logger *zap.Logger
-
-		once sync.Once
+		once   sync.Once
 	)
 
 	BeforeEach(func() {
 		var err error
 		once.Do(func() {
 			logBuf = new(testhelpers.LogBuffer)
-			err = zap.RegisterSink("managertest", func(*url.URL) (zap.Sink, error) {
+			err := zap.RegisterSink("managertest", func(*url.URL) (zap.Sink, error) {
 				return logBuf, nil
 			})
+			Expect(err).ToNot(HaveOccurred())
 		})
 		logBuf.Reset()
-		Expect(err).ToNot(HaveOccurred())
 		zapCfg := zap.NewDevelopmentConfig()
 		zapCfg.OutputPaths = []string{"managertest://"}
-		logger, err = zapCfg.Build()
+		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
 		generator = update.NewGenerator(nil)
