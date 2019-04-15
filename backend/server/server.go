@@ -35,7 +35,7 @@ func New(
 		logger: logger.Named("http-server"),
 
 		s: &http.Server{
-			Addr:    fmt.Sprintf("localhost:%d", cfg.APIPort),
+			Addr:    fmt.Sprintf("127.0.0.1:%d", cfg.APIPort),
 			Handler: serveMux,
 		},
 		ready:    make(chan struct{}),
