@@ -24,8 +24,9 @@ type Provider struct {
 
 	updatesChan         chan Update
 	internalRequestChan chan internalRequest
-	stop                chan struct{}
-	stopDone            chan struct{}
+
+	stop     chan struct{}
+	stopDone chan struct{}
 }
 
 // NewProvider creates a new store provider. It will also initialize the
@@ -51,6 +52,7 @@ func NewProvider(
 	for _, opt := range opts {
 		opt(&cfg)
 	}
+
 	return &Provider{
 		queryTimeout: cfg.queryTimeout,
 		logger:       logger.Named("store-provider"),
@@ -61,8 +63,9 @@ func NewProvider(
 
 		updatesChan:         make(chan Update, cfg.updateBufferSize),
 		internalRequestChan: make(chan internalRequest, cfg.requestBufferSize),
-		stop:                make(chan struct{}),
-		stopDone:            make(chan struct{}),
+
+		stop:     make(chan struct{}),
+		stopDone: make(chan struct{}),
 	}
 }
 
@@ -70,6 +73,7 @@ func NewProvider(
 // as a service and is responsible for exclusively handling all reads and
 // updates, including serving read requests.
 func (p *Provider) Serve() {
+	defer close(p.stopDone)
 	p.logger.Info("Running")
 	for {
 		select {
@@ -86,7 +90,6 @@ func (p *Provider) Serve() {
 			}
 		case <-p.stop:
 			p.logger.Info("Stopping...")
-			close(p.stopDone)
 			return
 		}
 	}

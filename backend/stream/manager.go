@@ -79,6 +79,7 @@ func NewManager(
 // handlers whenever new streams are created and shutting down stream handlers
 // when streams are closed.
 func (m *Manager) Serve() {
+	defer close(m.stopDone)
 	m.logger.Info("Running")
 	for {
 		select {
@@ -112,13 +113,12 @@ func (m *Manager) Serve() {
 			m.providersLock.Unlock()
 		case <-m.stop:
 			m.logger.Info("Stopping...")
-			close(m.stopDone)
 			return
 		}
 	}
 }
 
-// Stop will shutdown this service eventually, but will not wait on it to stop
+// Stop will shutdown this service and wait on it to stop before returning
 func (m *Manager) Stop() {
 	close(m.stop)
 	<-m.stopDone

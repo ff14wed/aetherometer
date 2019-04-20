@@ -53,7 +53,7 @@ var _ = Describe("Handler", func() {
 
 		ingressChan = make(chan *xivnet.Frame)
 		egressChan = make(chan *xivnet.Frame)
-		updateChan = make(chan store.Update)
+		updateChan = make(chan store.Update, 2)
 		generator = update.NewGenerator(nil)
 
 		handler = stream.NewHandler(stream.HandlerFactoryArgs{
@@ -116,7 +116,7 @@ var _ = Describe("Handler", func() {
 
 	Context("when shutting down", func() {
 		BeforeEach(func() {
-			By("Properly add new stream")
+			By("properly add a new stream first")
 			var u store.Update
 			Eventually(updateChan).Should(Receive(&u))
 			_, _, err := u.ModifyStore(&streams)

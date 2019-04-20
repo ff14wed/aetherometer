@@ -20,7 +20,8 @@ type handler struct {
 	generator   update.Generator
 	logger      *zap.Logger
 
-	stop chan struct{}
+	stop     chan struct{}
+	stopDone chan struct{}
 }
 
 // NewHandler returns a new stream Handler.
@@ -33,7 +34,8 @@ func NewHandler(args HandlerFactoryArgs) Handler {
 		generator:   args.Generator,
 		logger:      args.Logger.Named(fmt.Sprintf("stream-handler-%d", args.StreamID)),
 
-		stop: make(chan struct{}),
+		stop:     make(chan struct{}),
+		stopDone: make(chan struct{}),
 	}
 }
 
@@ -41,6 +43,7 @@ func NewHandler(args HandlerFactoryArgs) Handler {
 // as a service and is responsible for processing data from streams and
 // generating updates with that data.
 func (h *handler) Serve() {
+	defer close(h.stopDone)
 	h.logger.Info("Running")
 	h.updateChan <- addStreamUpdate{streamID: h.streamID}
 	for {
@@ -64,6 +67,7 @@ func (h *handler) Serve() {
 // Stop will shutdown this service and wait on it to stop before returning
 func (h *handler) Stop() {
 	close(h.stop)
+	<-h.stopDone
 }
 
 type addStreamUpdate struct {
