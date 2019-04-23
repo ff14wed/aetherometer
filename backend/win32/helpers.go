@@ -5,6 +5,7 @@ package win32
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"net"
 	"time"
 	"unicode/utf16"
@@ -127,4 +128,10 @@ func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
 // DialPipe dials a named pipe on the system for interprocess communication
 func (p Provider) DialPipe(path string, timeout *time.Duration) (net.Conn, error) {
 	return winio.DialPipe(path, timeout)
+}
+
+// IsPipeClosed returns whether or the error is due to the named pipe connection
+// being closed or if it's another error
+func (p Provider) IsPipeClosed(err error) bool {
+	return err == io.EOF || err == winio.ErrFileClosed
 }
