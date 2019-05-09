@@ -131,6 +131,7 @@ var _ = Describe("HookConfig", func() {
 				`dll_path = "some-path"`,
 				`ffxiv_process = "something.exe"`,
 				`dial_retry_interval = "13s"`,
+				`ping_interval = "30s"`,
 			}
 			input = strings.Join(lines, "\n")
 
@@ -143,6 +144,7 @@ var _ = Describe("HookConfig", func() {
 						DLLPath:           "some-path",
 						FFXIVProcess:      "something.exe",
 						DialRetryInterval: config.Duration(13 * time.Second),
+						PingInterval:      config.Duration(30 * time.Second),
 					},
 				},
 			}
