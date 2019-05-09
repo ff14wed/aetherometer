@@ -10,4 +10,9 @@ type HookConfig struct {
 
 	// FFXIVProcess is the name of the exe file for the game.
 	FFXIVProcess string `toml:"ffxiv_process" validate:"nonempty"`
+
+	// DialRetryInterval controls how long to wait before retrying
+	// failures to make a connection with the hook DLL.
+	// Defaults to 500 milliseconds.
+	DialRetryInterval Duration `toml:"dial_retry_interval"`
 }

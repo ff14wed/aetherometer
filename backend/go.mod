@@ -2,6 +2,7 @@ module github.com/ff14wed/sibyl/backend
 
 require (
 	github.com/99designs/gqlgen v0.7.1
+	github.com/BurntSushi/toml v0.3.1
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/ff14wed/xivnet/v3 v3.0.2
 	github.com/gorilla/websocket v1.4.0

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/ff14wed/sibyl/backend/config"
 
 	. "github.com/onsi/ginkgo"
@@ -177,6 +179,46 @@ var _ = Describe("Config", func() {
 				}).To(Panic())
 				Expect(panicMsg).To(Equal("ERROR: Adapter config for Unknown does not exist"))
 			})
+		})
+	})
+
+	Describe("toml.Decode", func() {
+		var (
+			input string
+		)
+
+		BeforeEach(func() {
+			lines := []string{
+				`api_port = 9000`,
+				`data_path = "dummy-path"`,
+				`[maps]`,
+				`cache = "some-map-dir"`,
+				`api_path = "www.maps.com"`,
+				`[adapters.hook]`,
+				`enabled = true`,
+			}
+			input = strings.Join(lines, "\n")
+
+			c = &config.Config{
+				APIPort:  9000,
+				DataPath: "dummy-path",
+				Maps: config.MapConfig{
+					Cache:   "some-map-dir",
+					APIPath: "www.maps.com",
+				},
+				Adapters: config.Adapters{
+					Hook: config.HookConfig{
+						Enabled: true,
+					},
+				},
+			}
+		})
+
+		It("decodes successfully from TOML", func() {
+			var cfg config.Config
+			_, err := toml.Decode(input, &cfg)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(cfg).To(Equal(*c))
 		})
 	})
 })

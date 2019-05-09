@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/ff14wed/sibyl/backend/config"
 
 	. "github.com/onsi/ginkgo"
@@ -111,6 +114,45 @@ var _ = Describe("HookConfig", func() {
 			It("errors when empty", func() {
 				Expect(c.Validate()).To(MatchError("config error in [adapters.hook]: ffxiv_process must be provided"))
 			})
+		})
+	})
+
+	Describe("toml.Decode", func() {
+		var (
+			input string
+		)
+
+		BeforeEach(func() {
+			lines := []string{
+				`api_port = 9000`,
+				`data_path = "dummy-path"`,
+				`[adapters.hook]`,
+				`enabled = true`,
+				`dll_path = "some-path"`,
+				`ffxiv_process = "something.exe"`,
+				`dial_retry_interval = "13s"`,
+			}
+			input = strings.Join(lines, "\n")
+
+			c = &config.Config{
+				APIPort:  9000,
+				DataPath: "dummy-path",
+				Adapters: config.Adapters{
+					Hook: config.HookConfig{
+						Enabled:           true,
+						DLLPath:           "some-path",
+						FFXIVProcess:      "something.exe",
+						DialRetryInterval: config.Duration(13 * time.Second),
+					},
+				},
+			}
+		})
+
+		It("decodes successfully from TOML", func() {
+			var cfg config.Config
+			_, err := toml.Decode(input, &cfg)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(cfg).To(Equal(*c))
 		})
 	})
 })
