@@ -17,12 +17,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type readData struct {
-	data []byte
-	err  error
-}
-
 var _ = Describe("StreamReader", func() {
+	type readData struct {
+		data []byte
+		err  error
+	}
+
 	var (
 		sr *hook.StreamReader
 
@@ -66,7 +66,7 @@ var _ = Describe("StreamReader", func() {
 
 		sr = hook.NewStreamReader(hookConn, logger)
 
-		supervisor = suture.New("test-provider", suture.Spec{
+		supervisor = suture.New("test-streamreader", suture.Spec{
 			Log: func(line string) {
 				_, _ = GinkgoWriter.Write([]byte(line))
 			},

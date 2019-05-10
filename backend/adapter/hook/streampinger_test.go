@@ -44,7 +44,7 @@ var _ = Describe("StreamPinger", func() {
 		hds = new(hookfakes.FakeHookDataSender)
 		sp = hook.NewStreamPinger(hds, 100*time.Millisecond, logger)
 
-		supervisor = suture.New("test-provider", suture.Spec{
+		supervisor = suture.New("test-streampinger", suture.Spec{
 			Log: func(line string) {
 				_, _ = GinkgoWriter.Write([]byte(line))
 			},
@@ -52,7 +52,6 @@ var _ = Describe("StreamPinger", func() {
 		})
 		supervisor.ServeBackground()
 		_ = supervisor.Add(sp)
-
 	})
 
 	AfterEach(func() {

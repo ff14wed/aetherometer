@@ -45,7 +45,7 @@ var _ = Describe("StreamSender", func() {
 		hookConn = new(hookfakes.FakeWriteCloser)
 		ss = hook.NewStreamSender(hookConn, logger)
 
-		supervisor = suture.New("test-provider", suture.Spec{
+		supervisor = suture.New("test-streamsender", suture.Spec{
 			Log: func(line string) {
 				_, _ = GinkgoWriter.Write([]byte(line))
 			},

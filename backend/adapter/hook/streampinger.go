@@ -30,7 +30,7 @@ func NewStreamPinger(hds HookDataSender, pingInterval time.Duration, logger *zap
 	return &StreamPinger{
 		hds:          hds,
 		pingInterval: pingInterval,
-		logger:       logger,
+		logger:       logger.Named("stream-pinger"),
 
 		stop:     make(chan struct{}),
 		stopDone: make(chan struct{}),
@@ -41,8 +41,7 @@ func NewStreamPinger(hds HookDataSender, pingInterval time.Duration, logger *zap
 // connection.
 func (p *StreamPinger) Serve() {
 	defer close(p.stopDone)
-	logger := p.logger.Named("stream-pinger")
-	logger.Info("Running")
+	p.logger.Info("Running")
 	t := time.NewTicker(p.pingInterval)
 
 	for {
@@ -50,7 +49,7 @@ func (p *StreamPinger) Serve() {
 		case <-t.C:
 			p.hds.Send(OpPing, 0, nil)
 		case <-p.stop:
-			logger.Info("Stopping...")
+			p.logger.Info("Stopping...")
 			return
 		}
 	}

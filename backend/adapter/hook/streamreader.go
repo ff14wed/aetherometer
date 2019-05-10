@@ -22,7 +22,7 @@ type StreamReader struct {
 func NewStreamReader(hookConn io.ReadCloser, logger *zap.Logger) *StreamReader {
 	return &StreamReader{
 		hookConn: hookConn,
-		logger:   logger,
+		logger:   logger.Named("stream-reader"),
 
 		recvChan: make(chan Envelope),
 		stopDone: make(chan struct{}),
@@ -35,9 +35,7 @@ func (r *StreamReader) Serve() {
 	defer close(r.recvChan)
 	defer close(r.stopDone)
 
-	logger := r.logger.Named("stream-reader")
-	logger.Info("Running")
-
+	r.logger.Info("Running")
 	d := NewDecoder(r.hookConn, 262144)
 
 	for {
@@ -45,10 +43,10 @@ func (r *StreamReader) Serve() {
 		if err == nil {
 			r.recvChan <- env
 		} else if err == io.EOF {
-			logger.Info("Stopping...")
+			r.logger.Info("Stopping...")
 			return
 		} else {
-			logger.Error("reading data from conn", zap.Error(err))
+			r.logger.Error("reading data from conn", zap.Error(err))
 		}
 	}
 }

@@ -107,7 +107,7 @@ var _ = Describe("FrameReader", func() {
 
 		fr = hook.NewFrameReader(123, envelopesChan, newTestFrameDecoder(testFrames), logger)
 
-		supervisor = suture.New("test-provider", suture.Spec{
+		supervisor = suture.New("test-framereader", suture.Spec{
 			Log: func(line string) {
 				_, _ = GinkgoWriter.Write([]byte(line))
 			},

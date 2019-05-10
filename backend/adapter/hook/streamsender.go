@@ -22,7 +22,7 @@ type StreamSender struct {
 func NewStreamSender(hookConn io.WriteCloser, logger *zap.Logger) *StreamSender {
 	return &StreamSender{
 		hookConn: hookConn,
-		logger:   logger,
+		logger:   logger.Named("stream-sender"),
 
 		sendChan: make(chan Envelope),
 		stopDone: make(chan struct{}),
@@ -33,24 +33,21 @@ func NewStreamSender(hookConn io.WriteCloser, logger *zap.Logger) *StreamSender 
 // hook connection.
 func (s *StreamSender) Serve() {
 	defer close(s.stopDone)
-
-	logger := s.logger.Named("stream-sender")
-	logger.Info("Running")
-
+	s.logger.Info("Running")
 	for {
 		envelope, ok := <-s.sendChan
 		if !ok {
-			logger.Info("Stopping...")
+			s.logger.Info("Stopping...")
 			return
 		}
 		envBytes := envelope.Encode()
 		n, err := s.hookConn.Write(envBytes)
 		if err != nil {
-			logger.Error("writing bytes to conn", zap.Error(err))
+			s.logger.Error("writing bytes to conn", zap.Error(err))
 		}
 		if n < len(envBytes) {
 			err := errors.New("wrote less than the envelope length")
-			logger.Error("writing bytes to conn", zap.Error(err))
+			s.logger.Error("writing bytes to conn", zap.Error(err))
 		}
 	}
 }
