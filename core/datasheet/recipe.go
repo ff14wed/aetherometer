@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 // RecipeStore stores all of the Recipe data.

@@ -3,10 +3,10 @@ package update_test
 import (
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/datasheet"
-	"github.com/ff14wed/sibyl/backend/models"
-	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/sibyl/backend/store/update"
+	"github.com/ff14wed/aetherometer/core/datasheet"
+	"github.com/ff14wed/aetherometer/core/models"
+	"github.com/ff14wed/aetherometer/core/store"
+	"github.com/ff14wed/aetherometer/core/store/update"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"

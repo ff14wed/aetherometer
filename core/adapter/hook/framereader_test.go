@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
-	"github.com/ff14wed/sibyl/backend/message"
-	"github.com/ff14wed/sibyl/backend/testhelpers"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/message"
+	"github.com/ff14wed/aetherometer/core/testhelpers"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	"github.com/thejerf/suture"

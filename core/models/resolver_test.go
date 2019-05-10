@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ff14wed/sibyl/backend/models"
-	"github.com/ff14wed/sibyl/backend/models/modelsfakes"
+	"github.com/ff14wed/aetherometer/core/models"
+	"github.com/ff14wed/aetherometer/core/models/modelsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

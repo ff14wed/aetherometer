@@ -3,7 +3,7 @@ package example
 import (
 	"context"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 type Resolver struct{}

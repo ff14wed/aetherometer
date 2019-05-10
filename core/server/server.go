@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/config"
+	"github.com/ff14wed/aetherometer/core/config"
 	"go.uber.org/zap"
 )
 
-// Server handles serving the backend API for Sibyl
+// Server handles serving the core API for Aetherometer
 type Server struct {
 	logger *zap.Logger
 
@@ -24,7 +24,7 @@ type Server struct {
 	serveMux *http.ServeMux
 }
 
-// New initializes a new instance of the backend server
+// New initializes a new instance of the core server
 func New(
 	cfg config.Config,
 	logger *zap.Logger,
@@ -67,7 +67,7 @@ func (ln tcpKeepAliveListener) Accept() (net.Conn, error) {
 	return tc, nil
 }
 
-// Serve is responsible for running the backend server
+// Serve is responsible for running the core server
 func (s *Server) Serve() {
 	ln, err := net.Listen("tcp", s.s.Addr)
 	if err != nil {
@@ -91,7 +91,7 @@ func (s *Server) WaitUntilReady() {
 	<-s.ready
 }
 
-// Stop will shutdown the backend server, and will timeout within 1 second
+// Stop will shutdown the core server, and will timeout within 1 second
 func (s *Server) Stop() {
 	s.logger.Info("Stopping...")
 	s.cancelFunc()

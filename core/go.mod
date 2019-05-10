@@ -1,4 +1,4 @@
-module github.com/ff14wed/sibyl/backend
+module github.com/ff14wed/aetherometer/core
 
 require (
 	github.com/99designs/gqlgen v0.7.1

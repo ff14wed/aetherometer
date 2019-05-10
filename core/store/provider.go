@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/hub"
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/hub"
+	"github.com/ff14wed/aetherometer/core/models"
 	"go.uber.org/zap"
 )
 

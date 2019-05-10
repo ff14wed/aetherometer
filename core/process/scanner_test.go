@@ -3,8 +3,8 @@ package process_test
 import (
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/process"
-	"github.com/ff14wed/sibyl/backend/process/processfakes"
+	"github.com/ff14wed/aetherometer/core/process"
+	"github.com/ff14wed/aetherometer/core/process/processfakes"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
 

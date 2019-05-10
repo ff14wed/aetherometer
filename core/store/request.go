@@ -3,7 +3,7 @@ package store
 import (
 	"errors"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 // ErrRequestTimedOut is returned if the store is taking too long to return from

@@ -1,6 +1,6 @@
 package store
 
-import "github.com/ff14wed/sibyl/backend/models"
+import "github.com/ff14wed/aetherometer/core/models"
 
 // Streams defines the structure of the data store in the store provider and
 // is consumed by updates for modification

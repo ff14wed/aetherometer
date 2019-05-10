@@ -4,7 +4,7 @@ package streamfakes
 import (
 	"sync"
 
-	"github.com/ff14wed/sibyl/backend/stream"
+	"github.com/ff14wed/aetherometer/core/stream"
 	xivnet "github.com/ff14wed/xivnet/v3"
 )
 

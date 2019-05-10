@@ -48,7 +48,7 @@ func WithEventBufferSize(size int) Option {
 }
 
 // WithRequestBufferSize sets the size of the internal request queue.
-// be any real reason to change this unless the the backend is getting hammered
+// be any real reason to change this unless the the core API is getting hammered
 // with requests.
 //
 // The default value is 10.

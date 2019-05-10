@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ff14wed/sibyl/backend/config"
+	"github.com/ff14wed/aetherometer/core/config"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

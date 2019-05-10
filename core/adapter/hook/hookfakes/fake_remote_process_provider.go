@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
 )
 
 type FakeRemoteProcessProvider struct {

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 // EntityHub is responsible for broadcasting Entity events to subscribers

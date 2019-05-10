@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/ff14wed/sibyl/backend/message"
+	"github.com/ff14wed/aetherometer/core/message"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -3,9 +3,9 @@ package stream
 import (
 	"fmt"
 
-	"github.com/ff14wed/sibyl/backend/models"
-	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/sibyl/backend/store/update"
+	"github.com/ff14wed/aetherometer/core/models"
+	"github.com/ff14wed/aetherometer/core/store"
+	"github.com/ff14wed/aetherometer/core/store/update"
 	"github.com/ff14wed/xivnet/v3"
 	"go.uber.org/zap"
 )

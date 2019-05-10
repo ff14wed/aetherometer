@@ -1,6 +1,6 @@
 package testassets
 
-import "github.com/ff14wed/sibyl/backend/datasheet"
+import "github.com/ff14wed/aetherometer/core/datasheet"
 
 // ExpectedActionData derives from ActionCSV
 var ExpectedActionData = map[uint32]datasheet.Action{

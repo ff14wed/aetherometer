@@ -1,8 +1,8 @@
 package adapter
 
 import (
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
-	"github.com/ff14wed/sibyl/backend/stream"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/stream"
 )
 
 // Inventory enumerates the adapters that are compatible with Windows.

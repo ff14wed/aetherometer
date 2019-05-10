@@ -3,9 +3,9 @@ package datasheet_test
 import (
 	"bytes"
 
-	"github.com/ff14wed/sibyl/backend/datasheet"
-	"github.com/ff14wed/sibyl/backend/models"
-	"github.com/ff14wed/sibyl/backend/testassets"
+	"github.com/ff14wed/aetherometer/core/datasheet"
+	"github.com/ff14wed/aetherometer/core/models"
+	"github.com/ff14wed/aetherometer/core/testassets"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

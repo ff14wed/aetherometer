@@ -1,3 +1,3 @@
-// Package config describes configuration for all of the backend server,
+// Package config describes configuration for all of the core server,
 // including adapters
 package config

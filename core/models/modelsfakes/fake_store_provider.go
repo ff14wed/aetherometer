@@ -4,7 +4,7 @@ package modelsfakes
 import (
 	"sync"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 type FakeStoreProvider struct {

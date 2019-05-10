@@ -7,9 +7,9 @@ import (
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
 
-	"github.com/ff14wed/sibyl/backend/config"
-	"github.com/ff14wed/sibyl/backend/process"
-	"github.com/ff14wed/sibyl/backend/stream"
+	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/ff14wed/aetherometer/core/process"
+	"github.com/ff14wed/aetherometer/core/stream"
 )
 
 // Adapter defines the implementation of the hook Adapter

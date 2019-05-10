@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/models"
-	"github.com/ff14wed/sibyl/backend/store"
-	"github.com/ff14wed/sibyl/backend/testhelpers"
+	"github.com/ff14wed/aetherometer/core/models"
+	"github.com/ff14wed/aetherometer/core/store"
+	"github.com/ff14wed/aetherometer/core/testhelpers"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
 

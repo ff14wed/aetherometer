@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
-	"github.com/ff14wed/sibyl/backend/adapter/hook/hookfakes"
-	"github.com/ff14wed/sibyl/backend/testhelpers"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/adapter/hook/hookfakes"
+	"github.com/ff14wed/aetherometer/core/testhelpers"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"

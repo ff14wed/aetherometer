@@ -9,9 +9,9 @@ import (
 	"path"
 	"sync"
 
-	"github.com/ff14wed/sibyl/backend/config"
-	"github.com/ff14wed/sibyl/backend/server/handlers"
-	"github.com/ff14wed/sibyl/backend/testhelpers"
+	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/ff14wed/aetherometer/core/server/handlers"
+	"github.com/ff14wed/aetherometer/core/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"

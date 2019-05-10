@@ -5,12 +5,12 @@ import (
 	"errors"
 )
 
-// SibylAPIVersion returns the current semantic version of the API. Generally,
+// AetherometerAPIVersion returns the current semantic version of the API. Generally,
 // incremental additions to the API will be introduced with new patch versions.
 // Minor breaking changes are introduced with new minor versions of the API.
 // Major API changes and rewrites will be introduced with new major versions
 // of the API
-const SibylAPIVersion = "v0.0.0-beta"
+const AetherometerAPIVersion = "v0.0.0-beta"
 
 // StreamRequestHandler defines the type of a client request handler that can
 // be attached to the resolver.
@@ -58,7 +58,7 @@ func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequ
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
-	return SibylAPIVersion, nil
+	return AetherometerAPIVersion, nil
 }
 func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
 	return r.sp.Streams()

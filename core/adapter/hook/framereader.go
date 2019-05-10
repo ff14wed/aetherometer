@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/ff14wed/sibyl/backend/message"
+	"github.com/ff14wed/aetherometer/core/message"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	"go.uber.org/zap"

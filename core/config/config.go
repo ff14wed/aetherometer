@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// Config stores configuration values for the Sibyl backend
+// Config stores configuration values for the Aetherometer core
 type Config struct {
-	// APIPort provides the port on which the backend API is served.
+	// APIPort provides the port on which the core API is served.
 	APIPort uint16 `toml:"api_port" validate:"nonempty"`
 
 	// DataPath provides the path to the folder with raw EXD files (in CSV format)
@@ -20,7 +20,7 @@ type Config struct {
 	Maps MapConfig `toml:"maps"`
 
 	// Adapters contains the configuration for all the adapters enabled for
-	// the backend API.
+	// the core API.
 	Adapters Adapters `toml:"adapters"`
 }
 

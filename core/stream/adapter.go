@@ -1,7 +1,7 @@
 package stream
 
 import (
-	"github.com/ff14wed/sibyl/backend/config"
+	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
@@ -20,10 +20,10 @@ type Provider interface {
 	// StreamID returns a unique identifier for the stream. This identifier
 	// must be unique across all adapters.
 	StreamID() int
-	// SubscribeIngress notifies the backend of network packets in the ingress
+	// SubscribeIngress notifies the core of network packets in the ingress
 	// direction from this stream.
 	SubscribeIngress() <-chan *xivnet.Frame
-	// SubscribeEgress notifies the backend of network packets in the egress
+	// SubscribeEgress notifies the core of network packets in the egress
 	// direction from this stream.
 	SubscribeEgress() <-chan *xivnet.Frame
 	// SendRequest provides an interface to allow clients to query or control
@@ -32,11 +32,11 @@ type Provider interface {
 }
 
 // Adapter defines an interface that translates data from data sources into
-// streams that the backend server can consume data from. Each stream provided
-// by the adapter is wrapped in a Provider in order for the backend server to
+// streams that the core server can consume data from. Each stream provided
+// by the adapter is wrapped in a Provider in order for the core server to
 // operate on them.
 //
-// The backend server is capable of handling multiple streams of data
+// The core server is capable of handling multiple streams of data
 // from multiple sources, and they are uniquely identified by stream IDs.
 // These stream IDs can correspond to anything to OS processes or just a unique
 // identifier for a service or a cluster of services.
@@ -71,12 +71,12 @@ type AdapterBuilder interface {
 	// options outside of this section.
 	LoadConfig(config.Config) error
 
-	// Build must return an adapter that is capable of notifying the backend
+	// Build must return an adapter that is capable of notifying the core
 	// with StreamProviders whenever a new stream is to be created. The adapter
-	// should also be capable of notifying the backend with stream IDs whenever
+	// should also be capable of notifying the core with stream IDs whenever
 	// a stream is closed.
 	// These StreamProviders should provide the stream's ID and channels
-	// that allow the backend to consume data from the stream.
+	// that allow the core to consume data from the stream.
 	Build(streamUp chan<- Provider, streamDown chan<- int, logger *zap.Logger) Adapter
 }
 

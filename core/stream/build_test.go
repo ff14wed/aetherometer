@@ -3,9 +3,9 @@ package stream_test
 import (
 	"errors"
 
-	"github.com/ff14wed/sibyl/backend/config"
-	"github.com/ff14wed/sibyl/backend/stream"
-	"github.com/ff14wed/sibyl/backend/stream/streamfakes"
+	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/ff14wed/aetherometer/core/stream"
+	"github.com/ff14wed/aetherometer/core/stream/streamfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"go.uber.org/zap"

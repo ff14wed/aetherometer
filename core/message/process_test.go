@@ -3,7 +3,7 @@ package message_test
 import (
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/message"
+	"github.com/ff14wed/aetherometer/core/message"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"

@@ -1,9 +1,9 @@
 package hook
 
 import (
-	"github.com/ff14wed/sibyl/backend/config"
-	"github.com/ff14wed/sibyl/backend/stream"
-	"github.com/ff14wed/sibyl/backend/win32"
+	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/ff14wed/aetherometer/core/stream"
+	"github.com/ff14wed/aetherometer/core/win32"
 	"go.uber.org/zap"
 )
 

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

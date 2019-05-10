@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/sibyl/backend/message"
-	"github.com/ff14wed/sibyl/backend/stream"
+	"github.com/ff14wed/aetherometer/core/message"
+	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"

@@ -2,7 +2,7 @@
 
 package adapter
 
-import "github.com/ff14wed/sibyl/backend/stream"
+import "github.com/ff14wed/aetherometer/core/stream"
 
 // Inventory enumerates the adapters that are compatible with Unix based systems.
 func Inventory() []stream.AdapterInfo {

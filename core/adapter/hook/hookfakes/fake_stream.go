@@ -4,7 +4,7 @@ package hookfakes
 import (
 	"sync"
 
-	"github.com/ff14wed/sibyl/backend/adapter/hook"
+	"github.com/ff14wed/aetherometer/core/adapter/hook"
 	xivnet "github.com/ff14wed/xivnet/v3"
 )
 

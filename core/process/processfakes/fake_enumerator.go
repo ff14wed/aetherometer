@@ -4,7 +4,7 @@ package processfakes
 import (
 	sync "sync"
 
-	process "github.com/ff14wed/sibyl/backend/process"
+	process "github.com/ff14wed/aetherometer/core/process"
 )
 
 type FakeEnumerator struct {

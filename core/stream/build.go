@@ -3,7 +3,7 @@ package stream
 import (
 	"fmt"
 
-	"github.com/ff14wed/sibyl/backend/config"
+	"github.com/ff14wed/aetherometer/core/config"
 	"go.uber.org/zap"
 )
 

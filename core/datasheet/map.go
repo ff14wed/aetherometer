@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ff14wed/sibyl/backend/models"
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 // MapInfo stores the information for a game Map
