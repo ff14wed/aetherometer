@@ -373,10 +373,10 @@ var _ = Describe("Stream", func() {
 	It(`logs "Running" for each subprocess on startup`, func() {
 		Eventually(logBuf).Should(gbytes.Say("stream-1234"))
 		// These subprocesses can start up in any order
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-sender"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-pinger"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-reader"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("frame-reader"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
 
 		Eventually(logBuf).Should(gbytes.Say("Running"))
 		Eventually(logBuf).Should(gbytes.Say("Running"))
@@ -401,10 +401,10 @@ var _ = Describe("Stream", func() {
 		supervisor.Stop()
 		Eventually(logBuf).Should(gbytes.Say("stream-1234"))
 		// These subprocesses can stop in any order
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-sender"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-pinger"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("stream-reader"))
-		Expect(logBuf.Buffer().Contents()).To(ContainSubstring("frame-reader"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
+		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
 
 		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
 		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
