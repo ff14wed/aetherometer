@@ -55,6 +55,7 @@ var _ = Describe("RemoveEntity Update", func() {
 
 	Context(`when the specified entity doesn't "exist"`, func() {
 		const nonexistentID uint64 = 0x88888888
+
 		BeforeEach(func() {
 			removeEntityData := &datatypes.RemoveEntity{
 				ID: uint32(nonexistentID),
