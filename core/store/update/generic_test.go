@@ -28,7 +28,7 @@ func genericSetup() (testEnv testVars) {
 	testEnv.streamID = 1234
 	testEnv.subjectID = 0x12345678
 
-	testEnv.entity = &models.Entity{}
+	testEnv.entity = &models.Entity{ID: testEnv.subjectID}
 
 	testEnv.streams = &store.Streams{
 		Map: map[int]*models.Stream{
@@ -38,6 +38,7 @@ func genericSetup() (testEnv testVars) {
 				EntitiesMap: map[uint64]*models.Entity{
 					testEnv.subjectID: testEnv.entity,
 					0x23456789:        nil,
+					0x99999999:        &models.Entity{ID: 0x99999999, Index: 123},
 				},
 			},
 		},
@@ -60,7 +61,7 @@ func genericSetup() (testEnv testVars) {
 	return
 }
 
-func entityValidationTests(testEnv *testVars, isEgress bool) {
+func streamValidationTests(testEnv *testVars, isEgress bool) {
 	It("errors when the stream doesn't exist", func() {
 		generator := testEnv.generator
 		b := testEnv.b
@@ -74,6 +75,10 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
 	})
+}
+
+func entityValidationTests(testEnv *testVars, isEgress bool) {
+	streamValidationTests(testEnv, isEgress)
 
 	It("errors when the entity doesn't exist", func() {
 		generator := testEnv.generator
