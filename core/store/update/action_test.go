@@ -1,8 +1,6 @@
 package update_test
 
 import (
-	"time"
-
 	"github.com/ff14wed/aetherometer/core/datasheet"
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/store"
@@ -94,7 +92,7 @@ var _ = Describe("Action Update", func() {
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
-				"LastUpdated": Equal(time.Unix(12, 0)),
+				"LastUpdated": Equal(b.Time),
 			}),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
@@ -123,7 +121,7 @@ var _ = Describe("Action Update", func() {
 				},
 			),
 			"EffectFlags": Equal(5),
-			"UseTime":     Equal(time.Unix(12, 0)),
+			"UseTime":     Equal(b.Time),
 		})
 	})
 

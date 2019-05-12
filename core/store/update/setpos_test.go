@@ -2,7 +2,6 @@ package update_test
 
 import (
 	"math"
-	"time"
 
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/store"
@@ -43,7 +42,7 @@ var _ = Describe("SetPos Update", func() {
 			"Y":           BeNumerically("~", 200.2, 1e-4),
 			"Z":           BeNumerically("~", 300.3, 1e-4),
 			"Orientation": BeNumerically("~", math.Pi),
-			"LastUpdated": Equal(time.Unix(12, 0)),
+			"LastUpdated": Equal(b.Time),
 		})
 
 		setPosData := &datatypes.SetPos{

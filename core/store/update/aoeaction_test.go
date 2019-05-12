@@ -1,8 +1,6 @@
 package update_test
 
 import (
-	"time"
-
 	"github.com/ff14wed/aetherometer/core/datasheet"
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/store"
@@ -118,7 +116,7 @@ var _ = Describe("AoEAction8 Update", func() {
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
-				"LastUpdated": Equal(time.Unix(12, 0)),
+				"LastUpdated": Equal(b.Time),
 			}),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
@@ -157,7 +155,7 @@ var _ = Describe("AoEAction8 Update", func() {
 				},
 			),
 			"EffectFlags": Equal(0),
-			"UseTime":     Equal(time.Unix(12, 0)),
+			"UseTime":     Equal(b.Time),
 		})
 	})
 
@@ -283,7 +281,7 @@ var _ = Describe("AoEAction16 Update", func() {
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
-				"LastUpdated": Equal(time.Unix(12, 0)),
+				"LastUpdated": Equal(b.Time),
 			}),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
@@ -322,7 +320,7 @@ var _ = Describe("AoEAction16 Update", func() {
 				},
 			),
 			"EffectFlags": Equal(0),
-			"UseTime":     Equal(time.Unix(12, 0)),
+			"UseTime":     Equal(b.Time),
 		})
 	})
 
@@ -448,7 +446,7 @@ var _ = Describe("AoEAction24 Update", func() {
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
-				"LastUpdated": Equal(time.Unix(12, 0)),
+				"LastUpdated": Equal(b.Time),
 			}),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
@@ -487,7 +485,7 @@ var _ = Describe("AoEAction24 Update", func() {
 				},
 			),
 			"EffectFlags": Equal(0),
-			"UseTime":     Equal(time.Unix(12, 0)),
+			"UseTime":     Equal(b.Time),
 		})
 	})
 
@@ -613,7 +611,7 @@ var _ = Describe("AoEAction32 Update", func() {
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
-				"LastUpdated": Equal(time.Unix(12, 0)),
+				"LastUpdated": Equal(b.Time),
 			}),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
@@ -652,7 +650,7 @@ var _ = Describe("AoEAction32 Update", func() {
 				},
 			),
 			"EffectFlags": Equal(0),
-			"UseTime":     Equal(time.Unix(12, 0)),
+			"UseTime":     Equal(b.Time),
 		})
 	})
 

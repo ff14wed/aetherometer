@@ -66,7 +66,7 @@ var _ = Describe("Casting Update", func() {
 
 		expectedCastingInfo = models.CastingInfo{
 			ActionID:  4238,
-			StartTime: time.Unix(12, 0),
+			StartTime: b.Time,
 			CastTime:  time.Unix(1, 0),
 			TargetID:  0x5678,
 			Location: models.Location{
@@ -74,7 +74,7 @@ var _ = Describe("Casting Update", func() {
 				X:           1000,
 				Y:           -1000,
 				Z:           -1000,
-				LastUpdated: time.Unix(12, 0),
+				LastUpdated: b.Time,
 			},
 			ActionName:    "Skyshard",
 			CastType:      4,
