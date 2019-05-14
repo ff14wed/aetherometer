@@ -96,8 +96,8 @@ var _ = Describe("Map", func() {
 			}))
 		})
 
-		It("correctly returns the maps associated with territory ID and place names", func() {
-			Expect(mapStore.GetMaps(131)).To(ConsistOf(
+		It("correctly returns (in sorted order) the maps associated with territory ID and place names", func() {
+			Expect(mapStore.GetMaps(131)).To(Equal([]models.MapInfo{
 				models.MapInfo{
 					Key: 14, ID: "w1t2/01", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 					PlaceNameSub: "Merchant Strip", TerritoryType: "w1t2",
@@ -106,7 +106,7 @@ var _ = Describe("Map", func() {
 					Key: 73, ID: "w1t2/02", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 					PlaceNameSub: "Hustings Strip", TerritoryType: "w1t2",
 				},
-			))
+			}))
 		})
 
 		It("correctly returns maps in the case of a many to 1 (territory -> map ID) relation", func() {

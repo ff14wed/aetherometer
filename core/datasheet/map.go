@@ -3,6 +3,7 @@ package datasheet
 import (
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/ff14wed/aetherometer/core/models"
 )
@@ -121,6 +122,9 @@ func (m *MapStore) GetMaps(territoryID uint16) []models.MapInfo {
 			mapInfos = append(mapInfos, foundMap)
 		}
 	}
+	sort.SliceStable(mapInfos, func(i, j int) bool {
+		return mapInfos[i].ID < mapInfos[j].ID
+	})
 	return mapInfos
 }
 
