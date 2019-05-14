@@ -53,8 +53,9 @@ func genericSetup() (testEnv testVars) {
 		SubjectID: uint32(testEnv.subjectID),
 		CurrentID: 0x9ABCDEF0,
 		IPCHeader: xivnet.IPCHeader{
-			Opcode: 1234,
-			Time:   time.Unix(102, 0),
+			Opcode:   1234,
+			ServerID: 5678,
+			Time:     time.Unix(102, 0),
 		},
 	}
 
