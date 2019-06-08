@@ -33,6 +33,7 @@ var _ = Describe("HookConfig", func() {
 			c = &config.Config{
 				APIPort:  9000,
 				DataPath: dummyPath,
+				AdminOTP: "dummy-otp",
 				Maps: config.MapConfig{
 					Cache: dummyPath,
 				},
@@ -54,6 +55,7 @@ var _ = Describe("HookConfig", func() {
 				c = &config.Config{
 					APIPort:  9000,
 					DataPath: dummyPath,
+					AdminOTP: "dummy-otp",
 					Maps: config.MapConfig{
 						Cache: dummyPath,
 					},
@@ -99,6 +101,7 @@ var _ = Describe("HookConfig", func() {
 				c = &config.Config{
 					APIPort:  9000,
 					DataPath: dummyPath,
+					AdminOTP: "dummy-otp",
 					Maps: config.MapConfig{
 						Cache: dummyPath,
 					},
@@ -126,6 +129,7 @@ var _ = Describe("HookConfig", func() {
 			lines := []string{
 				`api_port = 9000`,
 				`data_path = "dummy-path"`,
+				`admin_otp = "dummy-otp"`,
 				`[adapters.hook]`,
 				`enabled = true`,
 				`dll_path = "some-path"`,
@@ -138,6 +142,7 @@ var _ = Describe("HookConfig", func() {
 			c = &config.Config{
 				APIPort:  9000,
 				DataPath: "dummy-path",
+				AdminOTP: "dummy-otp",
 				Adapters: config.Adapters{
 					Hook: config.HookConfig{
 						Enabled:           true,

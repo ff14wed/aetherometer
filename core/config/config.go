@@ -16,6 +16,10 @@ type Config struct {
 	// containing game data.
 	DataPath string `toml:"data_path" validate:"directory"`
 
+	// AdminOTP provides a one time password that the admin can use to create an
+	// admin token for the API.
+	AdminOTP string `toml:"admin_otp" validate:"nonempty"`
+
 	// Maps provides the configuration for the Map endpoint of the API.
 	Maps MapConfig `toml:"maps"`
 

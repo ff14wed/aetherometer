@@ -32,6 +32,7 @@ var _ = Describe("Config", func() {
 			c = &config.Config{
 				APIPort:  9000,
 				DataPath: dummyPath,
+				AdminOTP: "dummy-otp",
 				Maps: config.MapConfig{
 					Cache: dummyPath,
 				},
@@ -49,6 +50,58 @@ var _ = Describe("Config", func() {
 			})
 		})
 
+		Describe("data_path", func() {
+			var dataDir string
+
+			JustBeforeEach(func() {
+				c = &config.Config{
+					APIPort:  9000,
+					DataPath: dataDir,
+				}
+			})
+
+			Context("when data_path is empty", func() {
+				BeforeEach(func() {
+					dataDir = ""
+				})
+
+				It("errors", func() {
+					Expect(c.Validate()).To(MatchError("config error: data_path must be provided"))
+				})
+			})
+
+			Context("when data_path does not exist", func() {
+				BeforeEach(func() {
+					dataDir = `Z:\foo\does\not\exist`
+				})
+				It("errors", func() {
+					Expect(c.Validate()).To(MatchError(`config error: data_path directory ("Z:\foo\does\not\exist") does not exist`))
+				})
+			})
+
+			Context("when data_path is not a directory", func() {
+				BeforeEach(func() {
+					dataDir = dummyFile
+				})
+				It("errors", func() {
+					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error: data_path ("%s") must be a directory`, dummyFile)))
+				})
+			})
+		})
+
+		Describe("admin_otp", func() {
+			JustBeforeEach(func() {
+				c = &config.Config{
+					APIPort:  9000,
+					DataPath: dummyPath,
+				}
+			})
+
+			It("errors when empty", func() {
+				Expect(c.Validate()).To(MatchError("config error: admin_otp must be provided"))
+			})
+		})
+
 		Describe("Maps", func() {
 			var mapsDir string
 
@@ -56,6 +109,7 @@ var _ = Describe("Config", func() {
 				c = &config.Config{
 					APIPort:  9000,
 					DataPath: dummyPath,
+					AdminOTP: "dummy-otp",
 					Maps: config.MapConfig{
 						Cache: mapsDir,
 					},
@@ -89,48 +143,6 @@ var _ = Describe("Config", func() {
 
 				It("errors", func() {
 					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error in [maps]: cache ("%s") must be a directory`, dummyFile)))
-				})
-			})
-		})
-
-		Describe("data_path", func() {
-			var dataDir string
-
-			JustBeforeEach(func() {
-				c = &config.Config{
-					APIPort:  9000,
-					DataPath: dataDir,
-					Maps: config.MapConfig{
-						Cache: dummyPath,
-					},
-				}
-			})
-
-			Context("when data_path is empty", func() {
-				BeforeEach(func() {
-					dataDir = ""
-				})
-
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError("config error: data_path must be provided"))
-				})
-			})
-
-			Context("when data_path does not exist", func() {
-				BeforeEach(func() {
-					dataDir = `Z:\foo\does\not\exist`
-				})
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(`config error: data_path directory ("Z:\foo\does\not\exist") does not exist`))
-				})
-			})
-
-			Context("when data_path is not a directory", func() {
-				BeforeEach(func() {
-					dataDir = dummyFile
-				})
-				It("errors", func() {
-					Expect(c.Validate()).To(MatchError(fmt.Sprintf(`config error: data_path ("%s") must be a directory`, dummyFile)))
 				})
 			})
 		})
@@ -191,6 +203,7 @@ var _ = Describe("Config", func() {
 			lines := []string{
 				`api_port = 9000`,
 				`data_path = "dummy-path"`,
+				`admin_otp = "dummy-otp"`,
 				`[maps]`,
 				`cache = "some-map-dir"`,
 				`api_path = "www.maps.com"`,
@@ -202,6 +215,7 @@ var _ = Describe("Config", func() {
 			c = &config.Config{
 				APIPort:  9000,
 				DataPath: "dummy-path",
+				AdminOTP: "dummy-otp",
 				Maps: config.MapConfig{
 					Cache:   "some-map-dir",
 					APIPath: "www.maps.com",
