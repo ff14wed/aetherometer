@@ -57,15 +57,23 @@ func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequ
 
 type queryResolver struct{ *Resolver }
 
+// APIVersion returns the version of the API (see AetherometerAPIVersion).
 func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
 	return AetherometerAPIVersion, nil
 }
+
+// Streams returns all of the streams known to the API
 func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
 	return r.sp.Streams()
 }
+
+// Stream returns the stream identified by streamID.
 func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error) {
 	return r.sp.Stream(streamID)
 }
+
+// Entity returns the entity identified by entityID in the requested stream
+// identified by streamID.
 func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error) {
 	return r.sp.Entity(streamID, entityID)
 }
