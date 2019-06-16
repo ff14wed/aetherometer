@@ -4,6 +4,7 @@ require (
 	github.com/99designs/gqlgen v0.7.1
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Microsoft/go-winio v0.4.11
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ff14wed/xivnet/v3 v3.0.2
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
@@ -13,6 +14,7 @@ require (
 	github.com/onsi/gomega v1.5.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/rs/cors v1.6.0
+	github.com/rs/xid v1.2.1
 	github.com/thejerf/suture v3.0.0+incompatible
 	github.com/urfave/cli v1.20.0 // indirect
 	github.com/vektah/gqlparser v1.1.0

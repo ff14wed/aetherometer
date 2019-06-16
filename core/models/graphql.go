@@ -175,6 +175,9 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		SendStreamRequest func(childComplexity int, request StreamRequest) int
+		CreateAdminToken  func(childComplexity int) int
+		AddPlugin         func(childComplexity int, pluginURL string) int
+		RemovePlugin      func(childComplexity int, apiToken string) int
 	}
 
 	Npcinfo struct {
@@ -319,6 +322,9 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	SendStreamRequest(ctx context.Context, request StreamRequest) (string, error)
+	CreateAdminToken(ctx context.Context) (string, error)
+	AddPlugin(ctx context.Context, pluginURL string) (string, error)
+	RemovePlugin(ctx context.Context, apiToken string) (bool, error)
 }
 type QueryResolver interface {
 	APIVersion(ctx context.Context) (string, error)
@@ -342,6 +348,36 @@ func field_Mutation_sendStreamRequest_args(rawArgs map[string]interface{}) (map[
 		}
 	}
 	args["request"] = arg0
+	return args, nil
+
+}
+
+func field_Mutation_addPlugin_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["pluginURL"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pluginURL"] = arg0
+	return args, nil
+
+}
+
+func field_Mutation_removePlugin_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["apiToken"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["apiToken"] = arg0
 	return args, nil
 
 }
@@ -1077,6 +1113,37 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SendStreamRequest(childComplexity, args["request"].(StreamRequest)), true
+
+	case "Mutation.createAdminToken":
+		if e.complexity.Mutation.CreateAdminToken == nil {
+			break
+		}
+
+		return e.complexity.Mutation.CreateAdminToken(childComplexity), true
+
+	case "Mutation.addPlugin":
+		if e.complexity.Mutation.AddPlugin == nil {
+			break
+		}
+
+		args, err := field_Mutation_addPlugin_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddPlugin(childComplexity, args["pluginURL"].(string)), true
+
+	case "Mutation.removePlugin":
+		if e.complexity.Mutation.RemovePlugin == nil {
+			break
+		}
+
+		args, err := field_Mutation_removePlugin_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemovePlugin(childComplexity, args["apiToken"].(string)), true
 
 	case "NPCInfo.nameID":
 		if e.complexity.Npcinfo.NameId == nil {
@@ -4974,6 +5041,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "createAdminToken":
+			out.Values[i] = ec._Mutation_createAdminToken(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "addPlugin":
+			out.Values[i] = ec._Mutation_addPlugin(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "removePlugin":
+			out.Values[i] = ec._Mutation_removePlugin(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5016,6 +5098,99 @@ func (ec *executionContext) _Mutation_sendStreamRequest(ctx context.Context, fie
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_createAdminToken(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateAdminToken(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_addPlugin(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_addPlugin_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddPlugin(rctx, args["pluginURL"].(string))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_removePlugin(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_removePlugin_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RemovePlugin(rctx, args["apiToken"].(string))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
 }
 
 var nPCInfoImplementors = []string{"NPCInfo"}
@@ -9810,6 +9985,10 @@ scalar Uint
 
 type Mutation {
   sendStreamRequest(request: StreamRequest!): String!
+
+  createAdminToken: String!
+  addPlugin(pluginURL: String!): String!
+  removePlugin(apiToken: String!): Boolean!
 }
 
 input StreamRequest {

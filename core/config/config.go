@@ -20,6 +20,10 @@ type Config struct {
 	// admin token for the API.
 	AdminOTP string `toml:"admin_otp" validate:"nonempty"`
 
+	// DisableAuth allows starting the API server without requiring an auth
+	// token for queries. CORS validation will still be enforced.
+	DisableAuth bool `toml:"disable_auth"`
+
 	// Maps provides the configuration for the Map endpoint of the API.
 	Maps MapConfig `toml:"maps"`
 

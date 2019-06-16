@@ -16,6 +16,7 @@ var _ = Describe("Models", func() {
 			fakeStreamEventSource *modelsfakes.FakeStreamEventSource
 			fakeEntityEventSource *modelsfakes.FakeEntityEventSource
 			fakeStoreProvider     *modelsfakes.FakeStoreProvider
+			fakeAuthProvider      *modelsfakes.FakeAuthProvider
 			resolver              *models.Resolver
 			stream1, stream2      models.Stream
 		)
@@ -24,6 +25,7 @@ var _ = Describe("Models", func() {
 			fakeStreamEventSource = new(modelsfakes.FakeStreamEventSource)
 			fakeEntityEventSource = new(modelsfakes.FakeEntityEventSource)
 			fakeStoreProvider = new(modelsfakes.FakeStoreProvider)
+			fakeAuthProvider = new(modelsfakes.FakeAuthProvider)
 
 			stream1 = models.Stream{
 				ID: 1234,
@@ -58,7 +60,7 @@ var _ = Describe("Models", func() {
 			fakeStoreProvider.StreamEventSourceReturns(fakeStreamEventSource)
 			fakeStoreProvider.EntityEventSourceReturns(fakeEntityEventSource)
 
-			resolver = models.NewResolver(fakeStoreProvider, nil)
+			resolver = models.NewResolver(fakeStoreProvider, fakeAuthProvider, nil)
 		})
 
 		Describe("Streams", func() {
@@ -66,6 +68,18 @@ var _ = Describe("Models", func() {
 				Expect(resolver.Query().Streams(context.Background())).To(Equal(
 					[]models.Stream{stream1, stream2},
 				))
+			})
+
+			Context("when the request is not authorized", func() {
+				BeforeEach(func() {
+					fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+				})
+
+				It("returns an authorization error", func() {
+					streams, err := resolver.Query().Streams(context.Background())
+					Expect(err).To(MatchError("Boom"))
+					Expect(streams).To(BeZero())
+				})
 			})
 		})
 
@@ -77,6 +91,18 @@ var _ = Describe("Models", func() {
 			It("returns an error if the requested stream does not exist", func() {
 				_, err := resolver.Query().Stream(context.Background(), 2345)
 				Expect(err).To(MatchError("not found"))
+			})
+
+			Context("when the request is not authorized", func() {
+				BeforeEach(func() {
+					fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+				})
+
+				It("returns an authorization error", func() {
+					s, err := resolver.Query().Stream(context.Background(), 2345)
+					Expect(err).To(MatchError("Boom"))
+					Expect(s).To(BeZero())
+				})
 			})
 		})
 
@@ -95,6 +121,18 @@ var _ = Describe("Models", func() {
 			It("returns an error if the requested entity does not exist", func() {
 				_, err := resolver.Query().Entity(context.Background(), 1234, 3)
 				Expect(err).To(MatchError("not found"))
+			})
+
+			Context("when the request is not authorized", func() {
+				BeforeEach(func() {
+					fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+				})
+
+				It("returns an authorization error", func() {
+					e, err := resolver.Query().Entity(context.Background(), 1234, 1)
+					Expect(err).To(MatchError("Boom"))
+					Expect(e).To(BeZero())
+				})
 			})
 		})
 
@@ -137,6 +175,18 @@ var _ = Describe("Models", func() {
 				Eventually(fakeStreamEventSource.UnsubscribeCallCount).Should(Equal(1))
 				Expect(fakeStreamEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
 			})
+
+			Context("when the request is not authorized", func() {
+				BeforeEach(func() {
+					fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+				})
+
+				It("returns an authorization error", func() {
+					ch, err := resolver.Subscription().StreamEvent(context.Background())
+					Expect(err).To(MatchError("Boom"))
+					Expect(ch).To(BeZero())
+				})
+			})
 		})
 
 		Describe("EntityEvent", func() {
@@ -178,6 +228,18 @@ var _ = Describe("Models", func() {
 				Eventually(fakeEntityEventSource.UnsubscribeCallCount).Should(Equal(1))
 				Expect(fakeEntityEventSource.UnsubscribeArgsForCall(0)).To(Equal(uint64(1234)))
 			})
+
+			Context("when the request is not authorized", func() {
+				BeforeEach(func() {
+					fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+				})
+
+				It("returns an authorization error", func() {
+					ch, err := resolver.Subscription().EntityEvent(context.Background())
+					Expect(err).To(MatchError("Boom"))
+					Expect(ch).To(BeZero())
+				})
+			})
 		})
 
 		Describe("SendStreamRequest", func() {
@@ -190,7 +252,7 @@ var _ = Describe("Models", func() {
 				BeforeEach(func() {
 					requestedStreamID = 0
 					requestedData = nil
-					resolver = models.NewResolver(fakeStoreProvider, func(streamID int, data []byte) (string, error) {
+					resolver = models.NewResolver(fakeStoreProvider, fakeAuthProvider, func(streamID int, data []byte) (string, error) {
 						requestedStreamID = streamID
 						requestedData = data
 						return "Success", nil
@@ -214,12 +276,12 @@ var _ = Describe("Models", func() {
 
 				Context("when the handler errors", func() {
 					BeforeEach(func() {
-						resolver = models.NewResolver(fakeStoreProvider, func(streamID int, data []byte) (string, error) {
+						resolver = models.NewResolver(fakeStoreProvider, fakeAuthProvider, func(streamID int, data []byte) (string, error) {
 							return "", errors.New("kaboom")
 						})
 					})
 
-					It("successfully calls the provided handler", func() {
+					It("returns the handler's error", func() {
 						resp, err := resolver.Mutation().SendStreamRequest(
 							context.Background(),
 							models.StreamRequest{
@@ -228,6 +290,24 @@ var _ = Describe("Models", func() {
 							})
 						Expect(resp).To(BeEmpty())
 						Expect(err).To(MatchError("kaboom"))
+					})
+				})
+
+				Context("when the request is not authorized", func() {
+					BeforeEach(func() {
+						fakeAuthProvider.AuthorizePluginTokenReturns(errors.New("Boom"))
+					})
+
+					It("returns an authorization error", func() {
+						resp, err := resolver.Mutation().SendStreamRequest(
+							context.Background(),
+							models.StreamRequest{
+								StreamID: 123,
+								Data:     "hello",
+							},
+						)
+						Expect(resp).To(BeEmpty())
+						Expect(err).To(MatchError("Boom"))
 					})
 				})
 			})
@@ -243,6 +323,53 @@ var _ = Describe("Models", func() {
 					Expect(resp).To(BeEmpty())
 					Expect(err).To(MatchError("Request handler is missing"))
 				})
+			})
+		})
+
+		Describe("CreateAdminToken", func() {
+			It("calls the auth provider", func() {
+				ctx := context.Background()
+				fakeAuthProvider.CreateAdminTokenReturns("some-token", nil)
+
+				Expect(resolver.Mutation().CreateAdminToken(ctx)).To(Equal(
+					"some-token",
+				))
+
+				Expect(fakeAuthProvider.CreateAdminTokenCallCount()).To(Equal(1))
+				ctxArg := fakeAuthProvider.CreateAdminTokenArgsForCall(0)
+				Expect(ctxArg).To(Equal(ctx))
+			})
+		})
+
+		Describe("AddPlugin", func() {
+			It("calls the auth provider", func() {
+				ctx := context.Background()
+				pluginURL := "some-plugin-url"
+				fakeAuthProvider.AddPluginReturns("some-token", nil)
+
+				Expect(resolver.Mutation().AddPlugin(ctx, pluginURL)).To(Equal(
+					"some-token",
+				))
+
+				Expect(fakeAuthProvider.AddPluginCallCount()).To(Equal(1))
+				ctxArg, pluginURLArg := fakeAuthProvider.AddPluginArgsForCall(0)
+				Expect(ctxArg).To(Equal(ctx))
+				Expect(pluginURLArg).To(Equal(pluginURL))
+			})
+		})
+
+		Describe("RemovePlugin", func() {
+			It("calls the auth provider", func() {
+				ctx := context.Background()
+				authToken := "some-auto-token"
+				fakeAuthProvider.RemovePluginReturns(true, nil)
+
+				Expect(resolver.Mutation().RemovePlugin(ctx, authToken)).To(BeTrue())
+
+				Expect(fakeAuthProvider.RemovePluginCallCount()).To(Equal(1))
+				ctxArg, authTokenArg := fakeAuthProvider.RemovePluginArgsForCall(0)
+				Expect(ctxArg).To(Equal(ctx))
+				Expect(authTokenArg).To(Equal(authToken))
 			})
 		})
 	})

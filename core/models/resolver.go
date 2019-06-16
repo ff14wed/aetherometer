@@ -19,14 +19,19 @@ type StreamRequestHandler func(streamID int, data []byte) (resp string, err erro
 // Resolver is a resolver for the queried data
 type Resolver struct {
 	sp      StoreProvider
+	auth    AuthProvider
 	handler StreamRequestHandler
 }
 
 // NewResolver creates a new query resolver
 // It takes the sp as an argument to use as a backing store for the queried
 // data
-func NewResolver(sp StoreProvider, streamRequestHandler StreamRequestHandler) *Resolver {
-	return &Resolver{sp: sp, handler: streamRequestHandler}
+func NewResolver(
+	sp StoreProvider,
+	auth AuthProvider,
+	streamRequestHandler StreamRequestHandler,
+) *Resolver {
+	return &Resolver{sp: sp, auth: auth, handler: streamRequestHandler}
 }
 
 // Mutation allows graphql to handle mutation requests for the system
@@ -49,10 +54,32 @@ type mutationResolver struct{ *Resolver }
 // SendStreamRequest allows a client to send data upstream to configure the
 // stream (the data source) at runtime.
 func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequest) (string, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return "", err
+	}
 	if r.handler == nil {
 		return "", errors.New("Request handler is missing")
 	}
 	return r.handler(req.StreamID, []byte(req.Data))
+}
+
+// CreateAdminToken creates a token that is used to authorize the AddPlugin
+// and RemovePlugin mutations. It can only be called once and will fail
+// the subsequent attempts.
+func (r *mutationResolver) CreateAdminToken(ctx context.Context) (string, error) {
+	return r.auth.CreateAdminToken(ctx)
+}
+
+// AddPlugin registers the pluginURL with the API. It returns the apiToken
+// that the plugin can use to authenticate with the API .
+func (r *mutationResolver) AddPlugin(ctx context.Context, pluginURL string) (string, error) {
+	return r.auth.AddPlugin(ctx, pluginURL)
+}
+
+// RemovePlugin revokes the access rights for the plugin associated with the API
+// token.
+func (r *mutationResolver) RemovePlugin(ctx context.Context, apiToken string) (bool, error) {
+	return r.auth.RemovePlugin(ctx, apiToken)
 }
 
 type queryResolver struct{ *Resolver }
@@ -64,17 +91,26 @@ func (r *queryResolver) APIVersion(ctx context.Context) (string, error) {
 
 // Streams returns all of the streams known to the API
 func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return nil, err
+	}
 	return r.sp.Streams()
 }
 
 // Stream returns the stream identified by streamID.
 func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return Stream{}, err
+	}
 	return r.sp.Stream(streamID)
 }
 
 // Entity returns the entity identified by entityID in the requested stream
 // identified by streamID.
 func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return Entity{}, err
+	}
 	return r.sp.Entity(streamID, entityID)
 }
 
@@ -83,6 +119,9 @@ type subscriptionResolver struct{ *Resolver }
 // StreamEvent returns an event channel that can be used for subscriptions to
 // Stream events
 func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEvent, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return nil, err
+	}
 	ses := r.sp.StreamEventSource()
 	ch, id := ses.Subscribe()
 	go func() {
@@ -95,6 +134,9 @@ func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEv
 // EntityEvent returns an event channel that can be used for subscriptions to
 // Entity events
 func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
+	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
+		return nil, err
+	}
 	ees := r.sp.EntityEventSource()
 	ch, id := ees.Subscribe()
 	go func() {

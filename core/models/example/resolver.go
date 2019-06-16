@@ -23,6 +23,15 @@ type mutationResolver struct{ *Resolver }
 func (r *mutationResolver) SendStreamRequest(ctx context.Context, request models.StreamRequest) (string, error) {
 	panic("not implemented")
 }
+func (r *mutationResolver) CreateAdminToken(ctx context.Context) (string, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) AddPlugin(ctx context.Context, pluginURL string) (string, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) RemovePlugin(ctx context.Context, apiToken string) (bool, error) {
+	panic("not implemented")
+}
 
 type queryResolver struct{ *Resolver }
 
