@@ -116,6 +116,9 @@ func (a *Auth) AllowOriginFunc(origin string) bool {
 	if strings.Contains(origin, "file://") {
 		return true
 	}
+	if strings.Contains(origin, "app://") {
+		return true
+	}
 	if strings.Contains(origin, "http://localhost") {
 		return true
 	}

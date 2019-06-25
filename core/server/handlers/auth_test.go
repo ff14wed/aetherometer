@@ -510,6 +510,10 @@ var _ = Describe("Auth", func() {
 			Expect(auth.AllowOriginFunc("file:///D:/dummy/path/index.html")).To(BeTrue())
 		})
 
+		It("always allows cross-origin requests from app://", func() {
+			Expect(auth.AllowOriginFunc("app://./index.html")).To(BeTrue())
+		})
+
 		It("always allows cross-origin requests from localhost", func() {
 			Expect(auth.AllowOriginFunc("http://localhost:9001")).To(BeTrue())
 		})
