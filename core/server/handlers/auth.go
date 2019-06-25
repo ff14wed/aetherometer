@@ -18,6 +18,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/rs/cors"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 )
 
 type ctxKey struct {
@@ -55,12 +56,14 @@ type Auth struct {
 	privKey *rsa.PrivateKey
 
 	initPayloadGetter InitPayloadGetter
+
+	logger *zap.Logger
 }
 
 // NewAuth creates a new instance of Auth. InitPayloadGetter provides a
 // way to grab credentials from the context when the connection is made
 // via Websockets.
-func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter) (*Auth, error) {
+func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger) (*Auth, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
@@ -76,6 +79,8 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter) (*Auth, error
 		allowedOrigins: make(map[string]int),
 
 		initPayloadGetter: initPayloadGetter,
+
+		logger: l.Named("auth-handler"),
 	}
 
 	invalidID := xid.New().String()
@@ -185,6 +190,7 @@ func (a *Auth) AddPlugin(ctx context.Context, pluginURL string) (string, error) 
 		return "", err
 	}
 
+	a.logger.Debug("Added Plugin", zap.String("url", pluginURL), zap.String("id", guid))
 	return apiToken, nil
 }
 
@@ -211,6 +217,7 @@ func (a *Auth) RemovePlugin(ctx context.Context, apiToken string) (bool, error) 
 		}
 		delete(a.allowedPlugins, id)
 		a.allowedLock.Unlock()
+		a.logger.Debug("Deleted Plugin", zap.String("id", id))
 		return true, nil
 	}
 

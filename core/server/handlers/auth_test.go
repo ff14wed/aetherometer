@@ -5,29 +5,49 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync"
 
 	"github.com/99designs/gqlgen/handler"
+	"go.uber.org/zap"
 
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/server/handlers"
+	"github.com/ff14wed/aetherometer/core/testhelpers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("Auth", func() {
 	var (
 		auth     *handlers.Auth
 		adminOTP string
+
+		logBuf *testhelpers.LogBuffer
+		once   sync.Once
 	)
 
 	BeforeEach(func() {
+		once.Do(func() {
+			logBuf = new(testhelpers.LogBuffer)
+			err := zap.RegisterSink("authhandlertest", func(*url.URL) (zap.Sink, error) {
+				return logBuf, nil
+			})
+			Expect(err).ToNot(HaveOccurred())
+		})
+		logBuf.Reset()
+
+		zapCfg := zap.NewDevelopmentConfig()
+		zapCfg.OutputPaths = []string{"authhandlertest://"}
+		logger, err := zapCfg.Build()
+		Expect(err).ToNot(HaveOccurred())
+
 		adminOTP = "one-time-password"
 		cfg := config.Config{
 			AdminOTP: adminOTP,
 		}
-		var err error
-		auth, err = handlers.NewAuth(cfg, nil)
+		auth, err = handlers.NewAuth(cfg, nil, logger)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -85,7 +105,7 @@ var _ = Describe("Auth", func() {
 		})
 
 		It("rejects the token if it was signed with the wrong key", func() {
-			altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil)
+			altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
 			Expect(err).ToNot(HaveOccurred())
 			ctx := handlers.ContextWithToken("altotp")
 			token, err := altAuth.CreateAdminToken(ctx)
@@ -105,7 +125,7 @@ var _ = Describe("Auth", func() {
 				var err error
 				auth, err = handlers.NewAuth(cfg, func(context.Context) handler.InitPayload {
 					return handler.InitPayload{"Authorization": adminToken}
-				})
+				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -143,6 +163,11 @@ var _ = Describe("Auth", func() {
 			ctx = handlers.ContextWithToken(apiToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
+
+			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
+			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
+			Eventually(logBuf).Should(gbytes.Say("Added Plugin"))
+			Eventually(logBuf).Should(gbytes.Say("https://example.com.*id"))
 		})
 
 		It("returns an error if the plugin URL is invalid", func() {
@@ -161,7 +186,7 @@ var _ = Describe("Auth", func() {
 
 		Context("when the incorrect admin token has been provided", func() {
 			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil)
+				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 				ctx := handlers.ContextWithToken("altotp")
 				adminToken, err = altAuth.CreateAdminToken(ctx)
@@ -202,6 +227,10 @@ var _ = Describe("Auth", func() {
 			ctx = handlers.ContextWithToken(apiToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
+
+			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
+			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
+			Eventually(logBuf).Should(gbytes.Say("Deleted Plugin.*id"))
 		})
 
 		It("removes the token if even if it doesn't exist or no longer exists", func() {
@@ -265,7 +294,7 @@ var _ = Describe("Auth", func() {
 
 		Context("when the incorrect admin token has been provided", func() {
 			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil)
+				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 				ctx := handlers.ContextWithToken("altotp")
 				adminToken, err = altAuth.CreateAdminToken(ctx)
@@ -288,7 +317,7 @@ var _ = Describe("Auth", func() {
 			var altAPIToken string
 
 			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil)
+				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 				ctx := handlers.ContextWithToken("altotp")
 				altAdminToken, err := altAuth.CreateAdminToken(ctx)
@@ -344,7 +373,7 @@ var _ = Describe("Auth", func() {
 					DisableAuth: true,
 				}
 				var err error
-				auth, err = handlers.NewAuth(cfg, nil)
+				auth, err = handlers.NewAuth(cfg, nil, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -363,7 +392,7 @@ var _ = Describe("Auth", func() {
 				var err error
 				auth, err = handlers.NewAuth(cfg, func(context.Context) handler.InitPayload {
 					return handler.InitPayload{"Authorization": apiToken}
-				})
+				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 
 				ctx := handlers.ContextWithToken(adminOTP)
