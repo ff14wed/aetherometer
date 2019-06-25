@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -107,6 +108,13 @@ func (a *Auth) Handler(next http.Handler) http.Handler {
 // AllowOriginFunc returns true only if the origin is referenced by any URL
 // of the registered plugins.
 func (a *Auth) AllowOriginFunc(origin string) bool {
+	if strings.Contains(origin, "file://") {
+		return true
+	}
+	if strings.Contains(origin, "http://localhost") {
+		return true
+	}
+
 	a.allowedLock.RLock()
 	count := a.allowedOrigins[origin]
 	a.allowedLock.RUnlock()
