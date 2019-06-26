@@ -62,6 +62,7 @@ export default observer({
     this.titlebar = new Titlebar({
       backgroundColor: Color.fromHex('#212121'),
       icon: 'icon.ico',
+      menu: new remote.Menu(),
     });
     this.titlebar.updateTitle('Aetherometer');
     this.state.init();
