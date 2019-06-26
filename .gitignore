@@ -10,3 +10,5 @@ node_modules
 vendor
 dist
 *.log
+resources/maps
+resources/win/core.exe
