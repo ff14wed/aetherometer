@@ -4,6 +4,8 @@ Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
 and display this information.
 
+<img src="doc/preview.png" alt="preview" />
+
 Aetherometer is capable of supporting many different use cases, including
 parsing combat data for trigger or DPS logging purposes, display of
 player and enemy movement on the map, crafting progress, etc.
