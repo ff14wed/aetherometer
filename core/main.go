@@ -16,7 +16,6 @@ import (
 	"github.com/ff14wed/aetherometer/core/server/handlers"
 	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/gorilla/websocket"
-	"github.com/onsi/gomega/format"
 	"go.uber.org/zap"
 
 	"github.com/99designs/gqlgen/handler"
@@ -70,7 +69,6 @@ func main() {
 	if err != nil {
 		logger.Fatal("Error reading config file", zap.Error(err))
 	}
-	logger.Debug("Config", zap.String("obj-debug", format.Object(cfg, 4)))
 	err = cfg.Validate()
 	if err != nil {
 		logger.Fatal("Error validating config file", zap.Error(err))
