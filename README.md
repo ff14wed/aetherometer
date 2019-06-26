@@ -16,14 +16,15 @@ this information: https://github.com/ff14wed/inspector-plugin.
 
 ## Running
 
-Download and extract the [latest release](https://github.com/ff14wed/aetherometer/releases) to a local directory on your system. Then run
-`aetherometer-ui.exe`.
+Download and extract the [latest release](https://github.com/ff14wed/aetherometer/releases)
+to a local directory on your system. Then run `aetherometer-ui.exe`.
 
 ## For developers
 
 ### Building on Windows
 
-To build core, simply run `go build -o resources/win/core.exe main.go`.
+To build core, simply `cd` into the `core` directory and run
+`go build -o ../resources/win/core.exe main.go`.
 
 Also copy your distribution of `xivhook.dll` into this `resources/win`
 directory.
@@ -39,3 +40,16 @@ steps for Windows and get pretty far in the process.
 Core is written to be platform agnostic, but it only has an adapter (for
 ingesting data) suited for running on Windows. With the right adapters,
 possibly using pcap, it can be made to run on Mac OSX or Linux.
+
+### What is xivhook.dll?
+
+xivhook.dll is the only part of the system that touches the game itself. It
+does not do any complicated memory accessing, but it uses a more reliable
+(not as lossy as using WinPcap) way of capturing network data before it
+reaches the game.
+
+Eventually, it can be used to enable overlays for the game with the same
+technology that Discord uses to power its ingame overlay.
+
+Unfortunately, this is the only part of Aetherometer that is not open-source
+since it can be easily modified to do a lot more ToS-breaking stuff.
