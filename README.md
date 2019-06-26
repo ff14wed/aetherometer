@@ -23,6 +23,8 @@ to a local directory on your system. Then run `aetherometer-ui.exe`.
 
 ### Building on Windows
 
+Requires Golang version at least 1.11 and latest stable version of Node.js.
+
 To build core, simply `cd` into the `core` directory and run
 `go build -o ../resources/win/core.exe main.go`.
 
@@ -37,8 +39,8 @@ run `yarn install` and then `yarn run build`.
 Currently, other platforms are not fully tested, but you could adapt the
 steps for Windows and get pretty far in the process.
 
-Core is written to be platform agnostic, but it only has an adapter (for
-ingesting data) suited for running on Windows. With the right adapters,
+Core is written to be platform agnostic, but it currently only has an adapter
+(for ingesting data) suited for running on Windows. With the right adapters,
 possibly using pcap, it can be made to run on Mac OSX or Linux.
 
 ### What is xivhook.dll?
