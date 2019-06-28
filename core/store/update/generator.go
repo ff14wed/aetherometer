@@ -63,7 +63,7 @@ func (g *Generator) Generate(streamID int, isEgress bool, b *xivnet.Block) store
 
 func getCanonicalOrientation(d uint32, max uint32) float64 {
 	factor := float32(d) / float32(max)
-	return float64(factor) * 2 * math.Pi
+	return 2 * math.Pi * float64(factor)
 }
 
 func getTimeForDuration(secs float32) time.Time {

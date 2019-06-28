@@ -23,7 +23,7 @@ func newCastingUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) st
 		CastTime:  getTimeForDuration(data.CastTime),
 		TargetID:  uint64(data.TargetID),
 		Location: models.Location{
-			Orientation: float64(data.Direction),
+			Orientation: getCanonicalOrientation(uint32(data.Direction), 0x10000),
 			X:           float64(data.Position.X.Float()),
 			Y:           float64(data.Position.Y.Float()),
 			Z:           float64(data.Position.Z.Float()),

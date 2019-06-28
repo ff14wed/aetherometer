@@ -54,7 +54,7 @@ var _ = Describe("Casting Update", func() {
 			ActionID:     4238,
 			CastTime:     1,
 			TargetID:     0x5678,
-			Direction:    math.Pi,
+			Direction:    0x8000,
 			UnkID1:       123,
 			U3:           123,
 		}
@@ -70,7 +70,7 @@ var _ = Describe("Casting Update", func() {
 			CastTime:  time.Unix(1, 0),
 			TargetID:  0x5678,
 			Location: models.Location{
-				Orientation: float64(float32(math.Pi)),
+				Orientation: 2 * math.Pi * float64(float32(0.5)),
 				X:           1000,
 				Y:           -1000,
 				Z:           -1000,
