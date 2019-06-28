@@ -75,7 +75,7 @@ int32,byte,uint16,byte,byte,uint16,byte,bit&01,bit&02,byte,sbyte,bit&04,bit&08,b
 
 const ModelSkeletonCSV = `
 key,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
-#,,,,,,,,,,,,,,,,,,
+#,ScaleFactor,,,,,,,,,,,,,,,,,
 int32,single,single,single,single,uint16,uint16,uint16,uint16,uint16,uint16,uint16,uint16,single,single,uint16,byte,bit&01,byte
 8094,0.2,0.5,0.3,0.5,100,300,66,300,66,300,0,0,3,3,0,0,False,1
 8095,0.2,0.5,0.3,0.5,100,300,66,300,66,300,0,0,3,3,0,0,False,1

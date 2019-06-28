@@ -61,11 +61,11 @@ var ExpectedModelCharas = map[uint32]datasheet.ModelChara{
 
 // ExpectedModelSkeletons derives from ModelSkeletonCSV
 var ExpectedModelSkeletons = map[uint32]datasheet.ModelSkeleton{
-	8094: datasheet.ModelSkeleton{Key: 8094, Size: 0.2},
-	8095: datasheet.ModelSkeleton{Key: 8095, Size: 0.2},
-	8096: datasheet.ModelSkeleton{Key: 8096, Size: 0.2},
-	8097: datasheet.ModelSkeleton{Key: 8097, Size: 0.2},
-	8098: datasheet.ModelSkeleton{Key: 8098, Size: 0.2},
+	8094: datasheet.ModelSkeleton{Key: 8094, ScaleFactor: 0.2},
+	8095: datasheet.ModelSkeleton{Key: 8095, ScaleFactor: 0.2},
+	8096: datasheet.ModelSkeleton{Key: 8096, ScaleFactor: 0.2},
+	8097: datasheet.ModelSkeleton{Key: 8097, ScaleFactor: 0.2},
+	8098: datasheet.ModelSkeleton{Key: 8098, ScaleFactor: 0.2},
 }
 
 // ExpectedMapInfo derives from MapCSV
