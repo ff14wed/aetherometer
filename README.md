@@ -4,6 +4,8 @@ Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
 and display this information.
 
+**Now updated for Shadowbringers**
+
 <img src="docs/preview.png" alt="preview" />
 
 ## Getting Started
