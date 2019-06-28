@@ -2,6 +2,40 @@
   <div id="settings-container">
     <v-container fill-height>
       <v-layout column>
+        <h5 class="section-heading headline font-weight-thin">About</h5>
+          <v-sheet class="mb-3" elevation=16>
+            <v-container>
+              <v-list>
+                <v-list-tile>
+                  <v-list-tile-content>Aetherometer Version:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">v{{ getAppVersion() }}</v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-content>Aetherometer API version:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">{{ state.apiVersion }}</v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-content>Aetherometer API URL:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">{{ state.apiURL }}</v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-content>Debug Logs:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">
+                    <v-btn @click="goToLogsPath()">View Core Logs</v-btn>
+                  </v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-list-tile-content>Help / Docs / Source Code:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">
+                    <v-layout>
+                      <v-flex><v-btn @click="goToLink('https://github.com/ff14wed/aetherometer')">GitHub</v-btn></v-flex>
+                    </v-layout>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-container>
+          </v-sheet>
+
         <h5 class="section-heading headline font-weight-thin">Manage Plugins</h5>
         <v-sheet class="mb-3" elevation=16>
           <v-container>
@@ -21,6 +55,7 @@
                 </template>
               </v-treeview>
               <v-flex align-self-end class="pb-3">
+                <v-btn @click="unselectAll">Unselect All</v-btn>
                 <v-btn :disabled="selectedPlugins.length === 0" @click="removeSelectedPlugins">
                   <template v-if="selectedPlugins.length === 1">Remove Plugin</template>
                   <template v-else>Remove Plugins</template>
@@ -99,6 +134,8 @@
 </template>
 
 <script>
+import { remote, shell } from 'electron';
+
 import CommonStore from '../stores/commonStore';
 
 import { observer } from 'mobx-vue';
@@ -165,6 +202,18 @@ export default observer({
     },
     formReset() {
       this.$refs.addPluginForm.reset();
+    },
+    getAppVersion() {
+      return remote.app.getVersion();
+    },
+    unselectAll() {
+      this.tree = [];
+    },
+    goToLogsPath() {
+      shell.openItem(remote.app.getPath('logs'));
+    },
+    goToLink(url) {
+      shell.openExternal(url);
     },
   },
 });

@@ -97,6 +97,13 @@ export default class GQLClient {
     return data.streams;
   }
 
+  public getAPIVersion = async (): Promise<string> => {
+    const data = await executeOperation(
+      this.httpLink, { query: gql.versionQuery }, this.adminToken,
+    );
+    return data.apiVersion;
+  }
+
   public addPlugin = async (pluginURL: string): Promise<string> => {
     const variables = { pluginURL };
 

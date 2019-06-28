@@ -19,6 +19,12 @@ export const listStreamsQuery = gql`
   }
 `;
 
+export const versionQuery = gql`
+  query Version {
+    apiVersion
+  }
+`;
+
 export const createAdminTokenMutation = gql`
   mutation CreateAdminToken {
     createAdminToken

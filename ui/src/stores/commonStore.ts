@@ -47,6 +47,7 @@ const schema: { [key: string]: JSONSchema } = {
 export default class CommonStore {
   @observable public streams = new Map<string, Stream>();
   @observable public apiPort = 0;
+  @observable public apiVersion = '';
 
   @observable public switchToNewStream = true;
   @observable public savedSessions: string = '';
@@ -78,6 +79,8 @@ export default class CommonStore {
       const adminToken = await this.gqlClient.initializeAdminToken(payload.adminOTP);
       ipcRenderer.send('save-admin-token', adminToken);
     }
+
+    this.apiVersion = await this.gqlClient.getAPIVersion();
 
     const storeDefaultPlugins = this.diskStore.get('defaultPlugins') as Array<{name: string, url: string}> ;
     for (const { name, url } of storeDefaultPlugins) {
@@ -113,7 +116,7 @@ export default class CommonStore {
         for (const [_, plugin] of this.defaultPlugins) {
           const pluginToken = await this.gqlAddPlugin(plugin.url);
           const newPlugin = plugin.withParams(newStream.uniqID, {
-            apiURL: `http://localhost:${this.apiPort}/query`,
+            apiURL: this.apiURL,
             apiToken: pluginToken,
             streamID,
           });
@@ -172,7 +175,7 @@ export default class CommonStore {
       const stream = this.streams.get(streamUniqID)!;
       const pluginToken = await this.gqlAddPlugin(url);
       const newPlugin = new Plugin(name, url, streamUniqID, {
-        apiURL: `http://localhost:${this.apiPort}/query`,
+        apiURL: this.apiURL,
         apiToken: pluginToken,
         streamID: stream.id,
       });
@@ -197,6 +200,9 @@ export default class CommonStore {
     });
   }
 
+  @computed public get apiURL(): string {
+    return `http://localhost:${this.apiPort}/query`;
+  }
   @computed public get selectedStream(): Stream | undefined {
     if (this.streams.size > 0) {
       if (this.streamSel && this.streams.has(this.streamSel)) {
