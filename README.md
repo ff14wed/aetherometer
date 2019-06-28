@@ -7,7 +7,7 @@ and display this information.
 <img src="docs/preview.png" alt="preview" />
 
 ## Getting Started
-## [Download for the latest release](https://github.com/ff14wed/aetherometer/releases)
+[**Download for the latest release**](https://github.com/ff14wed/aetherometer/releases)
 
 Download the zip file to a place with sufficient space on your system, and
 extract it. Then run `aetherometer-ui.exe`.
