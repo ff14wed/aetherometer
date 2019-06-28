@@ -262,19 +262,19 @@ var expectedMovementBlockData = &datatypes.Movement{
 var egressMovementBlockBytes = []byte{
 	219, 15, 73, 64, // Direction
 	0x67, 0x45, 0x00, 0x00, // U1
-	0xAB, 0x89, 0x00, 0x00, // U2
 	0, 0, 250, 67, // X
 	0, 0, 22, 68, // Y
 	0, 0, 47, 68, // Z
+	0xAB, 0x89, 0x00, 0x00, // U2
 }
 
 var expectedEgressMovementBlockData = &datatypes.EgressMovement{
 	Direction: math.Pi,
 	U1:        0x4567,
-	U2:        0x89AB,
 	X:         500,
 	Y:         600,
 	Z:         700,
+	U2:        0x89AB,
 }
 
 var newTestFrameDecoder = func(frames map[string]*xivnet.Frame) func(io.Reader) message.FrameDecoder {

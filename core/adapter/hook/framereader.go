@@ -118,7 +118,11 @@ func (d *FrameReader) feedDataAndSendBlocks(
 		if frame == nil {
 			return
 		}
-		blocks := message.ProcessBlocks(frame)
+		frame.CorrectTimestamps(frame.Time)
+		blocks := frame.Blocks
+		if isEgress {
+			blocks = message.ProcessBlocks(frame)
+		}
 		var parsedBlocks []*xivnet.Block
 		for _, b := range blocks {
 			parsedBlock, err := datatypes.ParseBlock(b, isEgress)

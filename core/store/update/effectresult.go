@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.AddStatus), newAddStatusUpdate)
+	registerIngressHandler(new(datatypes.EffectResult), newEffectResultUpdate)
 }
 
 // TODO: Add testing
-func newAddStatusUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.AddStatus)
+func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.EffectResult)
 
 	addedStatuses := make(map[int]models.Status)
 
@@ -30,7 +30,7 @@ func newAddStatusUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) 
 		}
 		addedStatuses[int(e.Index)] = models.Status{
 			ID:          int(e.EffectID),
-			Extra:       int(e.Extra),
+			Extra:       int(e.Param),
 			Name:        name,
 			Description: description,
 			StartedTime: b.Time,
@@ -43,7 +43,7 @@ func newAddStatusUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) 
 		}
 	}
 
-	return addStatusUpdate{
+	return effectResultUpdate{
 		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 
@@ -53,14 +53,13 @@ func newAddStatusUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) 
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
 			Tp:       int(data.CurrentTP),
-			MaxHP:    int(data.MaxHP),
 			MaxMP:    int(data.MaxMP),
 			LastTick: b.Time,
 		},
 	}
 }
 
-type addStatusUpdate struct {
+type effectResultUpdate struct {
 	streamID  int
 	subjectID uint64
 
@@ -69,11 +68,11 @@ type addStatusUpdate struct {
 	resources        models.Resources
 }
 
-func (u addStatusUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
+func (u effectResultUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 	return validateEntityUpdate(streams, u.streamID, u.subjectID, u.modifyFunc)
 }
 
-func (u addStatusUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
+func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.Resources = u.resources
 
 	if len(entity.Statuses) <= int(u.statusListLength) {

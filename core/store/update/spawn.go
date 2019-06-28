@@ -175,7 +175,6 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		if ent == nil || ent.Index != u.entity.Index {
 			continue
 		}
-		// fmt.Printf("Spawn Removed Entity: %x\n", key)
 		stream.EntitiesMap[key] = nil
 		entityEvents = append(entityEvents, models.EntityEvent{
 			StreamID: u.streamID,
@@ -186,8 +185,6 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		})
 		break
 	}
-
-	// fmt.Printf("AddEntity: %x\n", u.subjectID)
 
 	stream.EntitiesMap[u.subjectID] = &u.entity
 
