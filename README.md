@@ -4,128 +4,105 @@ Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
 and display this information.
 
-<img src="doc/preview.png" alt="preview" />
+<img src="docs/preview.png" alt="preview" />
+
+## Getting Started
+## [Download for the latest release](https://github.com/ff14wed/aetherometer/releases)
+
+Download the zip file to a place with sufficient space on your system, and
+extract it. Then run `aetherometer-ui.exe`.
+
+Then try out some [plugins](#plugins-list)!
+
+If you're a developer interested in Aetherometer, see
+[here](#for-developers).
+
+## Features
 
 Aetherometer is capable of supporting many different use cases, including
 parsing combat data for trigger or DPS logging purposes, display of
 player and enemy movement on the map, crafting progress, etc.
 
-A full description of what Aetherometer currently exposes as part of the API
-is available [here](core/models/schema.graphql).
+## Plugins
 
-Here is one example of a plugin that leverages Aetherometer to display
-this information: https://github.com/ff14wed/inspector-plugin.
+Plugins are mini-applications that process data from a specific instance
+of the game. They open as new "tabs" on the navigation drawer to the left,
+and you can navigate between them without losing data on any other tab.
 
-## Running
+ >Techincally plugins are able to process data from mulitple
+instances of the game, but Aetherometer's Stream handling abilities aim
+to reduce boilerplate Stream switching code.
 
-Download and extract the [latest
-release](https://github.com/ff14wed/aetherometer/releases) to a local
-directory on your system. Then run `aetherometer-ui.exe`.
+You can also switch between instances of games via the Stream menu on the bottom left to switch to that session's "tabs".
 
-## For Plugin Developers
+### Plugins List
 
-Aetherometer exposes a good amount of information that identifies your
-character through its [GraphQL API](core/models/schema.graphql). To prevent
-the leaking of information to practically any web page on the internet,
-Aetherometer core implements two (relatively weak but probably sufficient)
-safety measures to make sure only authorized plugins can access the API:
-  1. CORS validation in order to safe-guard against just random webpages from
-     accessing the localhost endpoint.
-  2. Validation of an API token via the `Authorization` header to permit only
-     user-approved applications access (as opposed to clients that bypass
-     CORS).
+Here are some plugins that you can try to get an idea for Aetherometer's capabilities:
+- Inspector Plugin - https://github.com/ff14wed/inspector-plugin
 
-When adding a plugin, Aetherometer will load it as a web page and inject
-credentials so that this plugin can access the API. That said, although
-Aetherometer does basically run a full Chromium process per plugin,
-for security reasons it will open all hyperlinks to external sites in an
-external browser instead.
+## Installing Plugins
 
-For integration with online services, opt to use a secure authorization
-workflow like OAuth instead of logging the user in directly in the UI.
+<img src="docs/settings.png" alt="preview" />
 
-### API Token
+1. Navigate to the Settings pane of the UI.
+2. Go to the `Manage Plugins` section of the Settings pane.
+3. Check the top-level tree nodes corresponding to the streams to which you
+   would like to add instances of plugins.
+    - **If the source of data is a running instance of FFXIV, then
+    Stream means Process ID**. Other sources of data are also listed here.
+    - The **Default Plugins** section lists plugins you would like
+      automatically started with every new instance of a Stream (game). You
+      can freely add or remove plugins here to affect *future* instances of
+      Streams.
+4. Click `Add Plugin`.
+5. You can click `Unselect All` to reset all checkboxes.
 
-In order to allow your plugin to access the API, it should expose a function
-on the global `window` object called `initPlugin` that receives a single
-object argument specified by the following:
-  ```typescript
-    interface PluginParams {
-      apiURL: string; // URL that allows access to the API, e.g. http://localhost:8080/query
-      apiToken: string; // API token in JWT format
-      streamID: number; // The focused stream ID. Other stream IDs could be handled by other instances of the same plugin
-    }
-  ```
+### Removing Plugins / Closing Panes
 
-To support cases where the plugin is not launched via the Aetherometer UI,
-the plugin may check for the absence of the `window.waitForInit` boolean
-(loaded as part of Aetherometer's preload script) and use custom parameters
-for loading the application.
+If you want to close the page for a plugin, simply make sure to check the
+leaf-level tree nodes and click `Remove Plugins`.
 
-See [examples](#plugin-examples) for examples on how to integrate this
-workflow into the startup of your app.
+## Miscellaneous Settings
 
-### Getting an API Token for Testing or External Applications
+### Automatically switch to new session when a stream is created
 
-The API token that is created for a single instance of a plugin isn't
-restricted to only that plugin (and there's actually no secure way to
-verify the origin of requests if all is on localhost anyways).
+This setting will automatically navigate you to a new Stream's session (kind
+of like a window in a browser) whenever a new instance of a Stream is
+started. Old Stream sessions that are closed will still be accessible via the
+Stream menu on the left navigation drawer.
 
-If your application is loaded in the web browser, you can load some plugin
-that will display its provided `apiToken` (like the
-[Playground](#playground)) and just copy and paste the token into
-a secure place for the application to read it.
+i.e, if you were viewing details about one instance of a game,
+starting another instance would automatically create a new "window" for this
+instance with new "tabs" (plugins) and navigate you to this new "window". In
+order to go back to viewing details about older instances of the game, you
+would have to navigate back to the other "windows" via the Stream menu.
 
-Or you could go one step further and have this plugin integrate with your
-external application through another local or online web service.
+This setting is on by default. Toggle the switch to disable this behavior.
 
-### Playground
+### Stream sessions retained
 
-For testing of GraphQL queries against the API and documentation of the API,
-you may use the Playground (located at `http://localhost:8080/playground`) as
-a plugin. If the core server is not running at `8080`, then it is probably
-running on some separate port. This port you can find by inspecting the
-core log output (in the settings menu), or by looking at the `config.json`
-used to run `core.exe`. This `config.json` can be found in the parent folder
-of the `logs` directory containing core logs.
+Keeping too many Stream sessions alive could eat up your RAM and hamper
+performance of your machine. To clean up, Aetherometer can automatically
+close old and inactive sessions (where the game is no longer running).
 
-### Plugin Examples
-[Inspector](https://github.com/ff14wed/inspector-plugin) - React-based App
-Craftbot - Coming soon
+However, your old inactive sessions could still
+include data that needs saving. This session provides a buffer to keep alive
+old "tabs" so you can finish working with them before letting them be closed.
 
-## For developers
+The default setting is 1. Set a negative number to disable closing any
+sessions.
 
-### Building on Windows
+Changing this setting does not instantly close existing inactive sessions
+until another instance of a Stream is removed (i.e. when a game process
+is no longer running).
 
-Requires Golang version at least 1.11 and latest stable version of Node.js.
+**If you want to immediately close some tabs for performance reasons, simply
+just remove all plugins from those streams, taking care not to delete your
+defaults**.
 
-To build core, simply `cd` into the `core` directory and run
-`go build -o ../resources/win/core.exe main.go`.
+## For Developers
 
-Also copy your distribution of `xivhook.dll` into this `resources/win`
-directory.
-
-Then to build the bundle including the UI, `cd` into the `ui` directory,
-run `yarn install` and then `yarn run build`.
-
-### Other Platforms
-
-Currently, other platforms are not fully tested, but you could adapt the
-steps for Windows and get pretty far in the process.
-
-Core is written to be platform agnostic, but it currently only has an adapter
-(for ingesting data) suited for running on Windows. With the right adapters,
-possibly using pcap, it can be made to run on Mac OSX or Linux.
-
-### What is xivhook.dll?
-
-xivhook.dll is the only part of the system that touches the game itself. It uses
-a stable and  more reliable (not as lossy as using WinPcap) way of capturing network
-data and does not require any memory accesses to the game itself. Therefore, it does not
-need updating whenever the game executable updates.
-
-Eventually, it can be used to enable overlays for the game with the same
-technology that Discord uses to power its ingame overlay.
-
-Unfortunately, this is the only part of Aetherometer that is not open-source
-since it can be easily modified to do a lot more ToS-breaking stuff.
+### Creating plugins
+See the [docs/plugin_work.md](docs/plugin_work.md) document.
+### Contributing to Aetherometer
+See the [CONTRIBUTING.md](CONTRIBUTING.md) document.
