@@ -53,6 +53,7 @@ func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collectio
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
 			Tp:       int(data.CurrentTP),
+			MaxHP:    int(data.MaxHP),
 			MaxMP:    int(data.MaxMP),
 			LastTick: b.Time,
 		},
