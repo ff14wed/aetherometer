@@ -78,6 +78,7 @@ type CraftingInfo struct {
 	DurabilityDelta     int        `json:"durabilityDelta"`
 	CurrentCondition    int        `json:"currentCondition"`
 	PreviousCondition   int        `json:"previousCondition"`
+	ReuseProc           bool       `json:"reuseProc"`
 }
 
 type Enmity struct {

@@ -17,6 +17,7 @@ func newDirectorPlaySceneUpdate(streamID int, b *xivnet.Block, d *datasheet.Coll
 	data := b.Data.(*datatypes.DirectorPlayScene)
 
 	if craftState, matches := data.Data.(datatypes.CraftState); matches {
+		unknownFlags := craftState.U6[0] >> 16
 		action := d.ActionData.GetAction(craftState.CraftAction)
 		return craftingInfoUpdate{
 			streamID: streamID,
@@ -33,6 +34,7 @@ func newDirectorPlaySceneUpdate(streamID int, b *xivnet.Block, d *datasheet.Coll
 				DurabilityDelta:     int(craftState.DurabilityDelta),
 				CurrentCondition:    int(craftState.CurrentCondition),
 				PreviousCondition:   int(craftState.PreviousCondition),
+				ReuseProc:           (unknownFlags == 0x4000),
 			},
 		}
 	}

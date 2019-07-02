@@ -110,6 +110,7 @@ type ComplexityRoot struct {
 		DurabilityDelta     func(childComplexity int) int
 		CurrentCondition    func(childComplexity int) int
 		PreviousCondition   func(childComplexity int) int
+		ReuseProc           func(childComplexity int) int
 	}
 
 	Enmity struct {
@@ -821,6 +822,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CraftingInfo.PreviousCondition(childComplexity), true
+
+	case "CraftingInfo.reuseProc":
+		if e.complexity.CraftingInfo.ReuseProc == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.ReuseProc(childComplexity), true
 
 	case "Enmity.targetHateRanking":
 		if e.complexity.Enmity.TargetHateRanking == nil {
@@ -3096,6 +3104,11 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "reuseProc":
+			out.Values[i] = ec._CraftingInfo_reuseProc(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3457,6 +3470,33 @@ func (ec *executionContext) _CraftingInfo_previousCondition(ctx context.Context,
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _CraftingInfo_reuseProc(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "CraftingInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReuseProc, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
 }
 
 var enmityImplementors = []string{"Enmity"}
@@ -9855,6 +9895,8 @@ type CraftingInfo {
 
   currentCondition: Int!
   previousCondition: Int!
+
+  reuseProc: Boolean!
 }
 
 type RecipeInfo {

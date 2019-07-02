@@ -176,6 +176,8 @@ type CraftingInfo {
 
   currentCondition: Int!
   previousCondition: Int!
+
+  reuseProc: Boolean!
 }
 
 type RecipeInfo {
