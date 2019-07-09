@@ -26,8 +26,7 @@ var _ = Describe("Manager", func() {
 		addProcEventChan chan uint32
 		remProcEventChan chan uint32
 
-		fakeStream      *hookfakes.FakeStream
-		closeFakeStream chan struct{}
+		fakeStream *hookfakes.FakeStream
 
 		logBuf *testhelpers.LogBuffer
 		once   sync.Once
@@ -61,10 +60,12 @@ var _ = Describe("Manager", func() {
 
 		fakeStream = new(hookfakes.FakeStream)
 
-		closeFakeStream = make(chan struct{})
+		closeFakeStream := make(chan struct{})
 		fakeStream.ServeStub = func() {
 			<-closeFakeStream
 		}
+
+		fakeStream.StringReturns("fake-stream")
 
 		var closeOnce sync.Once
 		fakeStream.StopStub = func() {

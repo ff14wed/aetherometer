@@ -2,6 +2,7 @@ package hook_test
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/url"
 	"os"
@@ -349,72 +350,15 @@ var _ = Describe("Stream", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 		})
+
 		logBuf.Reset()
 		zapCfg := zap.NewDevelopmentConfig()
 		zapCfg.OutputPaths = []string{"hookstreamtest://"}
+
 		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
 		hookStream = hook.NewStream(streamID, cfg, logger)
-		supervisor = suture.New("test-stream", suture.Spec{
-			Log: func(line string) {
-				_, _ = GinkgoWriter.Write([]byte(line))
-			},
-			FailureThreshold: 1,
-		})
-		supervisor.ServeBackground()
-		_ = supervisor.Add(hookStream)
-	})
-
-	AfterEach(func() {
-		supervisor.Stop()
-	})
-
-	It(`logs "Running" for each subprocess on startup`, func() {
-		Eventually(logBuf).Should(gbytes.Say("stream-1234"))
-		// These subprocesses can start up in any order
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
-
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-	})
-
-	It("initializes the hook on startup", func() {
-		Expect(rpp.InjectDLLCallCount()).To(Equal(1))
-		Expect(rpp.DialPipeCallCount()).To(Equal(1))
-		pipeName, dialTimeout := rpp.DialPipeArgsForCall(0)
-		Expect(pipeName).To(Equal(`\\.\pipe\xivhook-1234`))
-		Expect(*dialTimeout).To(Equal(5 * time.Second))
-	})
-
-	It(`logs "Stopping..." for each subprocess on shutdown`, func() {
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-		Eventually(logBuf).Should(gbytes.Say("Running"))
-
-		supervisor.Stop()
-		Eventually(logBuf).Should(gbytes.Say("stream-1234"))
-		// These subprocesses can stop in any order
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
-		Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
-
-		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
-		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
-		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
-		Eventually(logBuf).Should(gbytes.Say("Stopping..."))
-	})
-
-	It("closes the connection with the hook on shutdown", func() {
-		supervisor.Stop()
-		Eventually(conn.CloseCallCount).Should(Equal(1))
 	})
 
 	Context("when there is an error initializing the hook", func() {
@@ -446,63 +390,135 @@ var _ = Describe("Stream", func() {
 		})
 	})
 
-	Describe("SubscribeIngress", func() {
-		It("returns ingress frames when data is received from the hook", func() {
-			Consistently(hookStream.SubscribeIngress).ShouldNot(Receive())
-
-			fakeDataChan <- readData{data: hook.Envelope{
-				Op:         hook.OpRecv,
-				Additional: zeroBlockPacket,
-			}.Encode()}
-
-			Consistently(hookStream.SubscribeEgress).ShouldNot(Receive())
-			var f *xivnet.Frame
-			Eventually(hookStream.SubscribeIngress).Should(Receive(&f))
-			Expect(f.Preamble[0:4]).To(Equal([]byte{0x52, 0x52, 0xa0, 0x41}))
-			Expect(f.Blocks).To(HaveLen(0))
+	Describe("String", func() {
+		It("returns the string representation of the stream", func() {
+			Expect(hookStream.String()).To(Equal(fmt.Sprintf("stream-%d", int(streamID))))
 		})
 	})
 
-	Describe("SubscribeEgress", func() {
-		It("returns egress frames when data is received from the hook", func() {
-			Consistently(hookStream.SubscribeEgress).ShouldNot(Receive())
-
-			fakeDataChan <- readData{data: hook.Envelope{
-				Op:         hook.OpSend,
-				Additional: zeroBlockPacket,
-			}.Encode()}
-
-			Consistently(hookStream.SubscribeIngress).ShouldNot(Receive())
-			var f *xivnet.Frame
-			Eventually(hookStream.SubscribeEgress).Should(Receive(&f))
-			Expect(f.Preamble[0:4]).To(Equal([]byte{0x52, 0x52, 0xa0, 0x41}))
-			Expect(f.Blocks).To(HaveLen(0))
-		})
-	})
-
-	Describe("SendRequest", func() {
-		It("sends a JSON-encoded request as an envelope on the connection", func() {
-			// Byte arrays can be represented as base64 in JSON
-			resp, err := hookStream.SendRequest(
-				[]byte(`{"Op": 123, "Data": 456, "Additional": "BwgJAA=="}`),
-			)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(resp).To(Equal([]byte("OK")))
-
-			Eventually(conn.WriteCallCount).Should(Equal(1))
-			Expect(conn.WriteArgsForCall(0)).To(Equal([]byte{
-				13, 0, 0, 0, 123, 200, 1, 0, 0, 7, 8, 9, 0,
-			}))
+	Context("when the stream successfully starts running", func() {
+		BeforeEach(func() {
+			supervisor = suture.New("test-stream", suture.Spec{
+				Log: func(line string) {
+					_, _ = GinkgoWriter.Write([]byte(line))
+				},
+				FailureThreshold: 1,
+			})
+			supervisor.ServeBackground()
+			_ = supervisor.Add(hookStream)
 		})
 
-		Context("when the request cannot be unmarshaled", func() {
-			It("returns an error", func() {
-				resp, err := hookStream.SendRequest([]byte(`"bar"`))
-				Expect(err).To(MatchError("Cannot unmarshal data to envelope: json: cannot unmarshal string into Go value of type hook.Envelope"))
-				Expect(resp).To(BeNil())
+		AfterEach(func() {
+			supervisor.Stop()
+		})
+
+		It(`logs "Running" for each subprocess on startup`, func() {
+			Eventually(logBuf).Should(gbytes.Say("stream-1234"))
+			// These subprocesses can start up in any order
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
+
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+		})
+
+		It("initializes the hook on startup", func() {
+			Expect(rpp.InjectDLLCallCount()).To(Equal(1))
+			Expect(rpp.DialPipeCallCount()).To(Equal(1))
+			pipeName, dialTimeout := rpp.DialPipeArgsForCall(0)
+			Expect(pipeName).To(Equal(`\\.\pipe\xivhook-1234`))
+			Expect(*dialTimeout).To(Equal(5 * time.Second))
+		})
+
+		It(`logs "Stopping..." for each subprocess on shutdown`, func() {
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+
+			supervisor.Stop()
+			Eventually(logBuf).Should(gbytes.Say("stream-1234"))
+			// These subprocesses can stop in any order
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-sender"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-pinger"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("stream-reader"))
+			Eventually(logBuf.Buffer().Contents).Should(ContainSubstring("frame-reader"))
+
+			Eventually(logBuf).Should(gbytes.Say("Stopping..."))
+			Eventually(logBuf).Should(gbytes.Say("Stopping..."))
+			Eventually(logBuf).Should(gbytes.Say("Stopping..."))
+			Eventually(logBuf).Should(gbytes.Say("Stopping..."))
+		})
+
+		It("closes the connection with the hook on shutdown", func() {
+			supervisor.Stop()
+			Eventually(conn.CloseCallCount).Should(Equal(1))
+		})
+
+		Describe("SubscribeIngress", func() {
+			It("returns ingress frames when data is received from the hook", func() {
+				Consistently(hookStream.SubscribeIngress).ShouldNot(Receive())
+
+				fakeDataChan <- readData{data: hook.Envelope{
+					Op:         hook.OpRecv,
+					Additional: zeroBlockPacket,
+				}.Encode()}
+
+				Consistently(hookStream.SubscribeEgress).ShouldNot(Receive())
+				var f *xivnet.Frame
+				Eventually(hookStream.SubscribeIngress).Should(Receive(&f))
+				Expect(f.Preamble[0:4]).To(Equal([]byte{0x52, 0x52, 0xa0, 0x41}))
+				Expect(f.Blocks).To(HaveLen(0))
 			})
 		})
+
+		Describe("SubscribeEgress", func() {
+			It("returns egress frames when data is received from the hook", func() {
+				Consistently(hookStream.SubscribeEgress).ShouldNot(Receive())
+
+				fakeDataChan <- readData{data: hook.Envelope{
+					Op:         hook.OpSend,
+					Additional: zeroBlockPacket,
+				}.Encode()}
+
+				Consistently(hookStream.SubscribeIngress).ShouldNot(Receive())
+				var f *xivnet.Frame
+				Eventually(hookStream.SubscribeEgress).Should(Receive(&f))
+				Expect(f.Preamble[0:4]).To(Equal([]byte{0x52, 0x52, 0xa0, 0x41}))
+				Expect(f.Blocks).To(HaveLen(0))
+			})
+		})
+
+		Describe("SendRequest", func() {
+			It("sends a JSON-encoded request as an envelope on the connection", func() {
+				// Byte arrays can be represented as base64 in JSON
+				resp, err := hookStream.SendRequest(
+					[]byte(`{"Op": 123, "Data": 456, "Additional": "BwgJAA=="}`),
+				)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resp).To(Equal([]byte("OK")))
+
+				Eventually(conn.WriteCallCount).Should(Equal(1))
+				Expect(conn.WriteArgsForCall(0)).To(Equal([]byte{
+					13, 0, 0, 0, 123, 200, 1, 0, 0, 7, 8, 9, 0,
+				}))
+			})
+
+			Context("when the request cannot be unmarshaled", func() {
+				It("returns an error", func() {
+					resp, err := hookStream.SendRequest([]byte(`"bar"`))
+					Expect(err).To(MatchError("Cannot unmarshal data to envelope: json: cannot unmarshal string into Go value of type hook.Envelope"))
+					Expect(resp).To(BeNil())
+				})
+			})
+		})
+
 	})
+
 })
 
 var zeroBlockPacket = []byte{

@@ -40,6 +40,16 @@ type FakeStream struct {
 	streamIDReturnsOnCall map[int]struct {
 		result1 int
 	}
+	StringStub        func() string
+	stringMutex       sync.RWMutex
+	stringArgsForCall []struct {
+	}
+	stringReturns struct {
+		result1 string
+	}
+	stringReturnsOnCall map[int]struct {
+		result1 string
+	}
 	SubscribeEgressStub        func() <-chan *xivnet.Frame
 	subscribeEgressMutex       sync.RWMutex
 	subscribeEgressArgsForCall []struct {
@@ -230,6 +240,58 @@ func (fake *FakeStream) StreamIDReturnsOnCall(i int, result1 int) {
 	}{result1}
 }
 
+func (fake *FakeStream) String() string {
+	fake.stringMutex.Lock()
+	ret, specificReturn := fake.stringReturnsOnCall[len(fake.stringArgsForCall)]
+	fake.stringArgsForCall = append(fake.stringArgsForCall, struct {
+	}{})
+	fake.recordInvocation("String", []interface{}{})
+	fake.stringMutex.Unlock()
+	if fake.StringStub != nil {
+		return fake.StringStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.stringReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeStream) StringCallCount() int {
+	fake.stringMutex.RLock()
+	defer fake.stringMutex.RUnlock()
+	return len(fake.stringArgsForCall)
+}
+
+func (fake *FakeStream) StringCalls(stub func() string) {
+	fake.stringMutex.Lock()
+	defer fake.stringMutex.Unlock()
+	fake.StringStub = stub
+}
+
+func (fake *FakeStream) StringReturns(result1 string) {
+	fake.stringMutex.Lock()
+	defer fake.stringMutex.Unlock()
+	fake.StringStub = nil
+	fake.stringReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeStream) StringReturnsOnCall(i int, result1 string) {
+	fake.stringMutex.Lock()
+	defer fake.stringMutex.Unlock()
+	fake.StringStub = nil
+	if fake.stringReturnsOnCall == nil {
+		fake.stringReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.stringReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeStream) SubscribeEgress() <-chan *xivnet.Frame {
 	fake.subscribeEgressMutex.Lock()
 	ret, specificReturn := fake.subscribeEgressReturnsOnCall[len(fake.subscribeEgressArgsForCall)]
@@ -345,6 +407,8 @@ func (fake *FakeStream) Invocations() map[string][][]interface{} {
 	defer fake.stopMutex.RUnlock()
 	fake.streamIDMutex.RLock()
 	defer fake.streamIDMutex.RUnlock()
+	fake.stringMutex.RLock()
+	defer fake.stringMutex.RUnlock()
 	fake.subscribeEgressMutex.RLock()
 	defer fake.subscribeEgressMutex.RUnlock()
 	fake.subscribeIngressMutex.RLock()

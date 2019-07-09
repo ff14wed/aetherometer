@@ -24,6 +24,7 @@ import (
 type Stream interface {
 	suture.Service
 	stream.Provider
+	fmt.Stringer
 }
 
 type hookStream struct {
