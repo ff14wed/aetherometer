@@ -253,6 +253,7 @@ type ComplexityRoot struct {
 	Stream struct {
 		Id           func(childComplexity int) int
 		ServerId     func(childComplexity int) int
+		InstanceNum  func(childComplexity int) int
 		CharacterId  func(childComplexity int) int
 		Place        func(childComplexity int) int
 		Enmity       func(childComplexity int) int
@@ -289,6 +290,7 @@ type ComplexityRoot struct {
 	UpdateIds struct {
 		ServerId    func(childComplexity int) int
 		CharacterId func(childComplexity int) int
+		InstanceNum func(childComplexity int) int
 	}
 
 	UpdateLastAction struct {
@@ -1450,6 +1452,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.ServerId(childComplexity), true
 
+	case "Stream.instanceNum":
+		if e.complexity.Stream.InstanceNum == nil {
+			break
+		}
+
+		return e.complexity.Stream.InstanceNum(childComplexity), true
+
 	case "Stream.characterID":
 		if e.complexity.Stream.CharacterId == nil {
 			break
@@ -1554,6 +1563,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateIds.CharacterId(childComplexity), true
+
+	case "UpdateIDs.instanceNum":
+		if e.complexity.UpdateIds.InstanceNum == nil {
+			break
+		}
+
+		return e.complexity.UpdateIds.InstanceNum(childComplexity), true
 
 	case "UpdateLastAction.action":
 		if e.complexity.UpdateLastAction.Action == nil {
@@ -6953,6 +6969,11 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "instanceNum":
+			out.Values[i] = ec._Stream_instanceNum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "characterID":
 			out.Values[i] = ec._Stream_characterID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7027,6 +7048,33 @@ func (ec *executionContext) _Stream_serverID(ctx context.Context, field graphql.
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ServerID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Stream_instanceNum(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Stream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InstanceNum, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -7627,6 +7675,11 @@ func (ec *executionContext) _UpdateIDs(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "instanceNum":
+			out.Values[i] = ec._UpdateIDs_instanceNum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7690,6 +7743,33 @@ func (ec *executionContext) _UpdateIDs_characterID(ctx context.Context, field gr
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateIDs_instanceNum(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateIDs",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InstanceNum, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 var updateLastActionImplementors = []string{"UpdateLastAction"}
@@ -9727,6 +9807,8 @@ var parsedSchema = gqlparser.MustLoadSchema(
 type Stream {
   id: Int!
   serverID: Int!
+  instanceNum: Int!
+
   characterID: Uint!
 
   place: Place!
@@ -9939,6 +10021,7 @@ type RemoveStream {
 type UpdateIDs {
   serverID: Int!
   characterID: Uint!
+  instanceNum: Int!
 }
 
 type UpdateMap {

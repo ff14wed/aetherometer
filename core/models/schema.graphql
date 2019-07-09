@@ -8,6 +8,8 @@ type Query {
 type Stream {
   id: Int!
   serverID: Int!
+  instanceNum: Int!
+
   characterID: Uint!
 
   place: Place!
@@ -220,6 +222,7 @@ type RemoveStream {
 type UpdateIDs {
   serverID: Int!
   characterID: Uint!
+  instanceNum: Int!
 }
 
 type UpdateMap {

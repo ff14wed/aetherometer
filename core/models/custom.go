@@ -18,6 +18,7 @@ import (
 type Stream struct {
 	ID          int    `json:"id"`
 	ServerID    int    `json:"serverID"`
+	InstanceNum int    `json:"instanceNum"`
 	CharacterID uint64 `json:"characterID"`
 
 	Place        Place         `json:"place"`

@@ -82,7 +82,7 @@ var _ = Describe("InitZone Update", func() {
 		b.Data = initZoneData
 	})
 
-	It("generates an update that sets the current server and character IDs", func() {
+	It("generates an update that sets the current server ID, character ID, and the instance num", func() {
 		u := generator.Generate(streamID, false, b)
 		Expect(u).ToNot(BeNil())
 		streamEvents, _, err := u.ModifyStore(streams)
@@ -94,9 +94,11 @@ var _ = Describe("InitZone Update", func() {
 		Expect(assignable).To(BeTrue())
 		Expect(eventType.ServerID).To(Equal(int(b.ServerID)))
 		Expect(eventType.CharacterID).To(Equal(uint64(b.CurrentID)))
+		Expect(eventType.InstanceNum).To(Equal(0))
 
 		Expect(streams.Map[streamID].ServerID).To(Equal(int(b.ServerID)))
 		Expect(streams.Map[streamID].CharacterID).To(Equal(uint64(b.CurrentID)))
+		Expect(streams.Map[streamID].InstanceNum).To(Equal(0))
 	})
 
 	It("generates an update that changes the place", func() {
@@ -147,6 +149,96 @@ var _ = Describe("InitZone Update", func() {
 			// Since the update does nothing, these should not be changed
 			Expect(streams.Map[streamID].ServerID).To(BeZero())
 			Expect(streams.Map[streamID].CharacterID).To(Equal(testEnv.subjectID))
+		})
+
+		Context("when the instance ID has changed", func() {
+			BeforeEach(func() {
+				initZoneData := &datatypes.InitZone{
+					TerritoryTypeID: 131,
+					U1b:             2,
+				}
+				b.Data = initZoneData
+			})
+
+			It("generates an update that sets the current server ID, character ID, and the instance num", func() {
+				u := generator.Generate(streamID, false, b)
+				Expect(u).ToNot(BeNil())
+				streamEvents, _, err := u.ModifyStore(streams)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(streamEvents).To(HaveLen(2))
+				Expect(streamEvents[0].StreamID).To(Equal(streamID))
+				eventType, assignable := streamEvents[0].Type.(models.UpdateIDs)
+				Expect(assignable).To(BeTrue())
+				Expect(eventType.ServerID).To(Equal(int(b.ServerID)))
+				Expect(eventType.CharacterID).To(Equal(uint64(b.CurrentID)))
+				Expect(eventType.InstanceNum).To(Equal(2))
+
+				Expect(streams.Map[streamID].ServerID).To(Equal(int(b.ServerID)))
+				Expect(streams.Map[streamID].CharacterID).To(Equal(uint64(b.CurrentID)))
+				Expect(streams.Map[streamID].InstanceNum).To(Equal(2))
+			})
+
+			It("generates an update that clears the entity map", func() {
+				u := generator.Generate(streamID, false, b)
+				Expect(u).ToNot(BeNil())
+				_, entityEvents, err := u.ModifyStore(streams)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(entityEvents).To(HaveLen(1))
+				Expect(entityEvents[0].StreamID).To(Equal(streamID))
+				Expect(entityEvents[0].EntityID).To(BeZero())
+				eventType, assignable := entityEvents[0].Type.(models.SetEntities)
+				Expect(assignable).To(BeTrue())
+				Expect(eventType.Entities).To(BeNil())
+
+				Expect(streams.Map[streamID].EntitiesMap).To(BeEmpty())
+			})
+		})
+
+		Context("when the current world has changed", func() {
+			BeforeEach(func() {
+				initZoneData := &datatypes.InitZone{
+					TerritoryTypeID: 131,
+					U5b:             0x180,
+				}
+				b.Data = initZoneData
+			})
+
+			It("generates an update that sets the current server ID, character ID, and the instance num", func() {
+				u := generator.Generate(streamID, false, b)
+				Expect(u).ToNot(BeNil())
+				streamEvents, _, err := u.ModifyStore(streams)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(streamEvents).To(HaveLen(2))
+				Expect(streamEvents[0].StreamID).To(Equal(streamID))
+				eventType, assignable := streamEvents[0].Type.(models.UpdateIDs)
+				Expect(assignable).To(BeTrue())
+				Expect(eventType.ServerID).To(Equal(int(b.ServerID)))
+				Expect(eventType.CharacterID).To(Equal(uint64(b.CurrentID)))
+				Expect(eventType.InstanceNum).To(Equal(0))
+
+				Expect(streams.Map[streamID].ServerID).To(Equal(int(b.ServerID)))
+				Expect(streams.Map[streamID].CharacterID).To(Equal(uint64(b.CurrentID)))
+				Expect(streams.Map[streamID].InstanceNum).To(Equal(0))
+			})
+
+			It("generates an update that clears the entity map", func() {
+				u := generator.Generate(streamID, false, b)
+				Expect(u).ToNot(BeNil())
+				_, entityEvents, err := u.ModifyStore(streams)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(entityEvents).To(HaveLen(1))
+				Expect(entityEvents[0].StreamID).To(Equal(streamID))
+				Expect(entityEvents[0].EntityID).To(BeZero())
+				eventType, assignable := entityEvents[0].Type.(models.SetEntities)
+				Expect(assignable).To(BeTrue())
+				Expect(eventType.Entities).To(BeNil())
+
+				Expect(streams.Map[streamID].EntitiesMap).To(BeEmpty())
+			})
 		})
 	})
 

@@ -257,6 +257,7 @@ func (UpdateEnmity) IsStreamEventType() {}
 type UpdateIDs struct {
 	ServerID    int    `json:"serverID"`
 	CharacterID uint64 `json:"characterID"`
+	InstanceNum int    `json:"instanceNum"`
 }
 
 func (UpdateIDs) IsStreamEventType() {}
