@@ -27,7 +27,7 @@ var _ = Describe("StreamReader", func() {
 		sr *hook.StreamReader
 
 		hookConn     *hookfakes.FakeReadCloser
-		fakeDataChan chan readData
+		sendFakeData func(readData)
 
 		logBuf *testhelpers.LogBuffer
 		once   sync.Once
@@ -50,7 +50,12 @@ var _ = Describe("StreamReader", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		hookConn = new(hookfakes.FakeReadCloser)
-		fakeDataChan = make(chan readData)
+		fakeDataChan := make(chan readData)
+
+		sendFakeData = func(d readData) {
+			fakeDataChan <- d
+		}
+
 		hookConn.ReadStub = func(p []byte) (n int, err error) {
 			d, ok := <-fakeDataChan
 			if !ok {
@@ -95,13 +100,13 @@ var _ = Describe("StreamReader", func() {
 	})
 
 	It("receives data on the hook connection and decodes it into envelopes", func() {
-		fakeDataChan <- readData{
+		sendFakeData(readData{
 			data: append([]byte{
 				20, 0, 0, 0, // Length
 				200,          // Op
 				210, 4, 0, 0, // Data
 			}, []byte("Hello World")...),
-		}
+		})
 
 		var e hook.Envelope
 		Eventually(sr.ReceivedEnvelopesListener()).Should(Receive(&e))
@@ -112,12 +117,12 @@ var _ = Describe("StreamReader", func() {
 
 	Context("when the reader returns some sort of non-fatal error", func() {
 		It("logs the error and continues running", func() {
-			fakeDataChan <- readData{err: errors.New("Boom")}
+			sendFakeData(readData{err: errors.New("Boom")})
 			Eventually(logBuf).Should(gbytes.Say("ERROR.*stream-reader.*reading data from conn.*Boom"))
 
-			fakeDataChan <- readData{
+			sendFakeData(readData{
 				data: []byte{9, 0, 0, 0, 200, 210, 4, 0, 0},
-			}
+			})
 
 			var e hook.Envelope
 			Eventually(sr.ReceivedEnvelopesListener()).Should(Receive(&e))
@@ -127,7 +132,7 @@ var _ = Describe("StreamReader", func() {
 
 	Context("when the reader returns an EOF error", func() {
 		It("exits", func() {
-			fakeDataChan <- readData{err: io.EOF}
+			sendFakeData(readData{err: io.EOF})
 			Eventually(logBuf).Should(gbytes.Say("stream-reader.*Stopping..."))
 			Expect(sr.Complete()).To(BeTrue())
 		})
