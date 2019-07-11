@@ -1,5 +1,7 @@
 # Aetherometer
 
+[![Build Status](https://travis-ci.com/ff14wed/aetherometer.svg?branch=master)](https://travis-ci.com/ff14wed/aetherometer)
+
 Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
 and display this information.
