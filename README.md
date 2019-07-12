@@ -53,6 +53,7 @@ You can also switch between instances of games via the Stream menu on the bottom
 
 Here are some plugins that you can try to get an idea for Aetherometer's capabilities:
 - Inspector Plugin - https://github.com/ff14wed/inspector-plugin
+- Craftbot Plugin - https://github.com/ff14wed/craftbot-plugin
 
 ## Installing Plugins
 
