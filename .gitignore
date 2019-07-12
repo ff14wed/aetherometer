@@ -10,6 +10,9 @@ node_modules
 vendor
 dist
 *.log
+.task
 resources/maps
 resources/win/core.exe
+resources/linux/core
+resources/mac/core
 resources/win/xivhook.dll
