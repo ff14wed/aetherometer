@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.com/ff14wed/aetherometer.svg?branch=master)](https://travis-ci.com/ff14wed/aetherometer)
 
+**Now updated for Shadowbringers**
+
 Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
 and display this information.
-
-**Now updated for Shadowbringers**
 
 <img src="docs/preview.png" alt="preview" />
 
@@ -18,14 +18,24 @@ extract it. Then run `aetherometer-ui.exe`.
 
 Then try out some [plugins](#plugins-list)!
 
+> **Because Aetherometer fundamentally does not read memory, you should 
+  either start Aetherometer before starting any instance of FFXIV, or simply
+  switch zones if you are already logged in. Otherwise, Aetherometer will not
+  have a complete set of data from the game.**
+
 If you're a developer interested in Aetherometer, see
 [here](#for-developers).
 
 ## Features
 
 Aetherometer is capable of supporting many different use cases, including
-parsing combat data for trigger or DPS logging purposes, display of
+parsing live combat data for trigger or DPS logging purposes, display of
 player and enemy movement on the map, crafting progress, etc.
+
+While Aetherometer does not read memory to capture information from the game,
+it is capable of retrieving extremely useful information just from reading
+data from the network. This also has the advantage of potentially being
+faster than the game itself can process the data.
 
 ## Plugins
 
@@ -33,9 +43,9 @@ Plugins are mini-applications that process data from a specific instance
 of the game. They open as new "tabs" on the navigation drawer to the left,
 and you can navigate between them without losing data on any other tab.
 
- >Techincally plugins are able to process data from mulitple
-instances of the game, but Aetherometer's Stream handling abilities aim
-to reduce boilerplate Stream switching code.
+> Techincally plugins are able to process data from mulitple
+  instances of the game, but Aetherometer's Stream handling abilities aim
+  to reduce boilerplate Stream switching code.
 
 You can also switch between instances of games via the Stream menu on the bottom left to switch to that session's "tabs".
 
