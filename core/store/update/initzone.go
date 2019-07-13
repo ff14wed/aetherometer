@@ -38,8 +38,7 @@ func newInitZoneUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) s
 		serverID:  int(b.ServerID),
 		currentID: uint64(b.CurrentID),
 
-		instanceNum:  int(data.U1b & 0xFF),
-		worldChanged: (data.U5b & 0x100) != 0,
+		instanceNum: int(data.U1b & 0xFF),
 
 		place: place,
 	}
@@ -50,8 +49,7 @@ type placeUpdate struct {
 	serverID  int
 	currentID uint64
 
-	instanceNum  int
-	worldChanged bool
+	instanceNum int
 
 	place models.Place
 }
@@ -60,10 +58,6 @@ func (u placeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, 
 	stream, found := streams.Map[u.streamID]
 	if !found {
 		return nil, nil, ErrorStreamNotFound
-	}
-	instanceChanged := stream.InstanceNum != u.instanceNum
-	if u.place.TerritoryID == stream.Place.TerritoryID && !instanceChanged && !u.worldChanged {
-		return nil, nil, nil
 	}
 
 	var streamEvents []models.StreamEvent
