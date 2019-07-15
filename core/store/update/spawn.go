@@ -18,7 +18,6 @@ func init() {
 	registerIngressHandler(new(datatypes.NPCSpawn2), newNPCSpawn2Update)
 }
 
-// TODO: Add testing
 func newNPCSpawnUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.NPCSpawn)
 	return generateSpawnUpdate(streamID, uint64(b.SubjectID), b.Time, &data.PlayerSpawn, d, true)
@@ -46,10 +45,6 @@ func generateSpawnUpdate(streamID int, subjectID uint64, now time.Time, data *da
 		}
 		filteredName = append(filteredName, r)
 	}
-
-	var newName datatypes.EntityName
-
-	copy(newName[:], []byte(string(filteredName)))
 
 	spawnJSONBytes, _ := json.Marshal(data)
 
@@ -163,13 +158,7 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		return nil, nil, ErrorStreamNotFound
 	}
 
-	entityEvents := []models.EntityEvent{models.EntityEvent{
-		StreamID: u.streamID,
-		EntityID: u.subjectID,
-		Type: models.AddEntity{
-			Entity: u.entity,
-		},
-	}}
+	var entityEvents []models.EntityEvent
 
 	for key, ent := range stream.EntitiesMap {
 		if ent == nil || ent.Index != u.entity.Index {
@@ -185,6 +174,14 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		})
 		break
 	}
+
+	entityEvents = append(entityEvents, models.EntityEvent{
+		StreamID: u.streamID,
+		EntityID: u.subjectID,
+		Type: models.AddEntity{
+			Entity: u.entity,
+		},
+	})
 
 	stream.EntitiesMap[u.subjectID] = &u.entity
 
