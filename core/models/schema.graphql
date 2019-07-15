@@ -135,7 +135,7 @@ type ActionEffect {
 
 type Status {
   id: Int!
-  extra: Int!
+  param: Int!
   name: String!
   description: String!
   startedTime: Timestamp!

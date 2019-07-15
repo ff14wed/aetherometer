@@ -207,7 +207,7 @@ func (SetEntities) IsEntityEventType() {}
 
 type Status struct {
 	ID          int       `json:"id"`
-	Extra       int       `json:"extra"`
+	Param       int       `json:"param"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	StartedTime time.Time `json:"startedTime"`

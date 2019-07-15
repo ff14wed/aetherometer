@@ -39,7 +39,7 @@ func processUpdatedStatuses(
 		}
 		updatedStatuses[int(i)] = models.Status{
 			ID:          int(e.ID),
-			Extra:       int(e.Param),
+			Param:       int(e.Param),
 			Name:        name,
 			Description: description,
 			StartedTime: time,

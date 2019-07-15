@@ -131,7 +131,7 @@ func generateSpawnUpdate(streamID int, subjectID uint64, now time.Time, data *da
 		}
 		newEntity.Statuses[i] = &models.Status{
 			ID:          int(status.ID),
-			Extra:       int(status.Extra),
+			Param:       int(status.Param),
 			Name:        name,
 			Description: description,
 			StartedTime: now,

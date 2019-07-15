@@ -30,7 +30,7 @@ func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collectio
 		}
 		addedStatuses[int(e.Index)] = models.Status{
 			ID:          int(e.EffectID),
-			Extra:       int(e.Param),
+			Param:       int(e.Param),
 			Name:        name,
 			Description: description,
 			StartedTime: b.Time,

@@ -241,7 +241,7 @@ type ComplexityRoot struct {
 
 	Status struct {
 		Id          func(childComplexity int) int
-		Extra       func(childComplexity int) int
+		Param       func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Description func(childComplexity int) int
 		StartedTime func(childComplexity int) int
@@ -1389,12 +1389,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Status.Id(childComplexity), true
 
-	case "Status.extra":
-		if e.complexity.Status.Extra == nil {
+	case "Status.param":
+		if e.complexity.Status.Param == nil {
 			break
 		}
 
-		return e.complexity.Status.Extra(childComplexity), true
+		return e.complexity.Status.Param(childComplexity), true
 
 	case "Status.name":
 		if e.complexity.Status.Name == nil {
@@ -6683,8 +6683,8 @@ func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "extra":
-			out.Values[i] = ec._Status_extra(ctx, field, obj)
+		case "param":
+			out.Values[i] = ec._Status_param(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -6757,7 +6757,7 @@ func (ec *executionContext) _Status_id(ctx context.Context, field graphql.Collec
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Status_extra(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
+func (ec *executionContext) _Status_param(ctx context.Context, field graphql.CollectedField, obj *Status) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -6769,7 +6769,7 @@ func (ec *executionContext) _Status_extra(ctx context.Context, field graphql.Col
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Extra, nil
+		return obj.Param, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -9934,7 +9934,7 @@ type ActionEffect {
 
 type Status {
   id: Int!
-  extra: Int!
+  param: Int!
   name: String!
   description: String!
   startedTime: Timestamp!
@@ -10119,5 +10119,6 @@ type Mutation {
 input StreamRequest {
   streamID: Int!
   data: String!
-}`},
+}
+`},
 )
