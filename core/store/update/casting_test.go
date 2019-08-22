@@ -65,7 +65,7 @@ var _ = Describe("Casting Update", func() {
 		b.Data = castingData
 
 		expectedCastingInfo = models.CastingInfo{
-			ActionID:  4238,
+			ActionID:  203,
 			StartTime: b.Time,
 			CastTime:  time.Unix(1, 0),
 			TargetID:  0x5678,
@@ -77,14 +77,14 @@ var _ = Describe("Casting Update", func() {
 				LastUpdated: b.Time,
 			},
 			ActionName:    "Skyshard",
-			CastType:      4,
-			EffectRange:   30,
-			XAxisModifier: 4,
-			Omen:          "general02f",
+			CastType:      2,
+			EffectRange:   8,
+			XAxisModifier: 0,
+			Omen:          "general_1bf",
 		}
 	})
 
-	It("generates an update that sets the entity's casting info", func() {
+	It("generates an update that sets the entity's casting info based on the action name only", func() {
 		u := generator.Generate(streamID, false, b)
 		Expect(u).ToNot(BeNil())
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
@@ -107,7 +107,7 @@ var _ = Describe("Casting Update", func() {
 			delete(d.ActionData.Actions, 203)
 		})
 
-		It("sets the action name to Unknown_X instead", func() {
+		It("sets the action name to Unknown_X instead and returns a partial casting info", func() {
 			u := generator.Generate(streamID, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyStore(streams)
@@ -115,6 +115,10 @@ var _ = Describe("Casting Update", func() {
 			Expect(streamEvents).To(BeEmpty())
 
 			expectedCastingInfo.ActionName = "Unknown_cb"
+			expectedCastingInfo.CastType = 0
+			expectedCastingInfo.EffectRange = 0
+			expectedCastingInfo.XAxisModifier = 0
+			expectedCastingInfo.Omen = ""
 
 			Expect(entityEvents).To(ConsistOf(models.EntityEvent{
 				StreamID: streamID,
@@ -133,17 +137,12 @@ var _ = Describe("Casting Update", func() {
 			delete(d.ActionData.Actions, 4238)
 		})
 
-		It("sets a partially blank casting info", func() {
+		It("should still return a full casting info", func() {
 			u := generator.Generate(streamID, false, b)
 			Expect(u).ToNot(BeNil())
 			streamEvents, entityEvents, err := u.ModifyStore(streams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(streamEvents).To(BeEmpty())
-
-			expectedCastingInfo.CastType = 0
-			expectedCastingInfo.EffectRange = 0
-			expectedCastingInfo.XAxisModifier = 0
-			expectedCastingInfo.Omen = ""
 
 			Expect(entityEvents).To(ConsistOf(models.EntityEvent{
 				StreamID: streamID,

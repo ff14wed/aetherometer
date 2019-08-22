@@ -17,8 +17,15 @@ func init() {
 func newCastingUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.Casting)
 
+	actionNameID := uint32(data.ActionIDName)
+	actionID := uint32(data.ActionIDName)
+	if (data.U1 & 0xFF) == 0x2 {
+		actionID = data.ActionID
+	} else if (data.U1 & 0xFF) == 0xD {
+		actionID = data.ActionID
+	}
 	info := &models.CastingInfo{
-		ActionID:  int(data.ActionID),
+		ActionID:  int(actionID),
 		StartTime: b.Time,
 		CastTime:  getTimeForDuration(data.CastTime),
 		TargetID:  uint64(data.TargetID),
@@ -31,14 +38,13 @@ func newCastingUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) st
 		},
 	}
 
-	info.ActionName = fmt.Sprintf("Unknown_%x", data.ActionIDName)
-
-	actionInfo := d.ActionData.GetAction(uint32(data.ActionIDName))
+	info.ActionName = fmt.Sprintf("Unknown_%x", actionNameID)
+	actionInfo := d.ActionData.GetAction(actionNameID)
 	if actionInfo.Key != 0 {
 		info.ActionName = actionInfo.Name
 	}
 
-	actionInfo = d.ActionData.GetAction(data.ActionID)
+	actionInfo = d.ActionData.GetAction(actionID)
 	if actionInfo.Key != 0 {
 		info.CastType = int(actionInfo.CastType)
 		info.EffectRange = int(actionInfo.EffectRange)
