@@ -106,7 +106,7 @@ var _ = Describe("CSV", func() {
 			It("returns an UnmarshalTypeError", func() {
 				var v []testDataStruct
 				err := datasheet.Unmarshal([]byte(testCSV), &v)
-				Expect(err).To(MatchError("datasheet: cannot unmarshal foos into Go struct field testDataStruct.Nonexistent of type int"))
+				Expect(err).To(MatchError("datasheet row 0: cannot unmarshal 'foos' into Go struct field testDataStruct.Nonexistent of type int"))
 			})
 		})
 

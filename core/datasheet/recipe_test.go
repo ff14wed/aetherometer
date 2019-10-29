@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Recipe", func() {
 	Describe("PopulateRecipes", func() {
-		It("correctly populates the Actions store", func() {
+		It("correctly populates the Recipes store", func() {
 			var r datasheet.RecipeStore
 			err := r.PopulateRecipes(bytes.NewReader([]byte(testassets.RecipeCSV)))
 			Expect(err).ToNot(HaveOccurred())
@@ -100,8 +100,8 @@ var _ = Describe("Recipe", func() {
 				RecipeLevel: 380,
 				Element:     0,
 				CanHQ:       true,
-				Difficulty:  3728,
-				Quality:     29591,
+				Difficulty:  2900,
+				Quality:     19023,
 				Durability:  70,
 			}))
 		})

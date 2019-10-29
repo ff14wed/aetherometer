@@ -183,7 +183,7 @@ type UnmarshalTypeError struct {
 }
 
 func (e *UnmarshalTypeError) Error() string {
-	return "datasheet: cannot unmarshal " + e.Value + " into Go struct field " + e.Struct + "." + e.Field + " of type " + e.Type.String()
+	return fmt.Sprintf("datasheet row %d: cannot unmarshal '%s' into Go struct field %s.%s of type %s", e.Row, e.Value, e.Struct, e.Field, e.Type.String())
 }
 
 // InvalidUnmarshalError describes an error returned when
