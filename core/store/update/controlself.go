@@ -8,11 +8,11 @@ import (
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.Notify143), newNotify143Update)
+	registerIngressHandler(new(datatypes.ControlSelf), newControlSelfUpdate)
 }
 
-func newNotify143Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.Notify143)
+func newControlSelfUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.ControlSelf)
 
 	switch data.Type {
 	case 0x101:

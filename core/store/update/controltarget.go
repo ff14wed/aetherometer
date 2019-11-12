@@ -9,11 +9,11 @@ import (
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.Notify144), newNotify144Update)
+	registerIngressHandler(new(datatypes.ControlTarget), newControlTargetUpdate)
 }
 
-func newNotify144Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.Notify144)
+func newControlTargetUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.ControlTarget)
 
 	switch data.Type {
 	case 0x32:

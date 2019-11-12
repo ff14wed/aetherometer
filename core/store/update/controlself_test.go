@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Notify143 Update", func() {
+var _ = Describe("ControlSelf Update", func() {
 	Describe("type 0x101", func() {
 		var (
 			testEnv = new(testVars)
@@ -30,7 +30,7 @@ var _ = Describe("Notify143 Update", func() {
 			streamID = testEnv.streamID
 			generator = testEnv.generator
 
-			notify143Data := &datatypes.Notify143{
+			notify143Data := &datatypes.ControlSelf{
 				Type: 0x101,
 				P3:   uint32(removableID),
 			}
@@ -59,7 +59,7 @@ var _ = Describe("Notify143 Update", func() {
 			const nonexistentID uint64 = 0x88888888
 
 			BeforeEach(func() {
-				notify143Data := &datatypes.Notify143{
+				notify143Data := &datatypes.ControlSelf{
 					Type: 0x101,
 					P3:   uint32(nonexistentID),
 				}

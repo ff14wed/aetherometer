@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Notify142 Update", func() {
+var _ = Describe("Control Update", func() {
 	Describe("type 0xF", func() {
 		var (
 			testEnv = new(testVars)
@@ -32,7 +32,7 @@ var _ = Describe("Notify142 Update", func() {
 			entity = testEnv.entity
 			generator = testEnv.generator
 
-			notifyData := &datatypes.Notify142{
+			notifyData := &datatypes.Control{
 				Type: 0xF,
 			}
 
@@ -46,7 +46,7 @@ var _ = Describe("Notify142 Update", func() {
 
 		Context("when P1 is 538", func() {
 			BeforeEach(func() {
-				notifyData := &datatypes.Notify142{
+				notifyData := &datatypes.Control{
 					Type: 0xF,
 					P1:   538,
 				}
@@ -101,7 +101,7 @@ var _ = Describe("Notify142 Update", func() {
 
 			expectedLockonMarker = 123
 
-			notifyData := &datatypes.Notify142{
+			notifyData := &datatypes.Control{
 				Type: 0x22,
 				P1:   uint32(expectedLockonMarker),
 			}

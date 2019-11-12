@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Notify144 Update", func() {
+var _ = Describe("ControlTarget Update", func() {
 	Describe("type 0x32", func() {
 		var (
 			testEnv = new(testVars)
@@ -36,7 +36,7 @@ var _ = Describe("Notify144 Update", func() {
 
 			expectedTarget = 0xABCDEF01
 
-			notify4Data := &datatypes.Notify144{
+			notify4Data := &datatypes.ControlTarget{
 				Type:     0x32,
 				TargetID: uint32(expectedTarget),
 			}
