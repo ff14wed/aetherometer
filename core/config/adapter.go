@@ -20,3 +20,12 @@ type HookConfig struct {
 	// hook. Defaults to 1 second.
 	PingInterval Duration `toml:"ping_interval"`
 }
+
+type PcapConfig struct {
+	Enabled bool `toml:"enabled"`
+
+	Put        string
+	Your       string
+	Parameters string
+	Here       string
+}

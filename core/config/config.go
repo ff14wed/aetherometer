@@ -47,6 +47,9 @@ type Adapters struct {
 	// Hook provides the configuration for the Hook adapter.
 	Hook HookConfig `toml:"hook"`
 
+	// Pcap provides the configuration for the Pcap adapter.
+	Pcap PcapConfig `toml:"pcap"`
+
 	// Test is for testing purposes only. Do not use.
 	Test struct{}
 }
