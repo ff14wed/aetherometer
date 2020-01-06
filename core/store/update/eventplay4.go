@@ -9,17 +9,17 @@ import (
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.EventPlay2), newEventPlay2Update)
+	registerIngressHandler(new(datatypes.EventPlay4), newEventPlay4Update)
 }
 
 // TODO: Add testing
-func newEventPlay2Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.EventPlay2)
+func newEventPlay4Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.EventPlay4)
 
 	if data.EventID == 0xA0001 {
-		switch data.P3 {
+		switch data.P2 {
 		case 2:
-			recipeInfo := d.RecipeData.GetInfo(data.P4)
+			recipeInfo := d.RecipeData.GetInfo(data.Params[0])
 			return craftingInfoUpdate{
 				streamID: streamID,
 				craftingInfo: &models.CraftingInfo{

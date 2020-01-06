@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	registerIngressHandler(new(datatypes.DirectorPlayScene), newDirectorPlaySceneUpdate)
+	registerIngressHandler(new(datatypes.EventPlay32), newDirectorPlaySceneUpdate)
 }
 
 // TODO: Add testing
 func newDirectorPlaySceneUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
-	data := b.Data.(*datatypes.DirectorPlayScene)
+	data := b.Data.(*datatypes.EventPlay32)
 
 	if craftState, matches := data.Data.(datatypes.CraftState); matches {
 		unknownFlags := craftState.U6[0] >> 16
