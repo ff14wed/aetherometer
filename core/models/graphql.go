@@ -277,6 +277,7 @@ type ComplexityRoot struct {
 
 	UpdateClass struct {
 		ClassJob func(childComplexity int) int
+		Level    func(childComplexity int) int
 	}
 
 	UpdateCraftingInfo struct {
@@ -1535,6 +1536,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateClass.ClassJob(childComplexity), true
+
+	case "UpdateClass.level":
+		if e.complexity.UpdateClass.Level == nil {
+			break
+		}
+
+		return e.complexity.UpdateClass.Level(childComplexity), true
 
 	case "UpdateCraftingInfo.craftingInfo":
 		if e.complexity.UpdateCraftingInfo.CraftingInfo == nil {
@@ -7498,6 +7506,11 @@ func (ec *executionContext) _UpdateClass(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "level":
+			out.Values[i] = ec._UpdateClass_level(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7535,6 +7548,33 @@ func (ec *executionContext) _UpdateClass_classJob(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._ClassJob(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateClass_level(ctx context.Context, field graphql.CollectedField, obj *UpdateClass) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateClass",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Level, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 var updateCraftingInfoImplementors = []string{"UpdateCraftingInfo"}
@@ -10074,6 +10114,7 @@ type UpdateTarget {
 
 type UpdateClass {
   classJob: ClassJob!
+  level: Int!
 }
 
 type UpdateLastAction {

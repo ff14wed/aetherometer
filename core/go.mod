@@ -5,7 +5,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/ff14wed/xivnet/v3 v3.5.0
+	github.com/ff14wed/xivnet/v3 v3.5.2
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.1

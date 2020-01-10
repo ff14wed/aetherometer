@@ -10,7 +10,7 @@ import (
 // Minor breaking changes are introduced with new minor versions of the API.
 // Major API changes and rewrites will be introduced with new major versions
 // of the API
-const AetherometerAPIVersion = "v0.2.0-beta"
+const AetherometerAPIVersion = "v0.2.1-beta"
 
 // StreamRequestHandler defines the type of a client request handler that can
 // be attached to the resolver.

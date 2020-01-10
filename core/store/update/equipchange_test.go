@@ -25,6 +25,7 @@ var _ = Describe("EquipChange Update", func() {
 		generator update.Generator
 
 		expectedClass models.ClassJob
+		expectedLevel int
 	)
 
 	BeforeEach(func() {
@@ -43,13 +44,16 @@ var _ = Describe("EquipChange Update", func() {
 			ID: 0x12,
 		}
 
+		expectedLevel = 0x34
+
 		equipChangeData := &datatypes.EquipChange{
 			ClassJob: 0x12,
+			Level:    0x34,
 		}
 		b.Data = equipChangeData
 	})
 
-	It("generates an update that sets the entity's ClassJob", func() {
+	It("generates an update that sets the entity's ClassJob and Level", func() {
 		u := generator.Generate(streamID, false, b)
 		Expect(u).ToNot(BeNil())
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
@@ -61,10 +65,12 @@ var _ = Describe("EquipChange Update", func() {
 			EntityID: subjectID,
 			Type: models.UpdateClass{
 				ClassJob: expectedClass,
+				Level:    expectedLevel,
 			},
 		}))
 
 		Expect(entity.ClassJob).To(Equal(expectedClass))
+		Expect(entity.Level).To(Equal(expectedLevel))
 	})
 
 	Context("when the ClassJob can be found in the datasheet", func() {

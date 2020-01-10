@@ -26,6 +26,8 @@ func newEquipChangeUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection
 		streamID:  streamID,
 		subjectID: uint64(b.SubjectID),
 
+		level: int(data.Level),
+
 		classJob: models.ClassJob{
 			ID:           int(data.ClassJob),
 			Name:         className,
@@ -38,6 +40,7 @@ type equipChangeUpdate struct {
 	streamID  int
 	subjectID uint64
 
+	level    int
 	classJob models.ClassJob
 }
 
@@ -47,12 +50,14 @@ func (u equipChangeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 
 func (u equipChangeUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.ClassJob = u.classJob
+	entity.Level = u.level
 
 	return nil, []models.EntityEvent{models.EntityEvent{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateClass{
 			ClassJob: u.classJob,
+			Level:    u.level,
 		},
 	}}, nil
 }

@@ -238,6 +238,7 @@ func (UpdateCastingInfo) IsEntityEventType() {}
 
 type UpdateClass struct {
 	ClassJob ClassJob `json:"classJob"`
+	Level    int      `json:"level"`
 }
 
 func (UpdateClass) IsEntityEventType() {}

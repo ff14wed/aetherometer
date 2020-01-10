@@ -275,6 +275,7 @@ type UpdateTarget {
 
 type UpdateClass {
   classJob: ClassJob!
+  level: Int!
 }
 
 type UpdateLastAction {
