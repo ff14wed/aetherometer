@@ -75,11 +75,29 @@ func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
 	pathBytes := getWString(payloadPath)
 	lenPathBytes := int64(len(pathBytes))
 
+	sd, err := windows.GetSecurityInfo(windows.CurrentProcess(), windows.SE_KERNEL_OBJECT, windows.DACL_SECURITY_INFORMATION)
+	if err != nil {
+		return fmt.Errorf("GetSecurityInfo: %s", err)
+	}
+
+	baseHandle, err := windows.OpenProcess(windows.WRITE_DAC|windows.READ_CONTROL, false, processID)
+	if err != nil {
+		return fmt.Errorf("open process pid %d: %s", processID, err)
+	}
+
+	dacl, _, err := sd.DACL()
+	if err != nil {
+		return fmt.Errorf("getting DACL for current process: %s", err)
+	}
+	windows.SetSecurityInfo(baseHandle, windows.SE_KERNEL_OBJECT, windows.DACL_SECURITY_INFORMATION|windows.UNPROTECTED_DACL_SECURITY_INFORMATION, nil, nil, dacl, nil)
+
+	_ = windows.CloseHandle(baseHandle)
+
 	hProcess, err := windows.OpenProcess(
 		windows.PROCESS_QUERY_INFORMATION|
-			PROCESS_CREATE_THREAD|
-			PROCESS_VM_OPERATION|
-			PROCESS_VM_WRITE,
+			windows.PROCESS_CREATE_THREAD|
+			windows.PROCESS_VM_OPERATION|
+			windows.PROCESS_VM_WRITE,
 		false,
 		processID,
 	)
