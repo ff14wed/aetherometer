@@ -60,6 +60,16 @@ func getWString(s string) []byte {
 	return sBytes
 }
 
+func getRunningTime(handle windows.Handle) (time.Duration, error) {
+	var creationTime, exitTime, kernelTime, userTime windows.Filetime
+	err := windows.GetProcessTimes(handle, &creationTime, &exitTime, &kernelTime, &userTime)
+	if err != nil {
+		return 0, err
+	}
+	createdAt := time.Unix(0, creationTime.Nanoseconds())
+	return time.Since(createdAt), nil
+}
+
 // InjectDLL injects a library into another process on the system
 //
 // API Methods used:
@@ -80,9 +90,22 @@ func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
 		return fmt.Errorf("GetSecurityInfo: %s", err)
 	}
 
-	baseHandle, err := windows.OpenProcess(windows.WRITE_DAC|windows.READ_CONTROL, false, processID)
+	baseHandle, err := windows.OpenProcess(
+		windows.PROCESS_QUERY_LIMITED_INFORMATION|
+			windows.WRITE_DAC|
+			windows.READ_CONTROL,
+		false, processID)
 	if err != nil {
 		return fmt.Errorf("open process pid %d: %s", processID, err)
+	}
+
+	runningTime, err := getRunningTime(baseHandle)
+	if err != nil {
+		return fmt.Errorf("get runningTime time for %d: %s", processID, err)
+	}
+
+	if runningTime < 3*time.Second {
+		time.Sleep(3*time.Second - runningTime)
 	}
 
 	dacl, _, err := sd.DACL()
