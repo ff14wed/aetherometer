@@ -66,7 +66,7 @@ var _ = Describe("Spawn Update", func() {
 			UnkID3:  0xDEF0,
 
 			CurrentHP: 29000, DisplayFlags: 256, FateID: 0x1234, MaxHP: 30000,
-			CurrentMP: 11000, CurrentTP: 1000, MaxMP: 12000,
+			CurrentMP: 11000, MaxMP: 12000,
 
 			U21a: 0x1234, ModelChara: 0x5678, Direction: 0x7FFF,
 			Minion: 0x1234, Index: 10, State: 1, Emote: 0x12, Type: 1,
@@ -150,7 +150,7 @@ var _ = Describe("Spawn Update", func() {
 				Mp:       11000,
 				MaxHP:    30000,
 				MaxMP:    12000,
-				Tp:       1000,
+				Tp:       0,
 				LastTick: b.Time,
 			}),
 			"Location": gstruct.MatchAllFields(gstruct.Fields{

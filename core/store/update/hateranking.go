@@ -21,7 +21,7 @@ func newHateRankingUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection
 	for _, e := range data.Entries[:data.Count] {
 		l = append(l, models.HateRanking{
 			ActorID: uint64(e.ActorID),
-			Hate:    int(e.Hate),
+			Hate:    int(e.HatePct),
 		})
 	}
 	sort.SliceStable(l, func(i, j int) bool {

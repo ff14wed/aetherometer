@@ -2,7 +2,7 @@ package hook
 
 import (
 	"encoding/hex"
-	"fmt"
+	"encoding/json"
 
 	"github.com/ff14wed/aetherometer/core/message"
 	"github.com/ff14wed/xivnet/v3"
@@ -127,10 +127,11 @@ func (d *FrameReader) feedDataAndSendBlocks(
 		for _, b := range blocks {
 			parsedBlock, err := datatypes.ParseBlock(b, isEgress)
 			if err != nil {
+				dataJSON, _ := json.Marshal(b.Data)
 				d.logger.Error("Error unmarshaling block",
 					zap.Bool("isEgress", isEgress),
 					zap.Uint16("opcode", b.IPCHeader.Opcode),
-					zap.String("data", fmt.Sprintf("%#v", b.Data)),
+					zap.String("data", string(dataJSON)),
 					zap.Error(err),
 				)
 				parsedBlocks = append(parsedBlocks, b)

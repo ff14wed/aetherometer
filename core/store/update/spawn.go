@@ -65,7 +65,6 @@ func generateSpawnUpdate(streamID int, subjectID uint64, now time.Time, data *da
 		Resources: models.Resources{
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
-			Tp:       int(data.CurrentTP),
 			MaxHP:    int(data.MaxHP),
 			MaxMP:    int(data.MaxMP),
 			LastTick: now,

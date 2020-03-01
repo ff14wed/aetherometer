@@ -22,7 +22,6 @@ func newHPMPTPUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) sto
 		resources: models.Resources{
 			Hp:       int(data.HP),
 			Mp:       int(data.MP),
-			Tp:       int(data.TP),
 			LastTick: b.Time,
 		},
 	}
@@ -44,7 +43,6 @@ func (u hpmptpUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) (
 	if entity.ClassJob.ID < 8 || entity.ClassJob.ID > 18 {
 		entity.Resources.Mp = u.resources.Mp
 	}
-	entity.Resources.Tp = u.resources.Tp
 	entity.Resources.LastTick = u.resources.LastTick
 
 	return nil, []models.EntityEvent{

@@ -36,14 +36,13 @@ var _ = Describe("UpdateHPMPTP Update", func() {
 		expectedResources = models.Resources{
 			Hp:       100,
 			Mp:       200,
-			Tp:       300,
+			Tp:       0,
 			LastTick: b.Time,
 		}
 
 		updateHPMPTPData := &datatypes.UpdateHPMPTP{
 			HP: 100,
 			MP: 200,
-			TP: 300,
 		}
 		b.Data = updateHPMPTPData
 	})

@@ -229,13 +229,23 @@ var _ = Describe("FrameReader", func() {
 	})
 
 	Context("when receiving OpSend envelopes", func() {
+		var expectedF1 *xivnet.Frame
+		BeforeEach(func() {
+			testFrames["1"].Blocks[0].Opcode = datatypes.UndefinedOpcode
+			testFrames["1"].Blocks[1].Opcode = datatypes.UndefinedOpcode
+
+			expectedF1 = transformBlocks(testFrames["1"], func(b xivnet.Block) xivnet.Block {
+				b.Time = time.Unix(12, 0)
+				return b
+			})
+		})
 		It("decodes the egress frames and parses the blocks", func() {
 			envelopesChan <- hook.Envelope{Op: hook.OpSend, Data: 1, Additional: []byte("12")}
 			Consistently(fr.SubscribeIngress()).ShouldNot(Receive())
 			var f1, f2 *xivnet.Frame
 			Eventually(fr.SubscribeEgress()).Should(Receive(&f1))
 			Eventually(fr.SubscribeEgress()).Should(Receive(&f2))
-			Expect(f1).To(Equal(unparsedFrames["1"]))
+			Expect(f1).To(Equal(expectedF1))
 			Expect(f2).To(Equal(parsedFrames["2"]))
 
 			Consistently(fr.SubscribeEgress()).ShouldNot(Receive())
