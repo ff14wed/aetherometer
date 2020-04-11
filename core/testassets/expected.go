@@ -61,11 +61,11 @@ var ExpectedModelCharas = map[uint32]datasheet.ModelChara{
 
 // ExpectedModelSkeletons derives from ModelSkeletonCSV
 var ExpectedModelSkeletons = map[uint32]datasheet.ModelSkeleton{
-	8094: datasheet.ModelSkeleton{Key: 8094, ScaleFactor: 0.2},
-	8095: datasheet.ModelSkeleton{Key: 8095, ScaleFactor: 0.2},
-	8096: datasheet.ModelSkeleton{Key: 8096, ScaleFactor: 0.2},
-	8097: datasheet.ModelSkeleton{Key: 8097, ScaleFactor: 0.2},
-	8098: datasheet.ModelSkeleton{Key: 8098, ScaleFactor: 0.2},
+	8094: datasheet.ModelSkeleton{Key: 8094, Radius: 0.2},
+	8095: datasheet.ModelSkeleton{Key: 8095, Radius: 0.2},
+	8096: datasheet.ModelSkeleton{Key: 8096, Radius: 0.2},
+	8097: datasheet.ModelSkeleton{Key: 8097, Radius: 0.2},
+	8098: datasheet.ModelSkeleton{Key: 8098, Radius: 0.2},
 }
 
 // ExpectedMapInfo derives from MapCSV
@@ -181,8 +181,8 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 		RecipeLevel:      380,
 		ItemID:           23768,
 		RecipeElement:    0,
-		DifficultyFactor: 70,
-		QualityFactor:    90,
+		DifficultyFactor: 100,
+		QualityFactor:    100,
 		DurabilityFactor: 100,
 		CanHQ:            true,
 	},
@@ -191,8 +191,8 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 		RecipeLevel:      380,
 		ItemID:           23769,
 		RecipeElement:    0,
-		DifficultyFactor: 70,
-		QualityFactor:    90,
+		DifficultyFactor: 100,
+		QualityFactor:    100,
 		DurabilityFactor: 100,
 		CanHQ:            true,
 	},
@@ -200,8 +200,8 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 
 // ExpectedRecipeLevelTableData derives from RecipeLevelTableCSV
 var ExpectedRecipeLevelTableData = map[uint16]datasheet.RecipeLevel{
-	320: datasheet.RecipeLevel{Key: 320, Difficulty: 3543, Quality: 15837, Durability: 70},
-	380: datasheet.RecipeLevel{Key: 380, Difficulty: 4143, Quality: 21137, Durability: 70},
+	320: datasheet.RecipeLevel{Key: 320, Difficulty: 2657, Quality: 12511, Durability: 70},
+	380: datasheet.RecipeLevel{Key: 380, Difficulty: 2900, Quality: 14267, Durability: 70},
 }
 
 // ExpectedItemData derives from ItemCSV

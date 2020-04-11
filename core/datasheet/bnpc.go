@@ -41,8 +41,8 @@ type ModelChara struct {
 
 // ModelSkeleton stores information about the base size of the model
 type ModelSkeleton struct {
-	Key         uint32  `datasheet:"key"`
-	ScaleFactor float32 `datasheet:"ScaleFactor"`
+	Key    uint32  `datasheet:"key"`
+	Radius float32 `datasheet:"Radius"`
 }
 
 // PopulateBNPCNames will populate the BNPCStore with BNPC data provided a
@@ -124,7 +124,7 @@ func (b *BNPCStore) GetBNPCInfo(bNPCNameID, bNPCBaseID, modelCharaID uint32) *BN
 	modelChara, ok1 := b.ModelCharas[modelCharaID]
 	modelSkeleton, ok2 := b.ModelSkeletons[modelChara.Model]
 	if ok1 && ok2 {
-		baseSize = modelSkeleton.ScaleFactor
+		baseSize = modelSkeleton.Radius
 	}
 
 	bNPCInfo.Size = scale * baseSize

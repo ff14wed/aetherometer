@@ -30,7 +30,7 @@ type Action struct {
 // Omen stores the data for a game action Omen
 type Omen struct {
 	Key  uint16 `datasheet:"key"`
-	Name string `datasheet:"FileName"`
+	Name string `datasheet:"Path"`
 }
 
 // CraftAction stores the data for a game crafting Action
