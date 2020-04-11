@@ -516,9 +516,7 @@ var _ = Describe("Stream", func() {
 				})
 			})
 		})
-
 	})
-
 })
 
 var zeroBlockPacket = []byte{

@@ -70,6 +70,8 @@ func (d *FrameReader) Serve() {
 				d.feedDataAndSendBlocks(e.Data, e.Additional, ingressMuxDecoder, false)
 			case OpSend:
 				d.feedDataAndSendBlocks(e.Data, e.Additional, egressMuxDecoder, true)
+			case OpPing:
+			case OpExit:
 			default:
 			}
 		case <-d.stop:

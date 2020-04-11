@@ -2,9 +2,9 @@
 package processfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	process "github.com/ff14wed/aetherometer/core/process"
+	"github.com/ff14wed/aetherometer/core/process"
 )
 
 type FakeEnumerator struct {

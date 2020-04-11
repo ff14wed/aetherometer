@@ -135,6 +135,8 @@ var _ = Describe("FrameReader", func() {
 		It("logs the message as a debug log", func() {
 			envelopesChan <- hook.Envelope{Op: hook.OpDebug, Data: 123, Additional: []byte("Hello")}
 			Eventually(logBuf).Should(gbytes.Say("DEBUG.*frame-reader.*.*data.*123.*Hello"))
+			Consistently(fr.SubscribeIngress()).ShouldNot(Receive())
+			Consistently(fr.SubscribeEgress()).ShouldNot(Receive())
 		})
 	})
 
@@ -149,6 +151,14 @@ var _ = Describe("FrameReader", func() {
 	Context("when receiving OpExit envelopes", func() {
 		It("does nothing", func() {
 			envelopesChan <- hook.Envelope{Op: hook.OpExit, Data: 0, Additional: []byte("Hello")}
+			Consistently(fr.SubscribeIngress()).ShouldNot(Receive())
+			Consistently(fr.SubscribeEgress()).ShouldNot(Receive())
+		})
+	})
+
+	Context("when receiving envelopes of other Ops", func() {
+		It("does nothing", func() {
+			envelopesChan <- hook.Envelope{Op: 123, Data: 0, Additional: []byte("Hello")}
 			Consistently(fr.SubscribeIngress()).ShouldNot(Receive())
 			Consistently(fr.SubscribeEgress()).ShouldNot(Receive())
 		})
