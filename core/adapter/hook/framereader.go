@@ -18,6 +18,9 @@ type FrameReader struct {
 	frameDecoderFactory message.DecoderFactory
 	logger              *zap.Logger
 
+	zoneUsesPDK bool
+	pdk         byte
+
 	ingressFramesChan chan *xivnet.Frame
 	egressFramesChan  chan *xivnet.Frame
 
@@ -138,6 +141,7 @@ func (d *FrameReader) feedDataAndSendBlocks(
 				)
 				parsedBlocks = append(parsedBlocks, b)
 			} else {
+				d.runPacketHooks(parsedBlock)
 				parsedBlocks = append(parsedBlocks, parsedBlock)
 			}
 		}
@@ -146,6 +150,32 @@ func (d *FrameReader) feedDataAndSendBlocks(
 			d.egressFramesChan <- frame
 		} else {
 			d.ingressFramesChan <- frame
+		}
+	}
+}
+
+func (d *FrameReader) runPacketHooks(parsedBlock *xivnet.Block) {
+	if z, ok := parsedBlock.Data.(*datatypes.InitZone); ok {
+		d.pdk = 0
+		if z.TerritoryTypeID != 0x377 {
+			d.zoneUsesPDK = false
+			return
+		}
+		d.zoneUsesPDK = true
+	}
+
+	if d.zoneUsesPDK {
+		if d.pdk == 0 {
+			if z, ok := parsedBlock.Data.(*datatypes.Casting); ok {
+				d.pdk = byte(z.ActionID - uint32(z.ActionIDName))
+				d.logger.Info("Detected PDK for current zone", zap.Uint8("pdk", d.pdk))
+			}
+		}
+		if z, ok := parsedBlock.Data.(*datatypes.Control); ok {
+			if z.Type == 0x22 && d.pdk > 0 {
+				z.P1 = z.P1 - uint32(d.pdk)
+				return
+			}
 		}
 	}
 }
