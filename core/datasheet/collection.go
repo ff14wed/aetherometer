@@ -13,6 +13,7 @@ type Collection struct {
 	StatusData   StatusStore
 	ClassJobData ClassJobStore
 	RecipeData   RecipeStore
+	WorldData    WorldStore
 }
 
 type dataTuple struct {
@@ -42,6 +43,8 @@ func (c *Collection) Populate(dataPath string) error {
 		{filepath.Join(dataPath, "Recipe.csv"), c.RecipeData.PopulateRecipes},
 		{filepath.Join(dataPath, "RecipeLevelTable.csv"), c.RecipeData.PopulateRecipeLevelTable},
 		{filepath.Join(dataPath, "Item.csv"), c.RecipeData.PopulateItems},
+
+		{filepath.Join(dataPath, "World.csv"), c.WorldData.PopulateWorlds},
 	}
 	fileReader := new(FileReader)
 	for _, t := range dataMapping {

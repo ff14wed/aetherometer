@@ -178,3 +178,15 @@ int32,str,sbyte,str,sbyte,sbyte,sbyte,sbyte,sbyte,str,str,Image,ItemLevel,byte,b
 23768,"rakshasa blade",0,"rakshasa blades",0,0,1,0,0,"","Rakshasa Blade",30592,380,2,1,0,2,10,1,32000,1,False,False,False,False,71640,1208,True,True,False,0,2,0,9,17837,21800,13024,428,False,False,0,70,0,1,38,0,0,1,"201, 64, 3, 0","0, 0, 0, 0",1,1,95,64,2080,3,0,0,0,0,1,233,3,259,45,208,44,146,0,0,0,0,1,0,12,10,13,7,1,26,3,28,45,23,44,16,3,2,True,False,0,True
 23769,"pair of rakshasa knuckles",0,"pairs of rakshasa knuckles",0,0,1,0,0,"","Rakshasa Knuckles",31158,380,2,1,0,1,9,13,32000,1,False,False,False,False,107460,1812,True,True,False,0,2,0,9,17837,21800,13025,425,False,False,0,70,0,1,41,0,0,3,"323, 29, 1, 0","373, 29, 1, 0",2,3,95,64,2560,3,0,0,0,0,1,327,3,362,45,292,22,204,0,0,0,0,1,0,12,10,13,7,1,36,3,40,45,32,22,23,5,2,True,False,0,True
 `
+
+const WorldCSV = `
+key,0,1,2,3
+#,Name,UserType,DataCenter,IsPublic
+int32,str,byte,WorldDCGroupType,bit&01
+0,"crossworld",0,0,False
+1,"reserved1",0,1,False
+2,"c-contents",0,0,False
+3,"c-whiteae",0,1,False
+4,"c-baudinii",0,0,False
+5,"c-contents2",0,2,False
+`

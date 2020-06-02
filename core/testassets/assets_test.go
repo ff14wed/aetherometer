@@ -103,4 +103,11 @@ var _ = Describe("Test Asset", func() {
 			Expect(collection.RecipeData.Items).To(HaveKeyWithValue(k, v))
 		}
 	})
+
+	It("is up to date with the World CSV", func() {
+		for k, v := range testassets.ExpectedWorldData {
+			Expect(collection.WorldData).To(HaveKeyWithValue(k, v))
+		}
+	})
+
 })

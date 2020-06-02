@@ -211,3 +211,13 @@ var ExpectedItemData = map[uint32]datasheet.Item{
 	23768: datasheet.Item{Key: 23768, Name: "Rakshasa Blade"},
 	23769: datasheet.Item{Key: 23769, Name: "Rakshasa Knuckles"},
 }
+
+// ExpectedWorldData derives from WorldCSV
+var ExpectedWorldData = map[uint32]datasheet.World{
+	0: datasheet.World{Key: 0, Name: "crossworld"},
+	1: datasheet.World{Key: 1, Name: "reserved1"},
+	2: datasheet.World{Key: 2, Name: "c-contents"},
+	3: datasheet.World{Key: 3, Name: "c-whiteae"},
+	4: datasheet.World{Key: 4, Name: "c-baudinii"},
+	5: datasheet.World{Key: 5, Name: "c-contents2"},
+}

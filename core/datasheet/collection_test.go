@@ -40,6 +40,8 @@ var _ = Describe("Collection", func() {
 				"Recipe.csv":           testassets.RecipeCSV,
 				"RecipeLevelTable.csv": testassets.RecipeLevelTableCSV,
 				"Item.csv":             testassets.ItemCSV,
+
+				"World.csv": testassets.WorldCSV,
 			}
 
 			for name, contents := range fileToTestAssets {
