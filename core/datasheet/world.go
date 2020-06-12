@@ -3,6 +3,8 @@ package datasheet
 import (
 	"fmt"
 	"io"
+
+	"github.com/ff14wed/aetherometer/core/models"
 )
 
 // WorldStore stores all of the World data.
@@ -28,4 +30,18 @@ func (w *WorldStore) PopulateWorlds(dataReader io.Reader) error {
 		(*w)[world.Key] = world
 	}
 	return nil
+}
+
+func (w *WorldStore) Lookup(worldID int) models.World {
+	if resolved, ok := (*w)[uint32(worldID)]; ok {
+		return models.World{
+			ID:   worldID,
+			Name: resolved.Name,
+		}
+	}
+
+	return models.World{
+		ID:   worldID,
+		Name: fmt.Sprintf("Unknown_%d", worldID),
+	}
 }
