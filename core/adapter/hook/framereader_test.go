@@ -55,67 +55,67 @@ var _ = Describe("FrameReader", func() {
 		differentInitZoneBlockBytes[2] = 0x80
 
 		testFrames = map[string]*xivnet.Frame{
-			"1": &xivnet.Frame{
+			"1": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 123, SubjectID: 1234, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.MovementOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.MovementOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(movementBlockBytes),
 					},
-					&xivnet.Block{
+					{
 						Length: 456, SubjectID: 5678, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.MovementOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.MovementOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(movementBlockBytes),
 					},
 				},
 			},
-			"2": &xivnet.Frame{
+			"2": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 789, SubjectID: 2345, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.EgressMovementOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.EgressMovementOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(egressMovementBlockBytes),
 					},
 				},
 			},
-			"3": &xivnet.Frame{
+			"3": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 789, SubjectID: 2345, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.InitZoneOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.InitZoneOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(initZoneBlockBytes),
 					},
 				},
 			},
-			"4": &xivnet.Frame{
+			"4": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 789, SubjectID: 2345, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.CastingOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.CastingOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(castingBlockBytes),
 					},
 				},
 			},
-			"5": &xivnet.Frame{
+			"5": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 789, SubjectID: 2345, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.ControlOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.ControlOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(lockonBlockBytes),
 					},
 				},
 			},
-			"6": &xivnet.Frame{
+			"6": {
 				Time: time.Unix(12, 0),
 				Blocks: []*xivnet.Block{
-					&xivnet.Block{
+					{
 						Length: 789, SubjectID: 2345, CurrentID: 5678,
-						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.InitZoneOpcode},
+						IPCHeader: xivnet.IPCHeader{Opcode: datatypes.InitZoneOpcode, ServerID: 123},
 						Data:      xivnet.GenericBlockDataFromBytes(differentInitZoneBlockBytes),
 					},
 				},
@@ -241,7 +241,7 @@ var _ = Describe("FrameReader", func() {
 				Eventually(fr.SubscribeIngress()).Should(Receive())
 			})
 
-			It("uses the PDK to undecrypt the Lockon control block", func() {
+			It("uses the PDK to decrypt the Lockon control block", func() {
 				envelopesChan <- hook.Envelope{Op: hook.OpRecv, Data: 1, Additional: []byte("5")}
 				var f *xivnet.Frame
 				Eventually(fr.SubscribeIngress()).Should(Receive(&f))
