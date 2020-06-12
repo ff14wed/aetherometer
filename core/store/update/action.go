@@ -104,7 +104,7 @@ func (u actionUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent,
 func (u actionUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.LastAction = &u.action
 
-	entityEvents := []models.EntityEvent{models.EntityEvent{
+	entityEvents := []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLastAction{

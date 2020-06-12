@@ -49,16 +49,16 @@ type testDataStruct struct {
 }
 
 var expectedParsedData = []testDataStruct{
-	testDataStruct{
+	{
 		ID: 0, Singular: "", Extra: 0, Plural: "", FakeFloat: 0, FakeBool: false,
 	},
-	testDataStruct{
+	{
 		ID: 1, Singular: "", Extra: 0, Plural: "", FakeFloat: 0, FakeBool: false,
 	},
-	testDataStruct{
+	{
 		ID: 2, Singular: "ruins runner", Extra: 0, Plural: "ruins runners", FakeFloat: 0.1, FakeBool: true,
 	},
-	testDataStruct{
+	{
 		ID: 3, Singular: "antelope doe", Extra: 1, Plural: "antelope does", FakeFloat: 0.2, FakeBool: true,
 	},
 }

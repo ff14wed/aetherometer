@@ -74,7 +74,7 @@ func (u castingUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent
 func (u castingUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.CastingInfo = u.castingInfo
 
-	return nil, []models.EntityEvent{models.EntityEvent{
+	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateCastingInfo{

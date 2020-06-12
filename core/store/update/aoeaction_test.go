@@ -40,7 +40,7 @@ var _ = Describe("AoEAction8 Update", func() {
 
 		d.ActionData = datasheet.ActionStore{
 			Actions: map[uint32]datasheet.Action{
-				456: datasheet.Action{Key: 456, Name: "Foo"},
+				456: {Key: 456, Name: "Foo"},
 			},
 		}
 
@@ -58,7 +58,7 @@ var _ = Describe("AoEAction8 Update", func() {
 				NumAffected:       2,
 			},
 			EffectsList: [8]datatypes.ActionEffects{
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -78,7 +78,7 @@ var _ = Describe("AoEAction8 Update", func() {
 						Damage:      456,
 					},
 				},
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -90,7 +90,7 @@ var _ = Describe("AoEAction8 Update", func() {
 					},
 				},
 				// And then some garbage data
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        0xFF,
 						HitSeverity: 0xFF,
@@ -205,7 +205,7 @@ var _ = Describe("AoEAction16 Update", func() {
 
 		d.ActionData = datasheet.ActionStore{
 			Actions: map[uint32]datasheet.Action{
-				456: datasheet.Action{Key: 456, Name: "Foo"},
+				456: {Key: 456, Name: "Foo"},
 			},
 		}
 
@@ -223,7 +223,7 @@ var _ = Describe("AoEAction16 Update", func() {
 				NumAffected:       2,
 			},
 			EffectsList: [16]datatypes.ActionEffects{
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -243,7 +243,7 @@ var _ = Describe("AoEAction16 Update", func() {
 						Damage:      456,
 					},
 				},
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -255,7 +255,7 @@ var _ = Describe("AoEAction16 Update", func() {
 					},
 				},
 				// And then some garbage data
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        0xFF,
 						HitSeverity: 0xFF,
@@ -370,7 +370,7 @@ var _ = Describe("AoEAction24 Update", func() {
 
 		d.ActionData = datasheet.ActionStore{
 			Actions: map[uint32]datasheet.Action{
-				456: datasheet.Action{Key: 456, Name: "Foo"},
+				456: {Key: 456, Name: "Foo"},
 			},
 		}
 
@@ -388,7 +388,7 @@ var _ = Describe("AoEAction24 Update", func() {
 				NumAffected:       2,
 			},
 			EffectsList: [24]datatypes.ActionEffects{
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -408,7 +408,7 @@ var _ = Describe("AoEAction24 Update", func() {
 						Damage:      456,
 					},
 				},
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -420,7 +420,7 @@ var _ = Describe("AoEAction24 Update", func() {
 					},
 				},
 				// And then some garbage data
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        0xFF,
 						HitSeverity: 0xFF,
@@ -535,7 +535,7 @@ var _ = Describe("AoEAction32 Update", func() {
 
 		d.ActionData = datasheet.ActionStore{
 			Actions: map[uint32]datasheet.Action{
-				456: datasheet.Action{Key: 456, Name: "Foo"},
+				456: {Key: 456, Name: "Foo"},
 			},
 		}
 
@@ -553,7 +553,7 @@ var _ = Describe("AoEAction32 Update", func() {
 				NumAffected:       2,
 			},
 			EffectsList: [32]datatypes.ActionEffects{
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -573,7 +573,7 @@ var _ = Describe("AoEAction32 Update", func() {
 						Damage:      456,
 					},
 				},
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        3,
 						HitSeverity: 1,
@@ -585,7 +585,7 @@ var _ = Describe("AoEAction32 Update", func() {
 					},
 				},
 				// And then some garbage data
-				datatypes.ActionEffects{
+				{
 					datatypes.ActionEffect{
 						Type:        0xFF,
 						HitSeverity: 0xFF,

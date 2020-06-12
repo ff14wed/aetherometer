@@ -34,22 +34,22 @@ var _ = Describe("InitZone Update", func() {
 
 		d.MapData = datasheet.MapStore{
 			Maps: map[uint16]datasheet.MapInfo{
-				14: datasheet.MapInfo{
+				14: {
 					Key: 14, ID: "w1t2/01", SizeFactor: 200, PlaceName: 41,
 					PlaceNameSub: 373, TerritoryType: 131,
 				},
-				73: datasheet.MapInfo{
+				73: {
 					Key: 73, ID: "w1t2/02", SizeFactor: 200, PlaceName: 41,
 					PlaceNameSub: 698, TerritoryType: 131,
 				},
 			},
 			Territories: map[uint16]datasheet.TerritoryInfo{
-				131: datasheet.TerritoryInfo{Key: 131, Name: "w1t2", Map: 14},
+				131: {Key: 131, Name: "w1t2", Map: 14},
 			},
 			PlaceNames: map[uint16]datasheet.PlaceName{
-				41:  datasheet.PlaceName{Key: 41, Name: "Ul'dah - Steps of Thal"},
-				373: datasheet.PlaceName{Key: 373, Name: "Merchant Strip"},
-				698: datasheet.PlaceName{Key: 698, Name: "Hustings Strip"},
+				41:  {Key: 41, Name: "Ul'dah - Steps of Thal"},
+				373: {Key: 373, Name: "Merchant Strip"},
+				698: {Key: 698, Name: "Hustings Strip"},
 			},
 		}
 
@@ -57,7 +57,7 @@ var _ = Describe("InitZone Update", func() {
 			MapID:       14,
 			TerritoryID: 131,
 			Maps: []models.MapInfo{
-				models.MapInfo{
+				{
 					Key:           14,
 					ID:            "w1t2/01",
 					SizeFactor:    200,
@@ -65,7 +65,7 @@ var _ = Describe("InitZone Update", func() {
 					PlaceNameSub:  "Merchant Strip",
 					TerritoryType: "w1t2",
 				},
-				models.MapInfo{
+				{
 					Key:           73,
 					ID:            "w1t2/02",
 					SizeFactor:    200,

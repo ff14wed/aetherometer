@@ -44,7 +44,7 @@ func (u hateListUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEven
 
 	stream.Enmity.NearbyEnemyHate = u.hateList
 
-	return []models.StreamEvent{models.StreamEvent{
+	return []models.StreamEvent{{
 		StreamID: u.streamID,
 		Type: models.UpdateEnmity{
 			Enmity: stream.Enmity,

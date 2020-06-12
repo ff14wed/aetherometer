@@ -40,7 +40,7 @@ var _ = Describe("Action Update", func() {
 
 		d.ActionData = datasheet.ActionStore{
 			Actions: map[uint32]datasheet.Action{
-				456: datasheet.Action{Key: 456, Name: "Foo"},
+				456: {Key: 456, Name: "Foo"},
 			},
 		}
 

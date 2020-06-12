@@ -32,13 +32,13 @@ func genericSetup() (testEnv testVars) {
 
 	testEnv.streams = &store.Streams{
 		Map: map[int]*models.Stream{
-			testEnv.streamID: &models.Stream{
+			testEnv.streamID: {
 				ID:          testEnv.streamID,
 				CharacterID: testEnv.subjectID,
 				EntitiesMap: map[uint64]*models.Entity{
 					testEnv.subjectID: testEnv.entity,
 					0x23456789:        nil,
-					0x99999999:        &models.Entity{ID: 0x99999999, Index: 123},
+					0x99999999:        {ID: 0x99999999, Index: 123},
 				},
 			},
 		},

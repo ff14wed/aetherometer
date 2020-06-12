@@ -52,7 +52,7 @@ func (u equipChangeUpdate) modifyFunc(stream *models.Stream, entity *models.Enti
 	entity.ClassJob = u.classJob
 	entity.Level = u.level
 
-	return nil, []models.EntityEvent{models.EntityEvent{
+	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateClass{

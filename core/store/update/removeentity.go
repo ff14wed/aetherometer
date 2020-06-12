@@ -33,7 +33,7 @@ func (u removeEntityUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 	}
 	stream.EntitiesMap[u.subjectID] = nil
 
-	return nil, []models.EntityEvent{models.EntityEvent{
+	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.RemoveEntity{

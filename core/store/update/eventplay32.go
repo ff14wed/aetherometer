@@ -61,7 +61,7 @@ func (u craftingInfoUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 
 	stream.CraftingInfo = u.craftingInfo
 	return []models.StreamEvent{
-		models.StreamEvent{
+		{
 			StreamID: u.streamID,
 			Type: models.UpdateCraftingInfo{
 				CraftingInfo: u.craftingInfo,

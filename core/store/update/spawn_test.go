@@ -82,16 +82,16 @@ var _ = Describe("Spawn Update", func() {
 			U29:           0x1234,
 
 			Statuses: [30]datatypes.StatusEffect{
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
-				datatypes.StatusEffect{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
+				{ActorID: 0xE0000000},
 			},
 			X:     500,
 			Y:     600,
@@ -123,7 +123,7 @@ var _ = Describe("Spawn Update", func() {
 		b.Data = playerSpawnData
 
 		d.ClassJobData = map[byte]datasheet.ClassJob{
-			15: datasheet.ClassJob{
+			15: {
 				Key:          15,
 				Name:         "Dummy",
 				Abbreviation: "DUM",
@@ -202,30 +202,30 @@ var _ = Describe("Spawn Update", func() {
 	Context("with status effects", func() {
 		BeforeEach(func() {
 			playerSpawnData.Statuses = [30]datatypes.StatusEffect{
-				datatypes.StatusEffect{ID: 0, ActorID: 0xE0000000},
-				datatypes.StatusEffect{ID: 91, Param: 1, Duration: 1, ActorID: 0xE0000000},
-				datatypes.StatusEffect{ID: 92, Param: 2, Duration: 0.5, ActorID: 0xE0000000},
-				datatypes.StatusEffect{ID: 93, Param: 3, Duration: 0.25, ActorID: 0xE0000000},
+				{ID: 0, ActorID: 0xE0000000},
+				{ID: 91, Param: 1, Duration: 1, ActorID: 0xE0000000},
+				{ID: 92, Param: 2, Duration: 0.5, ActorID: 0xE0000000},
+				{ID: 93, Param: 3, Duration: 0.25, ActorID: 0xE0000000},
 			}
 			d.StatusData = map[uint32]datasheet.Status{
-				91: datasheet.Status{Key: 91, Name: "Test1", Description: "First"},
-				92: datasheet.Status{Key: 92, Name: "Test2", Description: "Second"},
-				93: datasheet.Status{Key: 93, Name: "Test3", Description: "Third"},
+				91: {Key: 91, Name: "Test1", Description: "First"},
+				92: {Key: 92, Name: "Test2", Description: "Second"},
+				93: {Key: 93, Name: "Test3", Description: "Third"},
 			}
 
 			expectedEntityFields["Statuses"] = Equal([]*models.Status{
 				nil,
-				&models.Status{
+				{
 					ID: 91, Param: 1, Name: "Test1", Description: "First",
 					StartedTime: b.Time, Duration: time.Unix(1, 0),
 					ActorID: 0xE0000000, LastTick: b.Time,
 				},
-				&models.Status{
+				{
 					ID: 92, Param: 2, Name: "Test2", Description: "Second",
 					StartedTime: b.Time, Duration: time.Unix(0, 500000000),
 					ActorID: 0xE0000000, LastTick: b.Time,
 				},
-				&models.Status{
+				{
 					ID: 93, Param: 3, Name: "Test3", Description: "Third",
 					StartedTime: b.Time, Duration: time.Unix(0, 250000000),
 					ActorID: 0xE0000000, LastTick: b.Time,

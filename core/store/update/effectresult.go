@@ -91,7 +91,7 @@ func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Ent
 	}
 
 	return nil, append([]models.EntityEvent{
-		models.EntityEvent{
+		{
 			StreamID: u.streamID,
 			EntityID: u.subjectID,
 			Type:     models.UpdateResources{Resources: entity.Resources},

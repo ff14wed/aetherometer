@@ -89,7 +89,7 @@ var _ = Describe("Map", func() {
 
 		It("correctly returns a map associated with territory ID and place names", func() {
 			Expect(mapStore.GetMaps(133)).To(Equal([]models.MapInfo{
-				models.MapInfo{
+				{
 					Key: 3, ID: "f1t2/00", SizeFactor: 200,
 					PlaceName: "Old Gridania", TerritoryType: "f1t2",
 				},
@@ -98,11 +98,11 @@ var _ = Describe("Map", func() {
 
 		It("correctly returns (in sorted order) the maps associated with territory ID and place names", func() {
 			Expect(mapStore.GetMaps(131)).To(Equal([]models.MapInfo{
-				models.MapInfo{
+				{
 					Key: 14, ID: "w1t2/01", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 					PlaceNameSub: "Merchant Strip", TerritoryType: "w1t2",
 				},
-				models.MapInfo{
+				{
 					Key: 73, ID: "w1t2/02", SizeFactor: 200, PlaceName: "Ul'dah - Steps of Thal",
 					PlaceNameSub: "Hustings Strip", TerritoryType: "w1t2",
 				},

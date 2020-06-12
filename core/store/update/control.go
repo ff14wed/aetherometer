@@ -50,7 +50,7 @@ func (u lockonUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent,
 func (u lockonUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.LockonMarker = u.lockonMarker
 
-	return nil, []models.EntityEvent{models.EntityEvent{
+	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLockonMarker{

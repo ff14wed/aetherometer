@@ -69,8 +69,9 @@ func (u placeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, 
 		StreamID: u.streamID,
 		Type: models.UpdateIDs{
 			ServerID:    u.serverID,
-			CharacterID: u.currentID,
 			InstanceNum: u.instanceNum,
+
+			CharacterID: u.currentID,
 		},
 	})
 
@@ -84,7 +85,7 @@ func (u placeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, 
 
 	stream.EntitiesMap = make(map[uint64]*models.Entity)
 	entityEvents := []models.EntityEvent{
-		models.EntityEvent{
+		{
 			StreamID: u.streamID,
 			Type: models.SetEntities{
 				Entities: nil,
