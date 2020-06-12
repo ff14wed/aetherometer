@@ -41,7 +41,7 @@ func (u targetUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent,
 func (u targetUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
 	entity.TargetID = u.targetID
 
-	return nil, []models.EntityEvent{models.EntityEvent{
+	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateTarget{
