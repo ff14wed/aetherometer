@@ -46,7 +46,7 @@ var _ = Describe("Spawn Update", func() {
 		generator = testEnv.generator
 
 		playerSpawnData = &datatypes.PlayerSpawn{
-			Title: 0x1234, U1b: 0x1234, CurrentWorld: 0x34, HomeWorld: 0x12,
+			Title: 0x1234, U1b: 0x1234, CurrentWorld: 123, HomeWorld: 456,
 			GMRank: 0x12, U3c: 0x9A, U4: 0x12, OnlineStatus: 0x12,
 			Pose: 0x12, U5a: 0x12, U5b: 0x34, U5c: 0x12,
 			TargetID: 0x9ABC, U6: 0x1234, U7: 0x1234,
@@ -129,6 +129,12 @@ var _ = Describe("Spawn Update", func() {
 				Abbreviation: "DUM",
 			},
 		}
+
+		d.WorldData = datasheet.WorldStore{
+			123: {Key: 123, Name: "Foo"},
+			456: {Key: 123, Name: "Bar"},
+		}
+
 		expectedEntityFields = gstruct.Fields{
 			"ID":       Equal(subjectID),
 			"Index":    Equal(10),
@@ -173,13 +179,18 @@ var _ = Describe("Spawn Update", func() {
 		expectedEntityFields["RawSpawnJSONData"] = Equal(string(rawSpawnData))
 	})
 
-	expectOneEntityToSpawn := func() {
+	expectOneEntityToSpawn := func(checkStreamEvents func([]models.StreamEvent)) {
 		u := generator.Generate(streamID, false, b)
 		Expect(u).ToNot(BeNil())
 
 		streamEvents, entityEvents, err := u.ModifyStore(streams)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(streamEvents).To(BeEmpty())
+
+		if checkStreamEvents != nil {
+			checkStreamEvents(streamEvents)
+		} else {
+			Expect(streamEvents).To(BeEmpty())
+		}
 
 		Expect(entityEvents).To(HaveLen(1))
 		Expect(entityEvents[0].StreamID).To(Equal(streamID))
@@ -196,7 +207,33 @@ var _ = Describe("Spawn Update", func() {
 	}
 
 	It("generates an update to spawn a Player entitty", func() {
-		expectOneEntityToSpawn()
+		expectOneEntityToSpawn(nil)
+	})
+
+	Context("when the spawn is for the current player character", func() {
+		BeforeEach(func() {
+			b.CurrentID = b.SubjectID
+			playerSpawnData.Index = 0
+			delete(streams.Map[streamID].EntitiesMap, subjectID)
+			expectedEntityFields["Index"] = Equal(0)
+		})
+
+		It("generates both a stream event for the world IDs and the spawn entity update", func() {
+			expectOneEntityToSpawn(func(streamEvents []models.StreamEvent) {
+				Expect(streamEvents).To(HaveLen(1))
+				Expect(streamEvents[0].StreamID).To(Equal(streamID))
+
+				eventType, assignable := streamEvents[0].Type.(models.UpdateIDs)
+				Expect(assignable).To(BeTrue())
+
+				Expect(eventType.ServerID).To(Equal(2000))
+				Expect(eventType.InstanceNum).To(Equal(1000))
+
+				Expect(eventType.CharacterID).To(Equal(subjectID))
+				Expect(eventType.CurrentWorld).To(Equal(models.World{ID: 123, Name: "Foo"}))
+				Expect(eventType.HomeWorld).To(Equal(models.World{ID: 456, Name: "Bar"}))
+			})
+		})
 	})
 
 	Context("with status effects", func() {
@@ -234,7 +271,7 @@ var _ = Describe("Spawn Update", func() {
 		})
 
 		It("generates an update to spawn the entity with status effects", func() {
-			expectOneEntityToSpawn()
+			expectOneEntityToSpawn(nil)
 		})
 	})
 
@@ -280,7 +317,7 @@ var _ = Describe("Spawn Update", func() {
 		})
 
 		It("generates an update to spawn the entity with the name stripped of invalid characters", func() {
-			expectOneEntityToSpawn()
+			expectOneEntityToSpawn(nil)
 		})
 	})
 
@@ -330,7 +367,7 @@ var _ = Describe("Spawn Update", func() {
 		})
 
 		It("generates an update to spawn the NPC", func() {
-			expectOneEntityToSpawn()
+			expectOneEntityToSpawn(nil)
 		})
 
 		Context("when the entity is a pet", func() {
@@ -344,7 +381,7 @@ var _ = Describe("Spawn Update", func() {
 			})
 
 			It("generates an update to spawn the friendly entity", func() {
-				expectOneEntityToSpawn()
+				expectOneEntityToSpawn(nil)
 			})
 		})
 
@@ -356,7 +393,7 @@ var _ = Describe("Spawn Update", func() {
 			})
 
 			It("generates an update to spawn the NPC", func() {
-				expectOneEntityToSpawn()
+				expectOneEntityToSpawn(nil)
 			})
 		})
 	})

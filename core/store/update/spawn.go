@@ -20,20 +20,28 @@ func init() {
 
 func newNPCSpawnUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.NPCSpawn)
-	return generateSpawnUpdate(streamID, uint64(b.SubjectID), b.Time, &data.PlayerSpawn, d, true)
+	return generateSpawnUpdate(streamID, uint64(b.SubjectID), uint64(b.CurrentID), b.Time, &data.PlayerSpawn, d, true)
 }
 
 func newNPCSpawn2Update(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.NPCSpawn2)
-	return generateSpawnUpdate(streamID, uint64(b.SubjectID), b.Time, &data.PlayerSpawn, d, true)
+	return generateSpawnUpdate(streamID, uint64(b.SubjectID), uint64(b.CurrentID), b.Time, &data.PlayerSpawn, d, true)
 }
 
 func newPlayerSpawnUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.PlayerSpawn)
-	return generateSpawnUpdate(streamID, uint64(b.SubjectID), b.Time, data, d, false)
+	return generateSpawnUpdate(streamID, uint64(b.SubjectID), uint64(b.CurrentID), b.Time, data, d, false)
 }
 
-func generateSpawnUpdate(streamID int, subjectID uint64, now time.Time, data *datatypes.PlayerSpawn, d *datasheet.Collection, isNPCSpawn bool) store.Update {
+func generateSpawnUpdate(
+	streamID int,
+	subjectID uint64,
+	currentID uint64,
+	now time.Time,
+	data *datatypes.PlayerSpawn,
+	d *datasheet.Collection,
+	isNPCSpawn bool,
+) store.Update {
 	spawnName := data.Name.String()
 	filteredName := make([]rune, 0, len(spawnName))
 	for i, r := range spawnName {
@@ -135,18 +143,36 @@ func generateSpawnUpdate(streamID int, subjectID uint64, now time.Time, data *da
 		}
 	}
 
+	var (
+		homeWorld, currentWorld models.World
+		isWorldSet              bool
+	)
+
+	if subjectID == currentID {
+		homeWorld = d.WorldData.Lookup(int(data.HomeWorld))
+		currentWorld = d.WorldData.Lookup(int(data.CurrentWorld))
+		isWorldSet = true
+	}
+
 	return entitySpawnUpdate{
 		streamID:  streamID,
 		subjectID: subjectID,
 
+		isWorldSet:   isWorldSet,
+		homeWorld:    homeWorld,
+		currentWorld: currentWorld,
+
 		entity: newEntity,
 	}
-
 }
 
 type entitySpawnUpdate struct {
 	streamID  int
 	subjectID uint64
+
+	isWorldSet   bool
+	homeWorld    models.World
+	currentWorld models.World
 
 	entity models.Entity
 }
@@ -157,7 +183,10 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		return nil, nil, ErrorStreamNotFound
 	}
 
-	var entityEvents []models.EntityEvent
+	var (
+		streamEvents []models.StreamEvent
+		entityEvents []models.EntityEvent
+	)
 
 	for key, ent := range stream.EntitiesMap {
 		if ent == nil || ent.Index != u.entity.Index {
@@ -184,5 +213,22 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 
 	stream.EntitiesMap[u.subjectID] = &u.entity
 
-	return nil, entityEvents, nil
+	if u.isWorldSet {
+		stream.HomeWorld = u.homeWorld
+		stream.CurrentWorld = u.currentWorld
+
+		streamEvents = append(streamEvents, models.StreamEvent{
+			StreamID: u.streamID,
+			Type: models.UpdateIDs{
+				ServerID:    stream.ServerID,
+				InstanceNum: stream.InstanceNum,
+
+				CharacterID:  stream.CharacterID,
+				HomeWorld:    u.homeWorld,
+				CurrentWorld: u.currentWorld,
+			},
+		})
+	}
+
+	return streamEvents, entityEvents, nil
 }

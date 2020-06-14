@@ -11,6 +11,8 @@ type Stream {
   instanceNum: Int!
 
   characterID: Uint!
+  homeWorld: World!
+  currentWorld: World!
 
   place: Place!
   enmity: Enmity!
@@ -193,6 +195,11 @@ type RecipeInfo {
   durability: Int!
 }
 
+type World {
+  id: Int!
+  name: String!
+}
+
 type Subscription {
   streamEvent: StreamEvent!
   entityEvent: EntityEvent!
@@ -209,7 +216,8 @@ union StreamEventType =
   UpdateIDs |
   UpdateMap |
   UpdateCraftingInfo |
-  UpdateEnmity
+  UpdateEnmity |
+  ChatEvent
 
 type AddStream {
   stream: Stream!
@@ -221,8 +229,11 @@ type RemoveStream {
 
 type UpdateIDs {
   serverID: Int!
-  characterID: Uint!
   instanceNum: Int!
+
+  characterID: Uint!
+  homeWorld: World!
+  currentWorld: World!
 }
 
 type UpdateMap {
@@ -235,6 +246,19 @@ type UpdateCraftingInfo {
 
 type UpdateEnmity {
   enmity: Enmity!
+}
+
+type ChatEvent {
+  channelID: Uint!
+  channelWorld: World!
+  channelType: String!
+
+  contentID: Uint!
+  entityID: Uint!
+  world: World!
+  name: String!
+
+  message: String!
 }
 
 type EntityEvent {

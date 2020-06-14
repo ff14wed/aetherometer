@@ -90,6 +90,17 @@ type ComplexityRoot struct {
 		Omen          func(childComplexity int) int
 	}
 
+	ChatEvent struct {
+		ChannelId    func(childComplexity int) int
+		ChannelWorld func(childComplexity int) int
+		ChannelType  func(childComplexity int) int
+		ContentId    func(childComplexity int) int
+		EntityId     func(childComplexity int) int
+		World        func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Message      func(childComplexity int) int
+	}
+
 	ClassJob struct {
 		Id           func(childComplexity int) int
 		Name         func(childComplexity int) int
@@ -255,6 +266,8 @@ type ComplexityRoot struct {
 		ServerId     func(childComplexity int) int
 		InstanceNum  func(childComplexity int) int
 		CharacterId  func(childComplexity int) int
+		HomeWorld    func(childComplexity int) int
+		CurrentWorld func(childComplexity int) int
 		Place        func(childComplexity int) int
 		Enmity       func(childComplexity int) int
 		CraftingInfo func(childComplexity int) int
@@ -289,9 +302,11 @@ type ComplexityRoot struct {
 	}
 
 	UpdateIds struct {
-		ServerId    func(childComplexity int) int
-		CharacterId func(childComplexity int) int
-		InstanceNum func(childComplexity int) int
+		ServerId     func(childComplexity int) int
+		InstanceNum  func(childComplexity int) int
+		CharacterId  func(childComplexity int) int
+		HomeWorld    func(childComplexity int) int
+		CurrentWorld func(childComplexity int) int
 	}
 
 	UpdateLastAction struct {
@@ -321,6 +336,11 @@ type ComplexityRoot struct {
 	UpsertStatus struct {
 		Index  func(childComplexity int) int
 		Status func(childComplexity int) int
+	}
+
+	World struct {
+		Id   func(childComplexity int) int
+		Name func(childComplexity int) int
 	}
 }
 
@@ -713,6 +733,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CastingInfo.Omen(childComplexity), true
+
+	case "ChatEvent.channelID":
+		if e.complexity.ChatEvent.ChannelId == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.ChannelId(childComplexity), true
+
+	case "ChatEvent.channelWorld":
+		if e.complexity.ChatEvent.ChannelWorld == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.ChannelWorld(childComplexity), true
+
+	case "ChatEvent.channelType":
+		if e.complexity.ChatEvent.ChannelType == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.ChannelType(childComplexity), true
+
+	case "ChatEvent.contentID":
+		if e.complexity.ChatEvent.ContentId == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.ContentId(childComplexity), true
+
+	case "ChatEvent.entityID":
+		if e.complexity.ChatEvent.EntityId == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.EntityId(childComplexity), true
+
+	case "ChatEvent.world":
+		if e.complexity.ChatEvent.World == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.World(childComplexity), true
+
+	case "ChatEvent.name":
+		if e.complexity.ChatEvent.Name == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.Name(childComplexity), true
+
+	case "ChatEvent.message":
+		if e.complexity.ChatEvent.Message == nil {
+			break
+		}
+
+		return e.complexity.ChatEvent.Message(childComplexity), true
 
 	case "ClassJob.id":
 		if e.complexity.ClassJob.Id == nil {
@@ -1467,6 +1543,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stream.CharacterId(childComplexity), true
 
+	case "Stream.homeWorld":
+		if e.complexity.Stream.HomeWorld == nil {
+			break
+		}
+
+		return e.complexity.Stream.HomeWorld(childComplexity), true
+
+	case "Stream.currentWorld":
+		if e.complexity.Stream.CurrentWorld == nil {
+			break
+		}
+
+		return e.complexity.Stream.CurrentWorld(childComplexity), true
+
 	case "Stream.place":
 		if e.complexity.Stream.Place == nil {
 			break
@@ -1565,6 +1655,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateIds.ServerId(childComplexity), true
 
+	case "UpdateIDs.instanceNum":
+		if e.complexity.UpdateIds.InstanceNum == nil {
+			break
+		}
+
+		return e.complexity.UpdateIds.InstanceNum(childComplexity), true
+
 	case "UpdateIDs.characterID":
 		if e.complexity.UpdateIds.CharacterId == nil {
 			break
@@ -1572,12 +1669,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateIds.CharacterId(childComplexity), true
 
-	case "UpdateIDs.instanceNum":
-		if e.complexity.UpdateIds.InstanceNum == nil {
+	case "UpdateIDs.homeWorld":
+		if e.complexity.UpdateIds.HomeWorld == nil {
 			break
 		}
 
-		return e.complexity.UpdateIds.InstanceNum(childComplexity), true
+		return e.complexity.UpdateIds.HomeWorld(childComplexity), true
+
+	case "UpdateIDs.currentWorld":
+		if e.complexity.UpdateIds.CurrentWorld == nil {
+			break
+		}
+
+		return e.complexity.UpdateIds.CurrentWorld(childComplexity), true
 
 	case "UpdateLastAction.action":
 		if e.complexity.UpdateLastAction.Action == nil {
@@ -1634,6 +1738,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpsertStatus.Status(childComplexity), true
+
+	case "World.id":
+		if e.complexity.World.Id == nil {
+			break
+		}
+
+		return e.complexity.World.Id(childComplexity), true
+
+	case "World.name":
+		if e.complexity.World.Name == nil {
+			break
+		}
+
+		return e.complexity.World.Name(childComplexity), true
 
 	}
 	return 0, false
@@ -2915,6 +3033,289 @@ func (ec *executionContext) _CastingInfo_omen(ctx context.Context, field graphql
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Omen, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+var chatEventImplementors = []string{"ChatEvent"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ChatEvent(ctx context.Context, sel ast.SelectionSet, obj *ChatEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, chatEventImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ChatEvent")
+		case "channelID":
+			out.Values[i] = ec._ChatEvent_channelID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "channelWorld":
+			out.Values[i] = ec._ChatEvent_channelWorld(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "channelType":
+			out.Values[i] = ec._ChatEvent_channelType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "contentID":
+			out.Values[i] = ec._ChatEvent_contentID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "entityID":
+			out.Values[i] = ec._ChatEvent_entityID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "world":
+			out.Values[i] = ec._ChatEvent_world(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._ChatEvent_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "message":
+			out.Values[i] = ec._ChatEvent_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_channelID(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_channelWorld(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelWorld, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(World)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._World(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_channelType(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChannelType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_contentID(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContentID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_entityID(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EntityID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_world(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.World, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(World)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._World(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_name(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ChatEvent_message(ctx context.Context, field graphql.CollectedField, obj *ChatEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ChatEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -6987,6 +7388,16 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "homeWorld":
+			out.Values[i] = ec._Stream_homeWorld(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "currentWorld":
+			out.Values[i] = ec._Stream_currentWorld(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "place":
 			out.Values[i] = ec._Stream_place(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7121,6 +7532,62 @@ func (ec *executionContext) _Stream_characterID(ctx context.Context, field graph
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return MarshalUint(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Stream_homeWorld(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Stream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HomeWorld, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(World)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._World(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Stream_currentWorld(ctx context.Context, field graphql.CollectedField, obj *Stream) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Stream",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentWorld, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(World)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._World(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -7710,13 +8177,23 @@ func (ec *executionContext) _UpdateIDs(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "instanceNum":
+			out.Values[i] = ec._UpdateIDs_instanceNum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "characterID":
 			out.Values[i] = ec._UpdateIDs_characterID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "instanceNum":
-			out.Values[i] = ec._UpdateIDs_instanceNum(ctx, field, obj)
+		case "homeWorld":
+			out.Values[i] = ec._UpdateIDs_homeWorld(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "currentWorld":
+			out.Values[i] = ec._UpdateIDs_currentWorld(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -7759,6 +8236,33 @@ func (ec *executionContext) _UpdateIDs_serverID(ctx context.Context, field graph
 }
 
 // nolint: vetshadow
+func (ec *executionContext) _UpdateIDs_instanceNum(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateIDs",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InstanceNum, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
 func (ec *executionContext) _UpdateIDs_characterID(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -7786,7 +8290,7 @@ func (ec *executionContext) _UpdateIDs_characterID(ctx context.Context, field gr
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _UpdateIDs_instanceNum(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+func (ec *executionContext) _UpdateIDs_homeWorld(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -7798,7 +8302,7 @@ func (ec *executionContext) _UpdateIDs_instanceNum(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.InstanceNum, nil
+		return obj.HomeWorld, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -7806,10 +8310,39 @@ func (ec *executionContext) _UpdateIDs_instanceNum(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(World)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+
+	return ec._World(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UpdateIDs_currentWorld(ctx context.Context, field graphql.CollectedField, obj *UpdateIDs) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UpdateIDs",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentWorld, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(World)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._World(ctx, field.Selections, &res)
 }
 
 var updateLastActionImplementors = []string{"UpdateLastAction"}
@@ -8246,6 +8779,95 @@ func (ec *executionContext) _UpsertStatus_status(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._Status(ctx, field.Selections, &res)
+}
+
+var worldImplementors = []string{"World"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _World(ctx context.Context, sel ast.SelectionSet, obj *World) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, worldImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("World")
+		case "id":
+			out.Values[i] = ec._World_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._World_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _World_id(ctx context.Context, field graphql.CollectedField, obj *World) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "World",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _World_name(ctx context.Context, field graphql.CollectedField, obj *World) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "World",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -9778,6 +10400,10 @@ func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.Select
 		return ec._UpdateEnmity(ctx, sel, &obj)
 	case *UpdateEnmity:
 		return ec._UpdateEnmity(ctx, sel, obj)
+	case ChatEvent:
+		return ec._ChatEvent(ctx, sel, &obj)
+	case *ChatEvent:
+		return ec._ChatEvent(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -9850,6 +10476,8 @@ type Stream {
   instanceNum: Int!
 
   characterID: Uint!
+  homeWorld: World!
+  currentWorld: World!
 
   place: Place!
   enmity: Enmity!
@@ -10032,6 +10660,11 @@ type RecipeInfo {
   durability: Int!
 }
 
+type World {
+  id: Int!
+  name: String!
+}
+
 type Subscription {
   streamEvent: StreamEvent!
   entityEvent: EntityEvent!
@@ -10048,7 +10681,8 @@ union StreamEventType =
   UpdateIDs |
   UpdateMap |
   UpdateCraftingInfo |
-  UpdateEnmity
+  UpdateEnmity |
+  ChatEvent
 
 type AddStream {
   stream: Stream!
@@ -10060,8 +10694,11 @@ type RemoveStream {
 
 type UpdateIDs {
   serverID: Int!
-  characterID: Uint!
   instanceNum: Int!
+
+  characterID: Uint!
+  homeWorld: World!
+  currentWorld: World!
 }
 
 type UpdateMap {
@@ -10074,6 +10711,19 @@ type UpdateCraftingInfo {
 
 type UpdateEnmity {
   enmity: Enmity!
+}
+
+type ChatEvent {
+  channelID: Uint!
+  channelWorld: World!
+  channelType: String!
+
+  contentID: Uint!
+  entityID: Uint!
+  world: World!
+  name: String!
+
+  message: String!
 }
 
 type EntityEvent {

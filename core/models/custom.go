@@ -16,10 +16,13 @@ import (
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
 type Stream struct {
-	ID          int    `json:"id"`
-	ServerID    int    `json:"serverID"`
-	InstanceNum int    `json:"instanceNum"`
-	CharacterID uint64 `json:"characterID"`
+	ID          int `json:"id"`
+	ServerID    int `json:"serverID"`
+	InstanceNum int `json:"instanceNum"`
+
+	CharacterID  uint64 `json:"characterID"`
+	HomeWorld    World  `json:"homeWorld"`
+	CurrentWorld World  `json:"currentWorld"`
 
 	Place        Place         `json:"place"`
 	Enmity       Enmity        `json:"enmity"`

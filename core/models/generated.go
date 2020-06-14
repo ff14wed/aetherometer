@@ -58,6 +58,19 @@ type CastingInfo struct {
 	Omen          string    `json:"omen"`
 }
 
+type ChatEvent struct {
+	ChannelID    uint64 `json:"channelID"`
+	ChannelWorld World  `json:"channelWorld"`
+	ChannelType  string `json:"channelType"`
+	ContentID    uint64 `json:"contentID"`
+	EntityID     uint64 `json:"entityID"`
+	World        World  `json:"world"`
+	Name         string `json:"name"`
+	Message      string `json:"message"`
+}
+
+func (ChatEvent) IsStreamEventType() {}
+
 type ClassJob struct {
 	ID           int    `json:"id"`
 	Name         string `json:"name"`
@@ -256,9 +269,11 @@ type UpdateEnmity struct {
 func (UpdateEnmity) IsStreamEventType() {}
 
 type UpdateIDs struct {
-	ServerID    int    `json:"serverID"`
-	CharacterID uint64 `json:"characterID"`
-	InstanceNum int    `json:"instanceNum"`
+	ServerID     int    `json:"serverID"`
+	InstanceNum  int    `json:"instanceNum"`
+	CharacterID  uint64 `json:"characterID"`
+	HomeWorld    World  `json:"homeWorld"`
+	CurrentWorld World  `json:"currentWorld"`
 }
 
 func (UpdateIDs) IsStreamEventType() {}
@@ -305,3 +320,8 @@ type UpsertStatus struct {
 }
 
 func (UpsertStatus) IsEntityEventType() {}
+
+type World struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
