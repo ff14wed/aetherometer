@@ -12,7 +12,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/ff14wed/aetherometer/core/config"
@@ -34,7 +34,7 @@ var AuthError = errors.New(
 // InitPayloadGetter provides an alternate method of retrieving credentials
 // for when the token cannot be sent via HTTP headers (basically the case of
 // websockets)
-type InitPayloadGetter func(context.Context) handler.InitPayload
+type InitPayloadGetter func(context.Context) transport.InitPayload
 
 // Auth provides a middleware handler that handles cross-origin
 // requests and pulling of authentication from incoming requests.

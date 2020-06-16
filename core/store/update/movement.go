@@ -40,13 +40,13 @@ func (u locationUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEven
 }
 
 func (u locationUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
-	entity.Location = u.location
+	entity.Location = &u.location
 
 	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLocation{
-			Location: u.location,
+			Location: &u.location,
 		},
 	}}, nil
 }

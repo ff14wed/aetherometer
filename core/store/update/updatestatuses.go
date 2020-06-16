@@ -68,8 +68,8 @@ func newUpdateStatusesUpdate(streamID int, b *xivnet.Block, d *datasheet.Collect
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
 			Tp:       int(data.CurrentTP),
-			MaxHP:    int(data.MaxHP),
-			MaxMP:    int(data.MaxMP),
+			MaxHp:    int(data.MaxHP),
+			MaxMp:    int(data.MaxMP),
 			LastTick: b.Time,
 		},
 	}
@@ -89,8 +89,8 @@ func newUpdateStatusesEurekaUpdate(streamID int, b *xivnet.Block, d *datasheet.C
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
 			Tp:       int(data.CurrentTP),
-			MaxHP:    int(data.MaxHP),
-			MaxMP:    int(data.MaxMP),
+			MaxHp:    int(data.MaxHP),
+			MaxMp:    int(data.MaxMP),
 			LastTick: b.Time,
 		},
 	}
@@ -110,7 +110,8 @@ func (u updateStatusesUpdate) ModifyStore(streams *store.Streams) ([]models.Stre
 }
 
 func (u updateStatusesUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
-	entity.Resources = u.resources
+	resourcesClone := u.resources
+	entity.Resources = &u.resources
 
 	if len(entity.Statuses) < int(u.statusListLength) {
 		diff := int(u.statusListLength) - len(entity.Statuses)
@@ -135,14 +136,14 @@ func (u updateStatusesUpdate) modifyFunc(stream *models.Stream, entity *models.E
 			statusEvents = append(statusEvents, models.EntityEvent{
 				StreamID: u.streamID,
 				EntityID: u.subjectID,
-				Type:     models.UpsertStatus{Index: i, Status: updatedStatus},
+				Type:     models.UpsertStatus{Index: i, Status: &updatedStatus},
 			})
 		}
 	}
 	entityEvents := append(statusEvents, models.EntityEvent{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
-		Type:     models.UpdateResources{Resources: entity.Resources},
+		Type:     models.UpdateResources{Resources: &resourcesClone},
 	})
 
 	return nil, entityEvents, nil

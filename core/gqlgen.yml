@@ -17,3 +17,5 @@ models:
     model: github.com/ff14wed/aetherometer/core/models.Timestamp
   Uint:
     model: github.com/ff14wed/aetherometer/core/models.Uint
+
+omit_slice_element_pointers: true

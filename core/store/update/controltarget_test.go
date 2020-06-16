@@ -8,6 +8,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("ControlTarget Update", func() {
@@ -60,6 +61,9 @@ var _ = Describe("ControlTarget Update", func() {
 			}))
 
 			Expect(entity.TargetID).To(Equal(expectedTarget))
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 
 		entityValidationTests(testEnv, false)

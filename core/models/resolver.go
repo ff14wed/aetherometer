@@ -98,18 +98,18 @@ func (r *queryResolver) Streams(ctx context.Context) ([]Stream, error) {
 }
 
 // Stream returns the stream identified by streamID.
-func (r *queryResolver) Stream(ctx context.Context, streamID int) (Stream, error) {
+func (r *queryResolver) Stream(ctx context.Context, streamID int) (*Stream, error) {
 	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
-		return Stream{}, err
+		return nil, err
 	}
 	return r.sp.Stream(streamID)
 }
 
 // Entity returns the entity identified by entityID in the requested stream
 // identified by streamID.
-func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (Entity, error) {
+func (r *queryResolver) Entity(ctx context.Context, streamID int, entityID uint64) (*Entity, error) {
 	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
-		return Entity{}, err
+		return nil, err
 	}
 	return r.sp.Entity(streamID, entityID)
 }
@@ -118,7 +118,7 @@ type subscriptionResolver struct{ *Resolver }
 
 // StreamEvent returns an event channel that can be used for subscriptions to
 // Stream events
-func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEvent, error) {
+func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan *StreamEvent, error) {
 	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (r *subscriptionResolver) StreamEvent(ctx context.Context) (<-chan StreamEv
 
 // EntityEvent returns an event channel that can be used for subscriptions to
 // Entity events
-func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan EntityEvent, error) {
+func (r *subscriptionResolver) EntityEvent(ctx context.Context) (<-chan *EntityEvent, error) {
 	if err := r.auth.AuthorizePluginToken(ctx); err != nil {
 		return nil, err
 	}

@@ -14,8 +14,8 @@ import (
 var _ = Describe("StreamHub", func() {
 	It("broadcasts messages to multiple subscribers", func() {
 		h := hub.NewStreamHub(5)
-		expected := models.StreamEvent{StreamID: 1234}
-		receivedChan := make(chan models.StreamEvent, 5)
+		expected := &models.StreamEvent{StreamID: 1234}
+		receivedChan := make(chan *models.StreamEvent, 5)
 		defer close(receivedChan)
 
 		wg := sync.WaitGroup{}
@@ -38,7 +38,7 @@ var _ = Describe("StreamHub", func() {
 
 		h.Broadcast(models.StreamEvent{StreamID: 1234})
 		for i := 0; i < 5; i++ {
-			var receivedMsg models.StreamEvent
+			var receivedMsg *models.StreamEvent
 			Eventually(receivedChan).Should(
 				Receive(&receivedMsg),
 				fmt.Sprintf("Subscriber %d did not receive an expected message", i),

@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	"sort"
 	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"gopkg.in/dealancer/validate.v2"
 )
 
-//go:generate go run ../scripts/gqlgen.go -v
+//go:generate go run ../scripts/gqlgen.go
 
 // Stream represents state reconstructed from the live stream of data from a
 // running FFXIV instance.
@@ -54,6 +56,11 @@ func MarshalTimestamp(t time.Time) graphql.Marshaler {
 	})
 }
 
+// UnmarshalTimestamp is currently unimplemented.
+func UnmarshalTimestamp(v interface{}) (time.Time, error) {
+	panic("not implemented")
+}
+
 func getTimeInMs(t time.Time) int64 {
 	return t.UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }
@@ -88,4 +95,16 @@ func UnmarshalUint(v interface{}) (uint64, error) {
 	default:
 		return 0, fmt.Errorf("%T is not a supported integer type", v)
 	}
+}
+
+// Validate implements a way to validate this StreamEvent, since the library
+// used doesn't dive into interfaces
+func (s *StreamEvent) Validate() error {
+	return validate.Validate(reflect.ValueOf(s.Type).Interface())
+}
+
+// Validate implements a way to validate this EntityEvent, since the library
+// used doesn't dive into interfaces
+func (e *EntityEvent) Validate() error {
+	return validate.Validate(reflect.ValueOf(e.Type).Interface())
 }

@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("Action Update", func() {
@@ -81,19 +82,19 @@ var _ = Describe("Action Update", func() {
 			EffectFlags: 5,
 		}
 
-		matchExpectedAction = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedAction = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"TargetID":          Equal(subjectID),
 			"Name":              Equal("Foo"),
 			"GlobalCounter":     Equal(1),
 			"AnimationLockTime": BeNumerically("~", 0.5),
 			"HiddenAnimation":   Equal(2),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           Equal(float64(0)),
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
 			"EffectDisplayType": Equal(4),
@@ -122,7 +123,7 @@ var _ = Describe("Action Update", func() {
 			),
 			"EffectFlags": Equal(5),
 			"UseTime":     Equal(b.Time),
-		})
+		}))
 	})
 
 	It("generates an update that sets the entity's last action", func() {
@@ -140,7 +141,10 @@ var _ = Describe("Action Update", func() {
 		Expect(eventType.Action).To(matchExpectedAction)
 
 		Expect(entity.LastAction).ToNot(BeNil())
-		Expect(*entity.LastAction).To(matchExpectedAction)
+		Expect(entity.LastAction).To(matchExpectedAction)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	Context("when the action ID name is not found in the datasheets", func() {
@@ -165,6 +169,8 @@ var _ = Describe("Action Update", func() {
 			Expect(entity.LastAction).ToNot(BeNil())
 			Expect(entity.LastAction.Name).To(Equal("Unknown_1c8"))
 
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 
@@ -192,8 +198,11 @@ var _ = Describe("Action Update", func() {
 				},
 			))
 			Expect(entity.LastAction).ToNot(BeNil())
-			Expect(*entity.LastAction).To(matchExpectedAction)
+			Expect(entity.LastAction).To(matchExpectedAction)
 			Expect(entity.CastingInfo).To(BeNil())
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 

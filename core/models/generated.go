@@ -6,13 +6,21 @@ import (
 	"time"
 )
 
+type EntityEventType interface {
+	IsEntityEventType()
+}
+
+type StreamEventType interface {
+	IsStreamEventType()
+}
+
 type Action struct {
 	TargetID          uint64         `json:"targetID"`
 	Name              string         `json:"name"`
 	GlobalCounter     int            `json:"globalCounter"`
 	AnimationLockTime float64        `json:"animationLockTime"`
 	HiddenAnimation   int            `json:"hiddenAnimation"`
-	Location          Location       `json:"location"`
+	Location          *Location      `json:"location" validate:"nil=false"`
 	ID                int            `json:"id"`
 	Variation         int            `json:"variation"`
 	EffectDisplayType int            `json:"effectDisplayType"`
@@ -34,13 +42,13 @@ type ActionEffect struct {
 }
 
 type AddEntity struct {
-	Entity Entity `json:"entity"`
+	Entity *Entity `json:"entity" validate:"nil=false"`
 }
 
 func (AddEntity) IsEntityEventType() {}
 
 type AddStream struct {
-	Stream Stream `json:"stream"`
+	Stream *Stream `json:"stream" validate:"nil=false"`
 }
 
 func (AddStream) IsStreamEventType() {}
@@ -51,7 +59,7 @@ type CastingInfo struct {
 	StartTime     time.Time `json:"startTime"`
 	CastTime      time.Time `json:"castTime"`
 	TargetID      uint64    `json:"targetID"`
-	Location      Location  `json:"location"`
+	Location      *Location `json:"location" validate:"nil=false"`
 	CastType      int       `json:"castType"`
 	EffectRange   int       `json:"effectRange"`
 	XAxisModifier int       `json:"xAxisModifier"`
@@ -60,11 +68,11 @@ type CastingInfo struct {
 
 type ChatEvent struct {
 	ChannelID    uint64 `json:"channelID"`
-	ChannelWorld World  `json:"channelWorld"`
+	ChannelWorld *World `json:"channelWorld" validate:"nil=false"`
 	ChannelType  string `json:"channelType"`
 	ContentID    uint64 `json:"contentID"`
 	EntityID     uint64 `json:"entityID"`
-	World        World  `json:"world"`
+	World        *World `json:"world" validate:"nil=false"`
 	Name         string `json:"name"`
 	Message      string `json:"message"`
 }
@@ -78,20 +86,20 @@ type ClassJob struct {
 }
 
 type CraftingInfo struct {
-	Recipe              RecipeInfo `json:"recipe"`
-	LastCraftActionID   int        `json:"lastCraftActionID"`
-	LastCraftActionName string     `json:"lastCraftActionName"`
-	StepNum             int        `json:"stepNum"`
-	Progress            int        `json:"progress"`
-	ProgressDelta       int        `json:"progressDelta"`
-	Quality             int        `json:"quality"`
-	QualityDelta        int        `json:"qualityDelta"`
-	HqChance            int        `json:"hqChance"`
-	Durability          int        `json:"durability"`
-	DurabilityDelta     int        `json:"durabilityDelta"`
-	CurrentCondition    int        `json:"currentCondition"`
-	PreviousCondition   int        `json:"previousCondition"`
-	ReuseProc           bool       `json:"reuseProc"`
+	Recipe              *RecipeInfo `json:"recipe" validate:"nil=false"`
+	LastCraftActionID   int         `json:"lastCraftActionID"`
+	LastCraftActionName string      `json:"lastCraftActionName"`
+	StepNum             int         `json:"stepNum"`
+	Progress            int         `json:"progress"`
+	ProgressDelta       int         `json:"progressDelta"`
+	Quality             int         `json:"quality"`
+	QualityDelta        int         `json:"qualityDelta"`
+	HqChance            int         `json:"hqChance"`
+	Durability          int         `json:"durability"`
+	DurabilityDelta     int         `json:"durabilityDelta"`
+	CurrentCondition    int         `json:"currentCondition"`
+	PreviousCondition   int         `json:"previousCondition"`
+	ReuseProc           bool        `json:"reuseProc"`
 }
 
 type Enmity struct {
@@ -106,13 +114,13 @@ type Entity struct {
 	TargetID         uint64       `json:"targetID"`
 	OwnerID          uint64       `json:"ownerID"`
 	Level            int          `json:"level"`
-	ClassJob         ClassJob     `json:"classJob"`
-	IsNPC            bool         `json:"isNPC"`
+	ClassJob         *ClassJob    `json:"classJob" validate:"nil=false"`
+	IsNpc            bool         `json:"isNPC"`
 	IsEnemy          bool         `json:"isEnemy"`
 	IsPet            bool         `json:"isPet"`
 	BNPCInfo         *NPCInfo     `json:"bNPCInfo"`
-	Resources        Resources    `json:"resources"`
-	Location         Location     `json:"location"`
+	Resources        *Resources   `json:"resources" validate:"nil=false"`
+	Location         *Location    `json:"location" validate:"nil=false"`
 	LastAction       *Action      `json:"lastAction"`
 	Statuses         []*Status    `json:"statuses"`
 	LockonMarker     int          `json:"lockonMarker"`
@@ -124,10 +132,6 @@ type EntityEvent struct {
 	StreamID int             `json:"streamID"`
 	EntityID uint64          `json:"entityID"`
 	Type     EntityEventType `json:"type"`
-}
-
-type EntityEventType interface {
-	IsEntityEventType()
 }
 
 type HateEntry struct {
@@ -179,7 +183,7 @@ type RecipeInfo struct {
 	Name        string `json:"name"`
 	RecipeLevel int    `json:"recipeLevel"`
 	Element     int    `json:"element"`
-	CanHQ       bool   `json:"canHQ"`
+	CanHq       bool   `json:"canHQ"`
 	Difficulty  int    `json:"difficulty"`
 	Quality     int    `json:"quality"`
 	Durability  int    `json:"durability"`
@@ -207,8 +211,8 @@ type Resources struct {
 	Hp       int       `json:"hp"`
 	Mp       int       `json:"mp"`
 	Tp       int       `json:"tp"`
-	MaxHP    int       `json:"maxHP"`
-	MaxMP    int       `json:"maxMP"`
+	MaxHp    int       `json:"maxHP"`
+	MaxMp    int       `json:"maxMP"`
 	LastTick time.Time `json:"lastTick"`
 }
 
@@ -234,10 +238,6 @@ type StreamEvent struct {
 	Type     StreamEventType `json:"type"`
 }
 
-type StreamEventType interface {
-	IsStreamEventType()
-}
-
 type StreamRequest struct {
 	StreamID int    `json:"streamID"`
 	Data     string `json:"data"`
@@ -250,8 +250,8 @@ type UpdateCastingInfo struct {
 func (UpdateCastingInfo) IsEntityEventType() {}
 
 type UpdateClass struct {
-	ClassJob ClassJob `json:"classJob"`
-	Level    int      `json:"level"`
+	ClassJob *ClassJob `json:"classJob" validate:"nil=false"`
+	Level    int       `json:"level"`
 }
 
 func (UpdateClass) IsEntityEventType() {}
@@ -263,7 +263,7 @@ type UpdateCraftingInfo struct {
 func (UpdateCraftingInfo) IsStreamEventType() {}
 
 type UpdateEnmity struct {
-	Enmity Enmity `json:"enmity"`
+	Enmity *Enmity `json:"enmity" validate:"nil=false"`
 }
 
 func (UpdateEnmity) IsStreamEventType() {}
@@ -272,20 +272,20 @@ type UpdateIDs struct {
 	ServerID     int    `json:"serverID"`
 	InstanceNum  int    `json:"instanceNum"`
 	CharacterID  uint64 `json:"characterID"`
-	HomeWorld    World  `json:"homeWorld"`
-	CurrentWorld World  `json:"currentWorld"`
+	HomeWorld    *World `json:"homeWorld" validate:"nil=false"`
+	CurrentWorld *World `json:"currentWorld" validate:"nil=false"`
 }
 
 func (UpdateIDs) IsStreamEventType() {}
 
 type UpdateLastAction struct {
-	Action Action `json:"action"`
+	Action *Action `json:"action" validate:"nil=false"`
 }
 
 func (UpdateLastAction) IsEntityEventType() {}
 
 type UpdateLocation struct {
-	Location Location `json:"location"`
+	Location *Location `json:"location" validate:"nil=false"`
 }
 
 func (UpdateLocation) IsEntityEventType() {}
@@ -297,13 +297,13 @@ type UpdateLockonMarker struct {
 func (UpdateLockonMarker) IsEntityEventType() {}
 
 type UpdateMap struct {
-	Place Place `json:"place"`
+	Place *Place `json:"place" validate:"nil=false"`
 }
 
 func (UpdateMap) IsStreamEventType() {}
 
 type UpdateResources struct {
-	Resources Resources `json:"resources"`
+	Resources *Resources `json:"resources" validate:"nil=false"`
 }
 
 func (UpdateResources) IsEntityEventType() {}
@@ -315,8 +315,8 @@ type UpdateTarget struct {
 func (UpdateTarget) IsEntityEventType() {}
 
 type UpsertStatus struct {
-	Index  int    `json:"index"`
-	Status Status `json:"status"`
+	Index  int     `json:"index"`
+	Status *Status `json:"status" validate:"nil=false"`
 }
 
 func (UpsertStatus) IsEntityEventType() {}

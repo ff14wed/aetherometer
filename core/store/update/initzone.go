@@ -71,7 +71,9 @@ func (u placeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, 
 			ServerID:    u.serverID,
 			InstanceNum: u.instanceNum,
 
-			CharacterID: u.currentID,
+			CharacterID:  u.currentID,
+			CurrentWorld: new(models.World),
+			HomeWorld:    new(models.World),
 		},
 	})
 
@@ -79,7 +81,7 @@ func (u placeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, 
 	streamEvents = append(streamEvents, models.StreamEvent{
 		StreamID: u.streamID,
 		Type: models.UpdateMap{
-			Place: u.place,
+			Place: &u.place,
 		},
 	})
 

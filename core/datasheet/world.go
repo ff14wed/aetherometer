@@ -32,15 +32,15 @@ func (w *WorldStore) PopulateWorlds(dataReader io.Reader) error {
 	return nil
 }
 
-func (w *WorldStore) Lookup(worldID int) models.World {
+func (w *WorldStore) Lookup(worldID int) *models.World {
 	if resolved, ok := (*w)[uint32(worldID)]; ok {
-		return models.World{
+		return &models.World{
 			ID:   worldID,
 			Name: resolved.Name,
 		}
 	}
 
-	return models.World{
+	return &models.World{
 		ID:   worldID,
 		Name: fmt.Sprintf("Unknown_%d", worldID),
 	}

@@ -53,7 +53,7 @@ func (u craftingInfoUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 		return nil, nil, ErrorStreamNotFound
 	}
 
-	if u.craftingInfo != nil && u.craftingInfo.Recipe.ID == 0 {
+	if u.craftingInfo != nil && (u.craftingInfo.Recipe == nil || u.craftingInfo.Recipe.ID == 0) {
 		if stream.CraftingInfo != nil {
 			u.craftingInfo.Recipe = stream.CraftingInfo.Recipe
 		}

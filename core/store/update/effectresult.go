@@ -52,8 +52,8 @@ func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collectio
 		resources: models.Resources{
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
-			MaxHP:    int(data.MaxHP),
-			MaxMP:    10000,
+			MaxHp:    int(data.MaxHP),
+			MaxMp:    10000,
 			LastTick: b.Time,
 		},
 	}
@@ -73,7 +73,7 @@ func (u effectResultUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 }
 
 func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
-	entity.Resources = u.resources
+	entity.Resources = &u.resources
 
 	if len(entity.Statuses) <= int(u.statusListLength) {
 		diff := int(u.statusListLength) - len(entity.Statuses)
@@ -86,7 +86,7 @@ func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Ent
 		statusEvents = append(statusEvents, models.EntityEvent{
 			StreamID: u.streamID,
 			EntityID: u.subjectID,
-			Type:     models.UpsertStatus{Index: i, Status: s},
+			Type:     models.UpsertStatus{Index: i, Status: &s},
 		})
 	}
 

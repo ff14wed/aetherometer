@@ -8,16 +8,16 @@ import (
 )
 
 type FakeEntityEventSource struct {
-	SubscribeStub        func() (chan models.EntityEvent, uint64)
+	SubscribeStub        func() (chan *models.EntityEvent, uint64)
 	subscribeMutex       sync.RWMutex
 	subscribeArgsForCall []struct {
 	}
 	subscribeReturns struct {
-		result1 chan models.EntityEvent
+		result1 chan *models.EntityEvent
 		result2 uint64
 	}
 	subscribeReturnsOnCall map[int]struct {
-		result1 chan models.EntityEvent
+		result1 chan *models.EntityEvent
 		result2 uint64
 	}
 	UnsubscribeStub        func(uint64)
@@ -29,7 +29,7 @@ type FakeEntityEventSource struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeEntityEventSource) Subscribe() (chan models.EntityEvent, uint64) {
+func (fake *FakeEntityEventSource) Subscribe() (chan *models.EntityEvent, uint64) {
 	fake.subscribeMutex.Lock()
 	ret, specificReturn := fake.subscribeReturnsOnCall[len(fake.subscribeArgsForCall)]
 	fake.subscribeArgsForCall = append(fake.subscribeArgsForCall, struct {
@@ -52,34 +52,34 @@ func (fake *FakeEntityEventSource) SubscribeCallCount() int {
 	return len(fake.subscribeArgsForCall)
 }
 
-func (fake *FakeEntityEventSource) SubscribeCalls(stub func() (chan models.EntityEvent, uint64)) {
+func (fake *FakeEntityEventSource) SubscribeCalls(stub func() (chan *models.EntityEvent, uint64)) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = stub
 }
 
-func (fake *FakeEntityEventSource) SubscribeReturns(result1 chan models.EntityEvent, result2 uint64) {
+func (fake *FakeEntityEventSource) SubscribeReturns(result1 chan *models.EntityEvent, result2 uint64) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = nil
 	fake.subscribeReturns = struct {
-		result1 chan models.EntityEvent
+		result1 chan *models.EntityEvent
 		result2 uint64
 	}{result1, result2}
 }
 
-func (fake *FakeEntityEventSource) SubscribeReturnsOnCall(i int, result1 chan models.EntityEvent, result2 uint64) {
+func (fake *FakeEntityEventSource) SubscribeReturnsOnCall(i int, result1 chan *models.EntityEvent, result2 uint64) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = nil
 	if fake.subscribeReturnsOnCall == nil {
 		fake.subscribeReturnsOnCall = make(map[int]struct {
-			result1 chan models.EntityEvent
+			result1 chan *models.EntityEvent
 			result2 uint64
 		})
 	}
 	fake.subscribeReturnsOnCall[i] = struct {
-		result1 chan models.EntityEvent
+		result1 chan *models.EntityEvent
 		result2 uint64
 	}{result1, result2}
 }

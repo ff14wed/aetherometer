@@ -455,6 +455,11 @@ var _ = Describe("Stream", func() {
 		})
 
 		It("closes the connection with the hook on shutdown", func() {
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+			Eventually(logBuf).Should(gbytes.Say("Running"))
+
 			supervisor.Stop()
 			Eventually(conn.CloseCallCount).Should(Equal(1))
 		})

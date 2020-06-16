@@ -10,7 +10,9 @@ import (
 	"os/signal"
 	"runtime/debug"
 	"syscall"
+	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/BurntSushi/toml"
 	"github.com/ff14wed/aetherometer/core/adapter"
 	"github.com/ff14wed/aetherometer/core/server/handlers"
@@ -18,7 +20,9 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 
-	"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/datasheet"
 	"github.com/ff14wed/aetherometer/core/models"
@@ -128,7 +132,7 @@ func main() {
 		topSupervisor.Add(adapter)
 	}
 
-	authHandler, err := handlers.NewAuth(cfg, handler.GetInitPayload, logger)
+	authHandler, err := handlers.NewAuth(cfg, transport.GetInitPayload, logger)
 	if err != nil {
 		logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
@@ -142,14 +146,26 @@ func main() {
 		EnableCompression: true,
 	}
 
-	gqlHandler := handler.GraphQL(
-		models.NewExecutableSchema(models.Config{
-			Resolvers: queryResolver,
-		}),
-		handler.WebsocketUpgrader(upgrader),
-	)
+	gqlServer := handler.New(models.NewExecutableSchema(models.Config{
+		Resolvers: queryResolver,
+	}))
 
-	queryHandler := authHandler.Handler(gqlHandler)
+	gqlServer.AddTransport(transport.Websocket{
+		Upgrader:              upgrader,
+		KeepAlivePingInterval: 10 * time.Second,
+	})
+	gqlServer.AddTransport(transport.Options{})
+	gqlServer.AddTransport(transport.GET{})
+	gqlServer.AddTransport(transport.POST{})
+	gqlServer.AddTransport(transport.MultipartForm{})
+
+	gqlServer.Use(extension.Introspection{})
+
+	gqlServer.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
+
+	queryHandler := authHandler.Handler(gqlServer)
 	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", cfg, logger))
 
 	addDebugHandlers(srv)

@@ -94,12 +94,12 @@ var _ = Describe("Recipe", func() {
 		})
 
 		It("gets the full recipe details", func() {
-			Expect(r.GetInfo(33074)).To(Equal(models.RecipeInfo{
+			Expect(r.GetInfo(33074)).To(Equal(&models.RecipeInfo{
 				ID:          33074,
 				Name:        "Rakshasa Knuckles",
 				RecipeLevel: 380,
 				Element:     0,
-				CanHQ:       true,
+				CanHq:       true,
 				Difficulty:  2900,
 				Quality:     14267,
 				Durability:  70,
@@ -107,21 +107,21 @@ var _ = Describe("Recipe", func() {
 		})
 
 		It("returns incomplete information if there is no RecipeLevel for the recipe", func() {
-			Expect(r.GetInfo(1)).To(Equal(models.RecipeInfo{
+			Expect(r.GetInfo(1)).To(Equal(&models.RecipeInfo{
 				ID:          1,
 				Name:        "Bronze Ingot",
 				RecipeLevel: 1,
 				Element:     0,
-				CanHQ:       true,
+				CanHq:       true,
 			}))
 		})
 
 		It("returns incomplete information if there is no Item for the recipe", func() {
-			Expect(r.GetInfo(33067)).To(Equal(models.RecipeInfo{
+			Expect(r.GetInfo(33067)).To(Equal(&models.RecipeInfo{
 				ID:          33067,
 				RecipeLevel: 320,
 				Element:     0,
-				CanHQ:       true,
+				CanHq:       true,
 				Difficulty:  2657,
 				Quality:     12511,
 				Durability:  70,

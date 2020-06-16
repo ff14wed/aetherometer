@@ -8,6 +8,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("UpdateHPMPTP Update", func() {
@@ -21,7 +22,7 @@ var _ = Describe("UpdateHPMPTP Update", func() {
 		entity    *models.Entity
 		generator update.Generator
 
-		expectedResources models.Resources
+		expectedResources *models.Resources
 	)
 
 	BeforeEach(func() {
@@ -33,7 +34,7 @@ var _ = Describe("UpdateHPMPTP Update", func() {
 		entity = testEnv.entity
 		generator = testEnv.generator
 
-		expectedResources = models.Resources{
+		expectedResources = &models.Resources{
 			Hp:       100,
 			Mp:       200,
 			Tp:       0,
@@ -62,6 +63,9 @@ var _ = Describe("UpdateHPMPTP Update", func() {
 		Expect(eventType.Resources).To(Equal(expectedResources))
 
 		Expect(entity.Resources).To(Equal(expectedResources))
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	entityValidationTests(testEnv, false)

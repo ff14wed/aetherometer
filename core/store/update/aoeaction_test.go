@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("AoEAction8 Update", func() {
@@ -105,19 +106,19 @@ var _ = Describe("AoEAction8 Update", func() {
 			Targets: [8]uint64{0xABCDEF01, 0xABCDEF02, 0x12345678},
 		}
 
-		matchExpectedAction = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedAction = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"TargetID":          Equal(subjectID),
 			"Name":              Equal("Foo"),
 			"GlobalCounter":     Equal(1),
 			"AnimationLockTime": BeNumerically("~", 0.5),
 			"HiddenAnimation":   Equal(2),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           Equal(float64(0)),
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
 			"EffectDisplayType": Equal(4),
@@ -156,7 +157,7 @@ var _ = Describe("AoEAction8 Update", func() {
 			),
 			"EffectFlags": Equal(0),
 			"UseTime":     Equal(b.Time),
-		})
+		}))
 	})
 
 	It("generates an update that sets the entity's last action", func() {
@@ -174,7 +175,10 @@ var _ = Describe("AoEAction8 Update", func() {
 		Expect(eventType.Action).To(matchExpectedAction)
 
 		Expect(entity.LastAction).ToNot(BeNil())
-		Expect(*entity.LastAction).To(matchExpectedAction)
+		Expect(entity.LastAction).To(matchExpectedAction)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 })
 
@@ -270,19 +274,19 @@ var _ = Describe("AoEAction16 Update", func() {
 			Targets: [16]uint64{0xABCDEF01, 0xABCDEF02, 0x12345678},
 		}
 
-		matchExpectedAction = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedAction = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"TargetID":          Equal(subjectID),
 			"Name":              Equal("Foo"),
 			"GlobalCounter":     Equal(1),
 			"AnimationLockTime": BeNumerically("~", 0.5),
 			"HiddenAnimation":   Equal(2),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           Equal(float64(0)),
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
 			"EffectDisplayType": Equal(4),
@@ -321,7 +325,7 @@ var _ = Describe("AoEAction16 Update", func() {
 			),
 			"EffectFlags": Equal(0),
 			"UseTime":     Equal(b.Time),
-		})
+		}))
 	})
 
 	It("generates an update that sets the entity's last action", func() {
@@ -339,7 +343,10 @@ var _ = Describe("AoEAction16 Update", func() {
 		Expect(eventType.Action).To(matchExpectedAction)
 
 		Expect(entity.LastAction).ToNot(BeNil())
-		Expect(*entity.LastAction).To(matchExpectedAction)
+		Expect(entity.LastAction).To(matchExpectedAction)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 })
 
@@ -435,19 +442,19 @@ var _ = Describe("AoEAction24 Update", func() {
 			Targets: [24]uint64{0xABCDEF01, 0xABCDEF02, 0x12345678},
 		}
 
-		matchExpectedAction = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedAction = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"TargetID":          Equal(subjectID),
 			"Name":              Equal("Foo"),
 			"GlobalCounter":     Equal(1),
 			"AnimationLockTime": BeNumerically("~", 0.5),
 			"HiddenAnimation":   Equal(2),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           Equal(float64(0)),
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
 			"EffectDisplayType": Equal(4),
@@ -486,7 +493,7 @@ var _ = Describe("AoEAction24 Update", func() {
 			),
 			"EffectFlags": Equal(0),
 			"UseTime":     Equal(b.Time),
-		})
+		}))
 	})
 
 	It("generates an update that sets the entity's last action", func() {
@@ -504,7 +511,10 @@ var _ = Describe("AoEAction24 Update", func() {
 		Expect(eventType.Action).To(matchExpectedAction)
 
 		Expect(entity.LastAction).ToNot(BeNil())
-		Expect(*entity.LastAction).To(matchExpectedAction)
+		Expect(entity.LastAction).To(matchExpectedAction)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 })
 
@@ -600,19 +610,19 @@ var _ = Describe("AoEAction32 Update", func() {
 			Targets: [32]uint64{0xABCDEF01, 0xABCDEF02, 0x12345678},
 		}
 
-		matchExpectedAction = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedAction = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"TargetID":          Equal(subjectID),
 			"Name":              Equal("Foo"),
 			"GlobalCounter":     Equal(1),
 			"AnimationLockTime": BeNumerically("~", 0.5),
 			"HiddenAnimation":   Equal(2),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           Equal(float64(0)),
 				"Y":           Equal(float64(0)),
 				"Z":           Equal(float64(0)),
 				"Orientation": BeNumerically("~", 5.445427316156579),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"ID":                Equal(123),
 			"Variation":         Equal(3),
 			"EffectDisplayType": Equal(4),
@@ -651,7 +661,7 @@ var _ = Describe("AoEAction32 Update", func() {
 			),
 			"EffectFlags": Equal(0),
 			"UseTime":     Equal(b.Time),
-		})
+		}))
 	})
 
 	It("generates an update that sets the entity's last action", func() {
@@ -669,6 +679,9 @@ var _ = Describe("AoEAction32 Update", func() {
 		Expect(eventType.Action).To(matchExpectedAction)
 
 		Expect(entity.LastAction).ToNot(BeNil())
-		Expect(*entity.LastAction).To(matchExpectedAction)
+		Expect(entity.LastAction).To(matchExpectedAction)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 })

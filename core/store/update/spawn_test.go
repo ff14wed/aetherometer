@@ -12,6 +12,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/testassets"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/ff14wed/xivnet/v3/datatypes"
+	"gopkg.in/dealancer/validate.v2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -142,30 +143,30 @@ var _ = Describe("Spawn Update", func() {
 			"TargetID": Equal(uint64(0x9ABC)),
 			"OwnerID":  Equal(uint64(0x9ABC)),
 			"Level":    Equal(60),
-			"ClassJob": Equal(models.ClassJob{
+			"ClassJob": Equal(&models.ClassJob{
 				ID:           15,
 				Name:         "Dummy",
 				Abbreviation: "DUM",
 			}),
-			"IsNPC":    BeFalse(),
+			"IsNpc":    BeFalse(),
 			"IsEnemy":  BeFalse(),
 			"IsPet":    BeFalse(),
 			"BNPCInfo": BeNil(),
-			"Resources": Equal(models.Resources{
+			"Resources": Equal(&models.Resources{
 				Hp:       29000,
 				Mp:       11000,
-				MaxHP:    30000,
-				MaxMP:    12000,
+				MaxHp:    30000,
+				MaxMp:    12000,
 				Tp:       0,
 				LastTick: b.Time,
 			}),
-			"Location": gstruct.MatchAllFields(gstruct.Fields{
+			"Location": gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 				"X":           BeNumerically("~", 500, 0.001),
 				"Y":           BeNumerically("~", 600, 0.001),
 				"Z":           BeNumerically("~", 700, 0.001),
 				"Orientation": BeNumerically("~", math.Pi, 0.001),
 				"LastUpdated": Equal(b.Time),
-			}),
+			})),
 			"LastAction":   BeNil(),
 			"Statuses":     BeEmpty(),
 			"LockonMarker": Equal(0),
@@ -198,12 +199,15 @@ var _ = Describe("Spawn Update", func() {
 		eventType, assignable := entityEvents[0].Type.(models.AddEntity)
 		Expect(assignable).To(BeTrue())
 
-		Expect(eventType.Entity).To(gstruct.MatchAllFields(expectedEntityFields))
+		Expect(eventType.Entity).To(gstruct.PointTo(gstruct.MatchAllFields(expectedEntityFields)))
 
 		Expect(streams.Map[streamID].EntitiesMap).To(HaveKey(subjectID))
 		Expect(streams.Map[streamID].EntitiesMap[subjectID]).To(
 			gstruct.PointTo(gstruct.MatchAllFields(expectedEntityFields)),
 		)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	}
 
 	It("generates an update to spawn a Player entitty", func() {
@@ -230,8 +234,10 @@ var _ = Describe("Spawn Update", func() {
 				Expect(eventType.InstanceNum).To(Equal(1000))
 
 				Expect(eventType.CharacterID).To(Equal(subjectID))
-				Expect(eventType.CurrentWorld).To(Equal(models.World{ID: 123, Name: "Foo"}))
-				Expect(eventType.HomeWorld).To(Equal(models.World{ID: 456, Name: "Bar"}))
+				Expect(eventType.CurrentWorld).To(Equal(&models.World{ID: 123, Name: "Foo"}))
+				Expect(eventType.HomeWorld).To(Equal(&models.World{ID: 456, Name: "Bar"}))
+
+				Expect(validate.Validate(streamEvents)).To(Succeed())
 			})
 		})
 	})
@@ -301,12 +307,15 @@ var _ = Describe("Spawn Update", func() {
 			Expect(entityEvents[1].EntityID).To(Equal(subjectID))
 			addEvent, assignable := entityEvents[1].Type.(models.AddEntity)
 			Expect(assignable).To(BeTrue())
-			Expect(addEvent.Entity).To(gstruct.MatchAllFields(expectedEntityFields))
+			Expect(addEvent.Entity).To(gstruct.PointTo(gstruct.MatchAllFields(expectedEntityFields)))
 
 			Expect(streams.Map[streamID].EntitiesMap).To(HaveKey(subjectID))
 			Expect(streams.Map[streamID].EntitiesMap[subjectID]).To(
 				gstruct.PointTo(gstruct.MatchAllFields(expectedEntityFields)),
 			)
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 
@@ -342,7 +351,7 @@ var _ = Describe("Spawn Update", func() {
 			npcSpawn.BNPCName = 2
 			npcSpawn.ModelChara = 878
 
-			expectedEntityFields["IsNPC"] = BeTrue()
+			expectedEntityFields["IsNpc"] = BeTrue()
 			expectedEntityFields["IsEnemy"] = BeTrue()
 			expectedEntityFields["IsPet"] = BeFalse()
 			npcName := "Ruins Runner"
@@ -355,7 +364,7 @@ var _ = Describe("Spawn Update", func() {
 				Size:    &npcSize,
 			})
 			// Since this is an NPC ClassJob shouldn't really be considered
-			expectedEntityFields["ClassJob"] = Equal(models.ClassJob{
+			expectedEntityFields["ClassJob"] = Equal(&models.ClassJob{
 				ID: 15,
 			})
 		})
@@ -375,7 +384,7 @@ var _ = Describe("Spawn Update", func() {
 				npcSpawn.EnemyType = 0
 				npcSpawn.Subtype = 2
 
-				expectedEntityFields["IsNPC"] = BeTrue()
+				expectedEntityFields["IsNpc"] = BeTrue()
 				expectedEntityFields["IsEnemy"] = BeFalse()
 				expectedEntityFields["IsPet"] = BeTrue()
 			})

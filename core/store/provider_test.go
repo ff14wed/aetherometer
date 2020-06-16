@@ -52,8 +52,8 @@ var _ = Describe("Provider", func() {
 		stream1 = models.Stream{
 			ID: 1234,
 			EntitiesMap: map[uint64]*models.Entity{
-				1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
-				2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
+				1: {ID: 1, Name: "FooBar", Index: 2},
+				2: {ID: 2, Name: "Baah", Index: 1},
 				3: nil,
 			},
 		}
@@ -122,7 +122,7 @@ var _ = Describe("Provider", func() {
 
 	Describe("Stream", func() {
 		It("returns the requested stream from the store", func() {
-			Expect(provider.Stream(5678)).To(Equal(stream2))
+			Expect(provider.Stream(5678)).To(Equal(&stream2))
 		})
 
 		It("returns an error if the requested stream does not exist", func() {
@@ -148,7 +148,7 @@ var _ = Describe("Provider", func() {
 
 	Describe("Entity", func() {
 		It("returns the requested entity from the store", func() {
-			Expect(provider.Entity(1234, 1)).To(Equal(models.Entity{ID: 1, Name: "FooBar", Index: 2}))
+			Expect(provider.Entity(1234, 1)).To(Equal(&models.Entity{ID: 1, Name: "FooBar", Index: 2}))
 		})
 
 		It("returns an error if the requested stream does not exist", func() {
@@ -188,18 +188,18 @@ var _ = Describe("Provider", func() {
 				s.Map[5678].CharacterID = 2345
 				return nil, nil, nil
 			})
-			Eventually(func() models.Stream {
+			Eventually(func() *models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{ID: 5678, CharacterID: 2345}))
+			}).Should(Equal(&models.Stream{ID: 5678, CharacterID: 2345}))
 		})
 
 		It("ignores nil updates", func() {
 			provider.UpdatesChan() <- nil
-			Consistently(func() models.Stream {
+			Consistently(func() *models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{ID: 5678}))
+			}).Should(Equal(&models.Stream{ID: 5678}))
 			Expect(logBuf).To(gbytes.Say("Running"))
 			Consistently(logBuf).ShouldNot(gbytes.Say("store-provider"))
 		})
@@ -212,12 +212,12 @@ var _ = Describe("Provider", func() {
 				s.Map[5678].CharacterID = 2345
 				return nil, nil, nil
 			})
-			Eventually(func() models.Stream {
+			Eventually(func() *models.Stream {
 				s, _ := provider.Stream(5678)
 				return s
-			}).Should(Equal(models.Stream{ID: 5678, CharacterID: 2345}))
+			}).Should(Equal(&models.Stream{ID: 5678, CharacterID: 2345}))
 
-			Expect(queriedStream).To(Equal(models.Stream{ID: 5678}))
+			Expect(queriedStream).To(Equal(&models.Stream{ID: 5678}))
 
 		})
 
@@ -243,21 +243,21 @@ var _ = Describe("Provider", func() {
 
 			provider.UpdatesChan() <- testUpdate(func(s *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 				return []models.StreamEvent{
-						models.StreamEvent{StreamID: 1234},
-						models.StreamEvent{StreamID: 5678},
+						{StreamID: 1234},
+						{StreamID: 5678},
 					}, []models.EntityEvent{
-						models.EntityEvent{StreamID: 1234, EntityID: 2},
-						models.EntityEvent{StreamID: 5678, EntityID: 2},
+						{StreamID: 1234, EntityID: 2},
+						{StreamID: 5678, EntityID: 2},
 					}, nil
 			})
 
-			Eventually(streamEvents1).Should(Receive(Equal(models.StreamEvent{StreamID: 1234})))
-			Eventually(streamEvents1).Should(Receive(Equal(models.StreamEvent{StreamID: 5678})))
-			Eventually(streamEvents2).Should(Receive(Equal(models.StreamEvent{StreamID: 1234})))
-			Eventually(streamEvents2).Should(Receive(Equal(models.StreamEvent{StreamID: 5678})))
+			Eventually(streamEvents1).Should(Receive(Equal(&models.StreamEvent{StreamID: 1234})))
+			Eventually(streamEvents1).Should(Receive(Equal(&models.StreamEvent{StreamID: 5678})))
+			Eventually(streamEvents2).Should(Receive(Equal(&models.StreamEvent{StreamID: 1234})))
+			Eventually(streamEvents2).Should(Receive(Equal(&models.StreamEvent{StreamID: 5678})))
 
-			Eventually(entityEvents).Should(Receive(Equal(models.EntityEvent{StreamID: 1234, EntityID: 2})))
-			Eventually(entityEvents).Should(Receive(Equal(models.EntityEvent{StreamID: 5678, EntityID: 2})))
+			Eventually(entityEvents).Should(Receive(Equal(&models.EntityEvent{StreamID: 1234, EntityID: 2})))
+			Eventually(entityEvents).Should(Receive(Equal(&models.EntityEvent{StreamID: 5678, EntityID: 2})))
 		})
 
 		It("broadcasts events even after an error", func() {
@@ -269,10 +269,10 @@ var _ = Describe("Provider", func() {
 
 			provider.UpdatesChan() <- testUpdate(func(s *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
 				return nil, []models.EntityEvent{
-					models.EntityEvent{StreamID: 1234, EntityID: 2},
+					{StreamID: 1234, EntityID: 2},
 				}, errors.New("kaboom")
 			})
-			Eventually(entityEvents).Should(Receive(Equal(models.EntityEvent{StreamID: 1234, EntityID: 2})))
+			Eventually(entityEvents).Should(Receive(Equal(&models.EntityEvent{StreamID: 1234, EntityID: 2})))
 		})
 	})
 })

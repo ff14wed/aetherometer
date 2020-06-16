@@ -8,16 +8,16 @@ import (
 )
 
 type FakeStreamEventSource struct {
-	SubscribeStub        func() (chan models.StreamEvent, uint64)
+	SubscribeStub        func() (chan *models.StreamEvent, uint64)
 	subscribeMutex       sync.RWMutex
 	subscribeArgsForCall []struct {
 	}
 	subscribeReturns struct {
-		result1 chan models.StreamEvent
+		result1 chan *models.StreamEvent
 		result2 uint64
 	}
 	subscribeReturnsOnCall map[int]struct {
-		result1 chan models.StreamEvent
+		result1 chan *models.StreamEvent
 		result2 uint64
 	}
 	UnsubscribeStub        func(uint64)
@@ -29,7 +29,7 @@ type FakeStreamEventSource struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeStreamEventSource) Subscribe() (chan models.StreamEvent, uint64) {
+func (fake *FakeStreamEventSource) Subscribe() (chan *models.StreamEvent, uint64) {
 	fake.subscribeMutex.Lock()
 	ret, specificReturn := fake.subscribeReturnsOnCall[len(fake.subscribeArgsForCall)]
 	fake.subscribeArgsForCall = append(fake.subscribeArgsForCall, struct {
@@ -52,34 +52,34 @@ func (fake *FakeStreamEventSource) SubscribeCallCount() int {
 	return len(fake.subscribeArgsForCall)
 }
 
-func (fake *FakeStreamEventSource) SubscribeCalls(stub func() (chan models.StreamEvent, uint64)) {
+func (fake *FakeStreamEventSource) SubscribeCalls(stub func() (chan *models.StreamEvent, uint64)) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = stub
 }
 
-func (fake *FakeStreamEventSource) SubscribeReturns(result1 chan models.StreamEvent, result2 uint64) {
+func (fake *FakeStreamEventSource) SubscribeReturns(result1 chan *models.StreamEvent, result2 uint64) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = nil
 	fake.subscribeReturns = struct {
-		result1 chan models.StreamEvent
+		result1 chan *models.StreamEvent
 		result2 uint64
 	}{result1, result2}
 }
 
-func (fake *FakeStreamEventSource) SubscribeReturnsOnCall(i int, result1 chan models.StreamEvent, result2 uint64) {
+func (fake *FakeStreamEventSource) SubscribeReturnsOnCall(i int, result1 chan *models.StreamEvent, result2 uint64) {
 	fake.subscribeMutex.Lock()
 	defer fake.subscribeMutex.Unlock()
 	fake.SubscribeStub = nil
 	if fake.subscribeReturnsOnCall == nil {
 		fake.subscribeReturnsOnCall = make(map[int]struct {
-			result1 chan models.StreamEvent
+			result1 chan *models.StreamEvent
 			result2 uint64
 		})
 	}
 	fake.subscribeReturnsOnCall[i] = struct {
-		result1 chan models.StreamEvent
+		result1 chan *models.StreamEvent
 		result2 uint64
 	}{result1, result2}
 }

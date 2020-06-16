@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("EgressMovement Update", func() {
@@ -37,13 +38,13 @@ var _ = Describe("EgressMovement Update", func() {
 		entity = testEnv.entity
 		generator = testEnv.generator
 
-		matchExpectedLocation = gstruct.MatchAllFields(gstruct.Fields{
+		matchExpectedLocation = gstruct.PointTo(gstruct.MatchAllFields(gstruct.Fields{
 			"X":           BeNumerically("~", 100.1, 1e-4),
 			"Y":           BeNumerically("~", 200.2, 1e-4),
 			"Z":           BeNumerically("~", 300.3, 1e-4),
 			"Orientation": BeNumerically("~", math.Pi),
 			"LastUpdated": Equal(b.Time),
-		})
+		}))
 
 		movementData := &datatypes.EgressMovement{
 			Direction: 0,
@@ -71,6 +72,9 @@ var _ = Describe("EgressMovement Update", func() {
 		Expect(eventType.Location).To(matchExpectedLocation)
 
 		Expect(entity.Location).To(matchExpectedLocation)
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	entityValidationTests(testEnv, true)

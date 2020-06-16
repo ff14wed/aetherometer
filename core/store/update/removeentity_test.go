@@ -8,6 +8,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("RemoveEntity Update", func() {
@@ -51,6 +52,9 @@ var _ = Describe("RemoveEntity Update", func() {
 
 		Expect(streams.Map[streamID].EntitiesMap).To(HaveKey(removableID))
 		Expect(streams.Map[streamID].EntitiesMap[removableID]).To(BeNil())
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	Context(`when the specified entity doesn't "exist"`, func() {
@@ -82,6 +86,8 @@ var _ = Describe("RemoveEntity Update", func() {
 			Expect(streams.Map[streamID].EntitiesMap).To(HaveKey(nonexistentID))
 			Expect(streams.Map[streamID].EntitiesMap[nonexistentID]).To(BeNil())
 
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 

@@ -8,18 +8,18 @@ import (
 )
 
 type FakeStoreProvider struct {
-	EntityStub        func(int, uint64) (models.Entity, error)
+	EntityStub        func(int, uint64) (*models.Entity, error)
 	entityMutex       sync.RWMutex
 	entityArgsForCall []struct {
 		arg1 int
 		arg2 uint64
 	}
 	entityReturns struct {
-		result1 models.Entity
+		result1 *models.Entity
 		result2 error
 	}
 	entityReturnsOnCall map[int]struct {
-		result1 models.Entity
+		result1 *models.Entity
 		result2 error
 	}
 	EntityEventSourceStub        func() models.EntityEventSource
@@ -32,17 +32,17 @@ type FakeStoreProvider struct {
 	entityEventSourceReturnsOnCall map[int]struct {
 		result1 models.EntityEventSource
 	}
-	StreamStub        func(int) (models.Stream, error)
+	StreamStub        func(int) (*models.Stream, error)
 	streamMutex       sync.RWMutex
 	streamArgsForCall []struct {
 		arg1 int
 	}
 	streamReturns struct {
-		result1 models.Stream
+		result1 *models.Stream
 		result2 error
 	}
 	streamReturnsOnCall map[int]struct {
-		result1 models.Stream
+		result1 *models.Stream
 		result2 error
 	}
 	StreamEventSourceStub        func() models.StreamEventSource
@@ -71,7 +71,7 @@ type FakeStoreProvider struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeStoreProvider) Entity(arg1 int, arg2 uint64) (models.Entity, error) {
+func (fake *FakeStoreProvider) Entity(arg1 int, arg2 uint64) (*models.Entity, error) {
 	fake.entityMutex.Lock()
 	ret, specificReturn := fake.entityReturnsOnCall[len(fake.entityArgsForCall)]
 	fake.entityArgsForCall = append(fake.entityArgsForCall, struct {
@@ -96,7 +96,7 @@ func (fake *FakeStoreProvider) EntityCallCount() int {
 	return len(fake.entityArgsForCall)
 }
 
-func (fake *FakeStoreProvider) EntityCalls(stub func(int, uint64) (models.Entity, error)) {
+func (fake *FakeStoreProvider) EntityCalls(stub func(int, uint64) (*models.Entity, error)) {
 	fake.entityMutex.Lock()
 	defer fake.entityMutex.Unlock()
 	fake.EntityStub = stub
@@ -109,28 +109,28 @@ func (fake *FakeStoreProvider) EntityArgsForCall(i int) (int, uint64) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeStoreProvider) EntityReturns(result1 models.Entity, result2 error) {
+func (fake *FakeStoreProvider) EntityReturns(result1 *models.Entity, result2 error) {
 	fake.entityMutex.Lock()
 	defer fake.entityMutex.Unlock()
 	fake.EntityStub = nil
 	fake.entityReturns = struct {
-		result1 models.Entity
+		result1 *models.Entity
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeStoreProvider) EntityReturnsOnCall(i int, result1 models.Entity, result2 error) {
+func (fake *FakeStoreProvider) EntityReturnsOnCall(i int, result1 *models.Entity, result2 error) {
 	fake.entityMutex.Lock()
 	defer fake.entityMutex.Unlock()
 	fake.EntityStub = nil
 	if fake.entityReturnsOnCall == nil {
 		fake.entityReturnsOnCall = make(map[int]struct {
-			result1 models.Entity
+			result1 *models.Entity
 			result2 error
 		})
 	}
 	fake.entityReturnsOnCall[i] = struct {
-		result1 models.Entity
+		result1 *models.Entity
 		result2 error
 	}{result1, result2}
 }
@@ -187,7 +187,7 @@ func (fake *FakeStoreProvider) EntityEventSourceReturnsOnCall(i int, result1 mod
 	}{result1}
 }
 
-func (fake *FakeStoreProvider) Stream(arg1 int) (models.Stream, error) {
+func (fake *FakeStoreProvider) Stream(arg1 int) (*models.Stream, error) {
 	fake.streamMutex.Lock()
 	ret, specificReturn := fake.streamReturnsOnCall[len(fake.streamArgsForCall)]
 	fake.streamArgsForCall = append(fake.streamArgsForCall, struct {
@@ -211,7 +211,7 @@ func (fake *FakeStoreProvider) StreamCallCount() int {
 	return len(fake.streamArgsForCall)
 }
 
-func (fake *FakeStoreProvider) StreamCalls(stub func(int) (models.Stream, error)) {
+func (fake *FakeStoreProvider) StreamCalls(stub func(int) (*models.Stream, error)) {
 	fake.streamMutex.Lock()
 	defer fake.streamMutex.Unlock()
 	fake.StreamStub = stub
@@ -224,28 +224,28 @@ func (fake *FakeStoreProvider) StreamArgsForCall(i int) int {
 	return argsForCall.arg1
 }
 
-func (fake *FakeStoreProvider) StreamReturns(result1 models.Stream, result2 error) {
+func (fake *FakeStoreProvider) StreamReturns(result1 *models.Stream, result2 error) {
 	fake.streamMutex.Lock()
 	defer fake.streamMutex.Unlock()
 	fake.StreamStub = nil
 	fake.streamReturns = struct {
-		result1 models.Stream
+		result1 *models.Stream
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeStoreProvider) StreamReturnsOnCall(i int, result1 models.Stream, result2 error) {
+func (fake *FakeStoreProvider) StreamReturnsOnCall(i int, result1 *models.Stream, result2 error) {
 	fake.streamMutex.Lock()
 	defer fake.streamMutex.Unlock()
 	fake.StreamStub = nil
 	if fake.streamReturnsOnCall == nil {
 		fake.streamReturnsOnCall = make(map[int]struct {
-			result1 models.Stream
+			result1 *models.Stream
 			result2 error
 		})
 	}
 	fake.streamReturnsOnCall[i] = struct {
-		result1 models.Stream
+		result1 *models.Stream
 		result2 error
 	}{result1, result2}
 }

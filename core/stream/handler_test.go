@@ -18,6 +18,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("Handler", func() {
@@ -67,8 +68,8 @@ var _ = Describe("Handler", func() {
 
 		streams = store.Streams{
 			Map: map[int]*models.Stream{
-				0: &models.Stream{},
-				1: &models.Stream{},
+				0: {},
+				1: {},
 			},
 			KeyOrder: []int{0, 1},
 		}
@@ -98,7 +99,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(entityEvents).To(BeEmpty())
 
-		expectedStream := models.Stream{
+		expectedStream := &models.Stream{
 			ID:          1234,
 			EntitiesMap: make(map[uint64]*models.Entity),
 		}
@@ -110,8 +111,11 @@ var _ = Describe("Handler", func() {
 			},
 		}))
 
-		Expect(streams.Map).To(HaveKeyWithValue(1234, &expectedStream))
+		Expect(streams.Map).To(HaveKeyWithValue(1234, expectedStream))
 		Expect(streams.KeyOrder).To(Equal([]int{0, 1, 1234}))
+
+		Expect(validate.Validate(streamEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	Context("when shutting down", func() {
@@ -144,6 +148,9 @@ var _ = Describe("Handler", func() {
 
 			Expect(streams.Map).ToNot(HaveKey(1234))
 			Expect(streams.KeyOrder).To(Equal([]int{0, 1}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 
@@ -154,8 +161,10 @@ var _ = Describe("Handler", func() {
 				ID:          1234,
 				CharacterID: 0x12345678,
 				EntitiesMap: map[uint64]*models.Entity{
-					0x12345678: &models.Entity{
-						Location: models.Location{},
+					0x12345678: {
+						Location:  &models.Location{},
+						ClassJob:  &models.ClassJob{},
+						Resources: &models.Resources{},
 					},
 				},
 			}
@@ -193,7 +202,7 @@ var _ = Describe("Handler", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(streamEvents).To(BeEmpty())
 
-				expectedLocation := models.Location{
+				expectedLocation := &models.Location{
 					Orientation: math.Pi, X: x, Y: y, Z: z,
 				}
 				Expect(entityEvents).To(ConsistOf(models.EntityEvent{
@@ -203,11 +212,15 @@ var _ = Describe("Handler", func() {
 				}))
 
 				Expect(streams.Map[1234].EntitiesMap[0x12345678].Location).To(Equal(expectedLocation))
+
+				Expect(validate.Validate(entityEvents)).To(Succeed())
+				Expect(validate.Validate(streams)).To(Succeed())
 			}
 
 			expectLocationUpdate(u1, 200, 200, -600)
 			expectLocationUpdate(u2, 200, 200, -200)
 			expectLocationUpdate(u3, 200, 200, 200)
+
 		})
 	})
 
@@ -218,8 +231,10 @@ var _ = Describe("Handler", func() {
 				ID:          1234,
 				CharacterID: 0x12345678,
 				EntitiesMap: map[uint64]*models.Entity{
-					0x12345678: &models.Entity{
-						Location: models.Location{},
+					0x12345678: {
+						Location:  &models.Location{},
+						ClassJob:  &models.ClassJob{},
+						Resources: &models.Resources{},
 					},
 				},
 			}
@@ -257,7 +272,7 @@ var _ = Describe("Handler", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(streamEvents).To(BeEmpty())
 
-				expectedLocation := models.Location{
+				expectedLocation := &models.Location{
 					Orientation: math.Pi, X: x, Y: y, Z: z,
 				}
 				Expect(entityEvents).To(ConsistOf(models.EntityEvent{
@@ -267,6 +282,9 @@ var _ = Describe("Handler", func() {
 				}))
 
 				Expect(streams.Map[1234].EntitiesMap[0x12345678].Location).To(Equal(expectedLocation))
+
+				Expect(validate.Validate(entityEvents)).To(Succeed())
+				Expect(validate.Validate(streams)).To(Succeed())
 			}
 
 			expectLocationUpdate(u1, 200, 200, -600)

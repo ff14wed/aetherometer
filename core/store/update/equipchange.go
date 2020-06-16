@@ -49,14 +49,14 @@ func (u equipChangeUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 }
 
 func (u equipChangeUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
-	entity.ClassJob = u.classJob
+	entity.ClassJob = &u.classJob
 	entity.Level = u.level
 
 	return nil, []models.EntityEvent{{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateClass{
-			ClassJob: u.classJob,
+			ClassJob: &u.classJob,
 			Level:    u.level,
 		},
 	}}, nil

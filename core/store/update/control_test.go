@@ -8,6 +8,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("Control Update", func() {
@@ -70,6 +71,9 @@ var _ = Describe("Control Update", func() {
 				}))
 
 				Expect(entity.CastingInfo).To(BeNil())
+
+				Expect(validate.Validate(entityEvents)).To(Succeed())
+				Expect(validate.Validate(streams)).To(Succeed())
 			})
 
 			entityValidationTests(testEnv, false)
@@ -125,6 +129,9 @@ var _ = Describe("Control Update", func() {
 			}))
 
 			Expect(entity.LockonMarker).To(Equal(expectedLockonMarker))
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 
 		entityValidationTests(testEnv, false)

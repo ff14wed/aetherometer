@@ -45,11 +45,12 @@ func (u hpmptpUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) (
 	}
 	entity.Resources.LastTick = u.resources.LastTick
 
+	resourcesClone := *entity.Resources
 	return nil, []models.EntityEvent{
 		{
 			StreamID: u.streamID,
 			EntityID: u.subjectID,
-			Type:     models.UpdateResources{Resources: entity.Resources},
+			Type:     models.UpdateResources{Resources: &resourcesClone},
 		},
 	}, nil
 }

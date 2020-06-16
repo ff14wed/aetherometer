@@ -10,6 +10,7 @@ import (
 	"github.com/ff14wed/xivnet/v3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 type testVars struct {
@@ -28,7 +29,12 @@ func genericSetup() (testEnv testVars) {
 	testEnv.streamID = 1234
 	testEnv.subjectID = 0x12345678
 
-	testEnv.entity = &models.Entity{ID: testEnv.subjectID, Name: "Test Subject"}
+	testEnv.entity = &models.Entity{
+		ID: testEnv.subjectID, Name: "Test Subject",
+		ClassJob:  &models.ClassJob{},
+		Resources: &models.Resources{},
+		Location:  &models.Location{},
+	}
 
 	testEnv.streams = &store.Streams{
 		Map: map[int]*models.Stream{
@@ -44,7 +50,12 @@ func genericSetup() (testEnv testVars) {
 				EntitiesMap: map[uint64]*models.Entity{
 					testEnv.subjectID: testEnv.entity,
 					0x23456789:        nil,
-					0x99999999:        {ID: 0x99999999, Index: 123},
+					0x99999999: {
+						ID: 0x99999999, Index: 123,
+						ClassJob:  &models.ClassJob{},
+						Resources: &models.Resources{},
+						Location:  &models.Location{},
+					},
 				},
 			},
 		},
@@ -81,6 +92,8 @@ func streamValidationTests(testEnv *testVars, isEgress bool) {
 		Expect(err).To(MatchError(update.ErrorStreamNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
+
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 }
 
@@ -102,6 +115,8 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		Expect(err).To(MatchError(update.ErrorEntityNotFound))
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
+
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	It("does nothing if the entity is nil", func() {
@@ -119,6 +134,8 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		Expect(err).To(BeNil())
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
+
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	It("does nothing if the stream's CharacterID is 0", func() {
@@ -136,5 +153,7 @@ func entityValidationTests(testEnv *testVars, isEgress bool) {
 		Expect(err).To(BeNil())
 		Expect(streamEvents).To(BeEmpty())
 		Expect(entityEvents).To(BeEmpty())
+
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 }

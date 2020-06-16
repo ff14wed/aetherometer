@@ -28,7 +28,7 @@ func actionFromHeader(h datatypes.ActionHeader, d *datasheet.Collection, t time.
 		GlobalCounter:     int(h.GlobalCounter),
 		AnimationLockTime: float64(h.AnimationLockTime),
 		HiddenAnimation:   int(h.HiddenAnimation),
-		Location: models.Location{
+		Location: &models.Location{
 			Orientation: getCanonicalOrientation(uint32(h.Direction), 0xFFFF),
 			LastUpdated: t,
 		},
@@ -108,7 +108,7 @@ func (u actionUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) (
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.UpdateLastAction{
-			Action: *entity.LastAction,
+			Action: entity.LastAction,
 		},
 	}}
 

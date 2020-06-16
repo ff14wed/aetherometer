@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"go.uber.org/zap"
 
 	"github.com/ff14wed/aetherometer/core/config"
@@ -123,8 +123,8 @@ var _ = Describe("Auth", func() {
 					AdminOTP: adminOTP,
 				}
 				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) handler.InitPayload {
-					return handler.InitPayload{"Authorization": adminToken}
+				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
+					return transport.InitPayload{"Authorization": adminToken}
 				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -390,8 +390,8 @@ var _ = Describe("Auth", func() {
 					AdminOTP: adminOTP,
 				}
 				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) handler.InitPayload {
-					return handler.InitPayload{"Authorization": apiToken}
+				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
+					return transport.InitPayload{"Authorization": apiToken}
 				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 

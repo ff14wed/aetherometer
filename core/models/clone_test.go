@@ -20,15 +20,15 @@ var _ = Describe("Stream Clone", func() {
 			Place: models.Place{
 				MapID: 20,
 				Maps: []models.MapInfo{
-					models.MapInfo{ID: "some-map"},
+					{ID: "some-map"},
 				},
 			},
 			Enmity: models.Enmity{
 				TargetHateRanking: []models.HateRanking{
-					models.HateRanking{ActorID: 2345, Hate: 1000},
+					{ActorID: 2345, Hate: 1000},
 				},
 				NearbyEnemyHate: []models.HateEntry{
-					models.HateEntry{EnemyID: 3456, HatePercent: 99},
+					{EnemyID: 3456, HatePercent: 99},
 				},
 			},
 
@@ -36,7 +36,7 @@ var _ = Describe("Stream Clone", func() {
 				StepNum: 900,
 			},
 			EntitiesMap: map[uint64]*models.Entity{
-				1: &models.Entity{
+				1: {
 					ID: 1, Index: 2, Name: "FooBar",
 					BNPCInfo: &models.NPCInfo{
 						Name: &bNPCInfoName,
@@ -45,12 +45,12 @@ var _ = Describe("Stream Clone", func() {
 					LastAction: &models.Action{
 						TargetID: 5678,
 						Effects: []models.ActionEffect{
-							models.ActionEffect{TargetID: 2345},
+							{TargetID: 2345},
 						},
 					},
 					CastingInfo: &models.CastingInfo{ActionID: 100},
 					Statuses: []*models.Status{
-						&models.Status{ID: 50},
+						{ID: 50},
 					},
 				},
 			},
@@ -119,8 +119,8 @@ var _ = Describe("Stream Clone", func() {
 			stream = &models.Stream{
 				ID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
-					1: &models.Entity{ID: 1, Index: 2, Name: "FooBar"},
-					2: &models.Entity{ID: 1, Index: 2, Name: "FooBar", BNPCInfo: &models.NPCInfo{}},
+					1: {ID: 1, Index: 2, Name: "FooBar"},
+					2: {ID: 1, Index: 2, Name: "FooBar", BNPCInfo: &models.NPCInfo{}},
 					3: nil,
 				},
 			}

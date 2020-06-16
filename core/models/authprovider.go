@@ -2,8 +2,6 @@ package models
 
 import "context"
 
-//go:generate counterfeiter . AuthProvider
-
 // AuthProvider describes the expected interface of an auth provider
 // that handles creation of auth tokens and authorization of them.
 type AuthProvider interface {

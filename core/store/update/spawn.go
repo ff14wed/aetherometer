@@ -63,21 +63,21 @@ func generateSpawnUpdate(
 		TargetID: data.TargetID,
 		OwnerID:  uint64(data.OwnerID),
 		Level:    int(data.Level),
-		ClassJob: models.ClassJob{
+		ClassJob: &models.ClassJob{
 			ID: int(data.ClassJob),
 		},
-		IsNPC:   isNPCSpawn,
+		IsNpc:   isNPCSpawn,
 		IsEnemy: (data.EnemyType != 0),
 		IsPet:   (data.EnemyType == 0 && data.Subtype == 2),
 
-		Resources: models.Resources{
+		Resources: &models.Resources{
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
-			MaxHP:    int(data.MaxHP),
-			MaxMP:    int(data.MaxMP),
+			MaxHp:    int(data.MaxHP),
+			MaxMp:    int(data.MaxMP),
 			LastTick: now,
 		},
-		Location: models.Location{
+		Location: &models.Location{
 			Orientation: getCanonicalOrientation(uint32(data.Direction), 0x10000),
 			X:           float64(data.X),
 			Z:           float64(data.Z),
@@ -149,8 +149,8 @@ func generateSpawnUpdate(
 	)
 
 	if subjectID == currentID {
-		homeWorld = d.WorldData.Lookup(int(data.HomeWorld))
-		currentWorld = d.WorldData.Lookup(int(data.CurrentWorld))
+		homeWorld = *d.WorldData.Lookup(int(data.HomeWorld))
+		currentWorld = *d.WorldData.Lookup(int(data.CurrentWorld))
 		isWorldSet = true
 	}
 
@@ -203,11 +203,12 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 		break
 	}
 
+	entityClone := u.entity.Clone()
 	entityEvents = append(entityEvents, models.EntityEvent{
 		StreamID: u.streamID,
 		EntityID: u.subjectID,
 		Type: models.AddEntity{
-			Entity: u.entity,
+			Entity: &entityClone,
 		},
 	})
 
@@ -224,8 +225,8 @@ func (u entitySpawnUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 				InstanceNum: stream.InstanceNum,
 
 				CharacterID:  stream.CharacterID,
-				HomeWorld:    u.homeWorld,
-				CurrentWorld: u.currentWorld,
+				HomeWorld:    &u.homeWorld,
+				CurrentWorld: &u.currentWorld,
 			},
 		})
 	}

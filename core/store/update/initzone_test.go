@@ -9,6 +9,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("InitZone Update", func() {
@@ -99,6 +100,11 @@ var _ = Describe("InitZone Update", func() {
 		Expect(streams.Map[streamID].ServerID).To(Equal(int(b.ServerID)))
 		Expect(streams.Map[streamID].CharacterID).To(Equal(uint64(b.CurrentID)))
 		Expect(streams.Map[streamID].InstanceNum).To(Equal(0))
+		Expect(streams.Map[streamID].CurrentWorld).ToNot(BeNil())
+		Expect(streams.Map[streamID].HomeWorld).ToNot(BeNil())
+
+		Expect(validate.Validate(streamEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	It("generates an update that changes the place", func() {
@@ -111,9 +117,12 @@ var _ = Describe("InitZone Update", func() {
 		Expect(streamEvents[1].StreamID).To(Equal(streamID))
 		eventType, assignable := streamEvents[1].Type.(models.UpdateMap)
 		Expect(assignable).To(BeTrue())
-		Expect(eventType.Place).To(Equal(expectedPlace))
+		Expect(eventType.Place).To(Equal(&expectedPlace))
 
 		Expect(streams.Map[streamID].Place).To(Equal(expectedPlace))
+
+		Expect(validate.Validate(streamEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	It("generates an update that clears the entity map", func() {
@@ -130,6 +139,9 @@ var _ = Describe("InitZone Update", func() {
 		Expect(eventType.Entities).To(BeNil())
 
 		Expect(streams.Map[streamID].EntitiesMap).To(BeEmpty())
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	streamValidationTests(testEnv, false)

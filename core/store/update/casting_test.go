@@ -13,6 +13,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("Casting Update", func() {
@@ -69,7 +70,7 @@ var _ = Describe("Casting Update", func() {
 			StartTime: b.Time,
 			CastTime:  time.Unix(1, 0),
 			TargetID:  0x5678,
-			Location: models.Location{
+			Location: &models.Location{
 				Orientation: 2 * math.Pi * float64(float32(0.5)),
 				X:           1000,
 				Y:           -1000,
@@ -100,6 +101,9 @@ var _ = Describe("Casting Update", func() {
 		}))
 
 		Expect(entity.CastingInfo).To(Equal(&expectedCastingInfo))
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	Context("when the action ID name is not found in the datasheets", func() {
@@ -129,6 +133,9 @@ var _ = Describe("Casting Update", func() {
 			}))
 
 			Expect(entity.CastingInfo).To(Equal(&expectedCastingInfo))
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 
@@ -153,6 +160,9 @@ var _ = Describe("Casting Update", func() {
 			}))
 
 			Expect(entity.CastingInfo).To(Equal(&expectedCastingInfo))
+
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 

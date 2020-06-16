@@ -26,8 +26,8 @@ var _ = Describe("BuildAdapterInventory", func() {
 		hookBuilder = new(streamfakes.FakeAdapterBuilder)
 		testBuilder = new(streamfakes.FakeAdapterBuilder)
 		inventory = []stream.AdapterInfo{
-			stream.AdapterInfo{Name: "Hook", Builder: hookBuilder},
-			stream.AdapterInfo{Name: "Test", Builder: testBuilder},
+			{Name: "Hook", Builder: hookBuilder},
+			{Name: "Test", Builder: testBuilder},
 		}
 
 		streamUp = make(chan stream.Provider)

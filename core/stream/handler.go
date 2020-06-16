@@ -75,15 +75,15 @@ type addStreamUpdate struct {
 }
 
 func (u addStreamUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, []models.EntityEvent, error) {
-	s := models.Stream{
+	s := &models.Stream{
 		ID:          u.streamID,
 		EntitiesMap: make(map[uint64]*models.Entity),
 	}
 
-	streams.Map[u.streamID] = &s
+	streams.Map[u.streamID] = s
 	streams.KeyOrder = append(streams.KeyOrder, u.streamID)
 
-	return []models.StreamEvent{models.StreamEvent{
+	return []models.StreamEvent{{
 		StreamID: u.streamID,
 		Type:     models.AddStream{Stream: s},
 	}}, nil, nil
@@ -105,7 +105,7 @@ func (u removeStreamUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 		streams.KeyOrder = append(streams.KeyOrder[:streamIDX], streams.KeyOrder[streamIDX+1:]...)
 	}
 
-	return []models.StreamEvent{models.StreamEvent{
+	return []models.StreamEvent{{
 		StreamID: u.streamID,
 		Type:     models.RemoveStream{ID: u.streamID},
 	}}, nil, nil

@@ -30,31 +30,31 @@ var _ = Describe("Models", func() {
 			stream1 = models.Stream{
 				ID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
-					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
-					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
+					1: {ID: 1, Name: "FooBar", Index: 2},
+					2: {ID: 2, Name: "Baah", Index: 1},
 				},
 			}
 			stream2 = models.Stream{ID: 5678}
 			fakeStoreProvider.StreamsReturns([]models.Stream{stream1, stream2}, nil)
 
-			fakeStoreProvider.StreamStub = func(streamID int) (models.Stream, error) {
+			fakeStoreProvider.StreamStub = func(streamID int) (*models.Stream, error) {
 				if streamID == 1234 {
-					return stream1, nil
+					return &stream1, nil
 				} else if streamID == 5678 {
-					return stream2, nil
+					return &stream2, nil
 				}
-				return models.Stream{}, errors.New("not found")
+				return nil, errors.New("not found")
 			}
 
-			fakeStoreProvider.EntityStub = func(streamID int, entityID uint64) (models.Entity, error) {
+			fakeStoreProvider.EntityStub = func(streamID int, entityID uint64) (*models.Entity, error) {
 				s, err := fakeStoreProvider.Stream(streamID)
 				if err != nil {
-					return models.Entity{}, err
+					return nil, err
 				}
 				if e, found := s.EntitiesMap[entityID]; found {
-					return *e, nil
+					return e, nil
 				}
-				return models.Entity{}, errors.New("not found")
+				return nil, errors.New("not found")
 			}
 
 			fakeStoreProvider.StreamEventSourceReturns(fakeStreamEventSource)
@@ -85,7 +85,7 @@ var _ = Describe("Models", func() {
 
 		Describe("Stream", func() {
 			It("returns the requested stream from the store", func() {
-				Expect(resolver.Query().Stream(context.Background(), 5678)).To(Equal(stream2))
+				Expect(resolver.Query().Stream(context.Background(), 5678)).To(Equal(&stream2))
 			})
 
 			It("returns an error if the requested stream does not exist", func() {
@@ -109,7 +109,7 @@ var _ = Describe("Models", func() {
 		Describe("Entity", func() {
 			It("returns the requested entity from the store", func() {
 				Expect(resolver.Query().Entity(context.Background(), 1234, 1)).To(Equal(
-					models.Entity{ID: 1, Name: "FooBar", Index: 2},
+					&models.Entity{ID: 1, Name: "FooBar", Index: 2},
 				))
 			})
 
@@ -137,10 +137,10 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("StreamEvent", func() {
-			var eventsChannel chan models.StreamEvent
+			var eventsChannel chan *models.StreamEvent
 
 			BeforeEach(func() {
-				eventsChannel = make(chan models.StreamEvent, 1)
+				eventsChannel = make(chan *models.StreamEvent, 1)
 				fakeStreamEventSource.SubscribeReturns(eventsChannel, 1234)
 			})
 
@@ -152,14 +152,14 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				payload := models.StreamEvent{
+				payload := &models.StreamEvent{
 					StreamID: 123,
 				}
 				eventsChannel <- payload
 				ch, err := resolver.Subscription().StreamEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
-				var receivedPayload models.StreamEvent
+				var receivedPayload *models.StreamEvent
 				Expect(ch).To(Receive(&receivedPayload))
 				Expect(receivedPayload).To(Equal(payload))
 			})
@@ -190,10 +190,10 @@ var _ = Describe("Models", func() {
 		})
 
 		Describe("EntityEvent", func() {
-			var eventsChannel chan models.EntityEvent
+			var eventsChannel chan *models.EntityEvent
 
 			BeforeEach(func() {
-				eventsChannel = make(chan models.EntityEvent, 1)
+				eventsChannel = make(chan *models.EntityEvent, 1)
 				fakeEntityEventSource.SubscribeReturns(eventsChannel, 1234)
 			})
 
@@ -205,14 +205,14 @@ var _ = Describe("Models", func() {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 
-				payload := models.EntityEvent{
+				payload := &models.EntityEvent{
 					StreamID: 123,
 				}
 				eventsChannel <- payload
 				ch, err := resolver.Subscription().EntityEvent(ctx)
 				Expect(err).ToNot(HaveOccurred())
 
-				var receivedPayload models.EntityEvent
+				var receivedPayload *models.EntityEvent
 				Expect(ch).To(Receive(&receivedPayload))
 				Expect(receivedPayload).To(Equal(payload))
 			})

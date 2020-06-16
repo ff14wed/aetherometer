@@ -4,27 +4,28 @@ package main
 
 import (
 	"log"
-	"os"
-	"path/filepath"
 
-	"github.com/99designs/gqlgen/cmd"
-	"github.com/99designs/gqlgen/codegen"
+	"github.com/99designs/gqlgen/api"
+	"github.com/99designs/gqlgen/codegen/config"
+
+	"github.com/99designs/gqlgen/plugin/resolvergen"
+	"github.com/ff14wed/aetherometer/core/scripts/modelgen"
 )
 
 func main() {
-	config, err := codegen.LoadConfigFromDefaultLocations()
+	cfg, err := config.LoadConfigFromDefaultLocations()
 	if err != nil {
 		log.Fatalln("cannot find gqlgen.yml anywhere from current working directory:", err)
 	}
 
-	p, err := filepath.Abs(config.Resolver.Filename)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	log.Println("Regenerating GraphQL models and resolvers...")
+	err = api.Generate(cfg,
+		api.NoPlugins(),
+		api.AddPlugin(modelgen.New()),
+		api.AddPlugin(resolvergen.New()),
+	)
 
-	err = os.Remove(p)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("gqlgen generation error:", err)
 	}
-	cmd.Execute()
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("Chat Update", func() {
@@ -55,12 +56,12 @@ var _ = Describe("Chat Update", func() {
 
 			expectedChatEvent = models.ChatEvent{
 				ChannelID:    0x0,
-				ChannelWorld: models.World{ID: 456, Name: "Bar"},
+				ChannelWorld: &models.World{ID: 456, Name: "Bar"},
 				ChannelType:  "Private",
 
 				ContentID: 0x004000170000001,
 				EntityID:  0x0,
-				World:     models.World{ID: 123, Name: "Foo"},
+				World:     &models.World{ID: 123, Name: "Foo"},
 				Name:      "Sender",
 				Message:   "Private message",
 			}
@@ -77,6 +78,9 @@ var _ = Describe("Chat Update", func() {
 				StreamID: streamID,
 				Type:     expectedChatEvent,
 			}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 
 		streamValidationTests(testEnv, false)
@@ -96,12 +100,12 @@ var _ = Describe("Chat Update", func() {
 
 			expectedChatEvent = models.ChatEvent{
 				ChannelID:    0xABCD,
-				ChannelWorld: models.World{ID: 456, Name: "Bar"},
+				ChannelWorld: &models.World{ID: 456, Name: "Bar"},
 				ChannelType:  "PrivateTo",
 
 				ContentID: 0x004000170000002,
 				EntityID:  0x0,
-				World:     models.World{ID: 123, Name: "Foo"},
+				World:     &models.World{ID: 123, Name: "Foo"},
 				Name:      "Recipient",
 				Message:   "Private message",
 			}
@@ -118,6 +122,9 @@ var _ = Describe("Chat Update", func() {
 				StreamID: streamID,
 				Type:     expectedChatEvent,
 			}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 
 		streamValidationTests(testEnv, true)
@@ -160,12 +167,12 @@ var _ = Describe("Chat Update", func() {
 
 					expectedChatEvent = models.ChatEvent{
 						ChannelID:    channelID,
-						ChannelWorld: models.World{ID: 123, Name: "Foo"},
+						ChannelWorld: &models.World{ID: 123, Name: "Foo"},
 						ChannelType:  channelType,
 
 						ContentID: 0x004000170000001,
 						EntityID:  0x12345678,
-						World:     models.World{ID: 456, Name: "Bar"},
+						World:     &models.World{ID: 456, Name: "Bar"},
 						Name:      "Sender",
 						Message:   "Blah blah",
 					}
@@ -182,6 +189,9 @@ var _ = Describe("Chat Update", func() {
 						StreamID: streamID,
 						Type:     expectedChatEvent,
 					}))
+
+					Expect(validate.Validate(streamEvents)).To(Succeed())
+					Expect(validate.Validate(streams)).To(Succeed())
 				})
 				streamValidationTests(testEnv, false)
 			})
@@ -222,12 +232,12 @@ var _ = Describe("Chat Update", func() {
 
 					expectedChatEvent = models.ChatEvent{
 						ChannelID:    channelID,
-						ChannelWorld: models.World{ID: 123, Name: "Foo"},
+						ChannelWorld: &models.World{ID: 123, Name: "Foo"},
 						ChannelType:  channelType,
 
 						ContentID: 0,
 						EntityID:  subjectID,
-						World:     models.World{ID: 456, Name: "Bar"},
+						World:     &models.World{ID: 456, Name: "Bar"},
 						Name:      "Test Subject",
 						Message:   "Blah blah",
 					}
@@ -244,6 +254,9 @@ var _ = Describe("Chat Update", func() {
 						StreamID: streamID,
 						Type:     expectedChatEvent,
 					}))
+
+					Expect(validate.Validate(streamEvents)).To(Succeed())
+					Expect(validate.Validate(streams)).To(Succeed())
 				})
 				streamValidationTests(testEnv, true)
 			})
@@ -265,10 +278,11 @@ var _ = Describe("Chat Update", func() {
 
 				expectedChatEvent = models.ChatEvent{
 					ChannelID:    0xABCD,
-					ChannelWorld: models.World{ID: 456, Name: "Bar"},
+					ChannelWorld: &models.World{ID: 456, Name: "Bar"},
 					ChannelType:  "FreeCompanyResult",
 
 					ContentID: 0x004000170000001,
+					World:     &models.World{ID: 456, Name: "Bar"},
 					Name:      "Free the Company",
 					Message:   "Some Employee has logged in.",
 				}
@@ -285,6 +299,9 @@ var _ = Describe("Chat Update", func() {
 					StreamID: streamID,
 					Type:     expectedChatEvent,
 				}))
+
+				Expect(validate.Validate(streamEvents)).To(Succeed())
+				Expect(validate.Validate(streams)).To(Succeed())
 			})
 
 			streamValidationTests(testEnv, false)
@@ -304,10 +321,11 @@ var _ = Describe("Chat Update", func() {
 
 				expectedChatEvent = models.ChatEvent{
 					ChannelID:    0xABCD,
-					ChannelWorld: models.World{ID: 456, Name: "Bar"},
+					ChannelWorld: &models.World{ID: 456, Name: "Bar"},
 					ChannelType:  "FreeCompanyResult",
 
 					ContentID: 0x004000170000001,
+					World:     &models.World{ID: 456, Name: "Bar"},
 					Name:      "Free the Company",
 					Message:   "Some Employee has logged out.",
 				}
@@ -324,6 +342,9 @@ var _ = Describe("Chat Update", func() {
 					StreamID: streamID,
 					Type:     expectedChatEvent,
 				}))
+
+				Expect(validate.Validate(streamEvents)).To(Succeed())
+				Expect(validate.Validate(streams)).To(Succeed())
 			})
 
 			streamValidationTests(testEnv, false)
@@ -347,12 +368,13 @@ var _ = Describe("Chat Update", func() {
 			b.Data = chatData
 
 			expectedChatEvent = models.ChatEvent{
-				ChannelID:   channelID,
-				ChannelType: "CrossWorldLinkshell",
+				ChannelID:    channelID,
+				ChannelWorld: new(models.World),
+				ChannelType:  "CrossWorldLinkshell",
 
 				ContentID: 0x004000170000001,
 				EntityID:  0x12345678,
-				World:     models.World{ID: 456, Name: "Bar"},
+				World:     &models.World{ID: 456, Name: "Bar"},
 				Name:      "Sender",
 				Message:   "Blah blah",
 			}
@@ -369,6 +391,9 @@ var _ = Describe("Chat Update", func() {
 				StreamID: streamID,
 				Type:     expectedChatEvent,
 			}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 		streamValidationTests(testEnv, false)
 	})
@@ -386,12 +411,13 @@ var _ = Describe("Chat Update", func() {
 			b.Data = chatData
 
 			expectedChatEvent = models.ChatEvent{
-				ChannelID:   channelID,
-				ChannelType: "CrossWorldLinkshell",
+				ChannelID:    channelID,
+				ChannelWorld: new(models.World),
+				ChannelType:  "CrossWorldLinkshell",
 
 				ContentID: 0,
 				EntityID:  subjectID,
-				World:     models.World{ID: 456, Name: "Bar"},
+				World:     &models.World{ID: 456, Name: "Bar"},
 				Name:      "Test Subject",
 				Message:   "Blah blah",
 			}
@@ -408,6 +434,9 @@ var _ = Describe("Chat Update", func() {
 				StreamID: streamID,
 				Type:     expectedChatEvent,
 			}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 		streamValidationTests(testEnv, true)
 	})
@@ -442,12 +471,12 @@ var _ = Describe("Chat Update", func() {
 					b.Data = chatData
 
 					expectedChatEvent = models.ChatEvent{
-						ChannelWorld: models.World{ID: 123, Name: "Foo"},
+						ChannelWorld: &models.World{ID: 123, Name: "Foo"},
 						ChannelType:  channelType,
 
 						ContentID: 0x004000170000001,
 						EntityID:  0x12345678,
-						World:     models.World{ID: 456, Name: "Bar"},
+						World:     &models.World{ID: 456, Name: "Bar"},
 						Name:      "Sender",
 						Message:   "Blah blah",
 					}
@@ -464,6 +493,8 @@ var _ = Describe("Chat Update", func() {
 						StreamID: streamID,
 						Type:     expectedChatEvent,
 					}))
+					Expect(validate.Validate(streamEvents)).To(Succeed())
+					Expect(validate.Validate(streams)).To(Succeed())
 				})
 				streamValidationTests(testEnv, false)
 			})
@@ -496,12 +527,12 @@ var _ = Describe("Chat Update", func() {
 					b.Data = chatData
 
 					expectedChatEvent = models.ChatEvent{
-						ChannelWorld: models.World{ID: 123, Name: "Foo"},
+						ChannelWorld: &models.World{ID: 123, Name: "Foo"},
 						ChannelType:  channelType,
 
 						ContentID: 0,
 						EntityID:  subjectID,
-						World:     models.World{ID: 456, Name: "Bar"},
+						World:     &models.World{ID: 456, Name: "Bar"},
 						Name:      "Test Subject",
 						Message:   "Blah blah",
 					}
@@ -518,6 +549,8 @@ var _ = Describe("Chat Update", func() {
 						StreamID: streamID,
 						Type:     expectedChatEvent,
 					}))
+					Expect(validate.Validate(streamEvents)).To(Succeed())
+					Expect(validate.Validate(streams)).To(Succeed())
 				})
 				streamValidationTests(testEnv, true)
 			})

@@ -51,7 +51,7 @@ func (u hateRankingUpdate) ModifyStore(streams *store.Streams) ([]models.StreamE
 	return []models.StreamEvent{{
 		StreamID: u.streamID,
 		Type: models.UpdateEnmity{
-			Enmity: stream.Enmity,
+			Enmity: &stream.Enmity,
 		},
 	}}, nil, nil
 }

@@ -26,7 +26,7 @@ import (
 // Expected output:
 // 	models.EntityEvent{StreamID:1, EntityID:0, Type:models.EntityEventType(nil)}
 type EntityHub struct {
-	subscribers map[uint64]chan models.EntityEvent
+	subscribers map[uint64]chan *models.EntityEvent
 	baseSubID   uint64
 	chanSize    int
 
@@ -36,7 +36,7 @@ type EntityHub struct {
 // NewEntityHub creates a new hub for broadcasting Entity events to subscribers
 func NewEntityHub(chanSize int) *EntityHub {
 	return &EntityHub{
-		subscribers: make(map[uint64]chan models.EntityEvent),
+		subscribers: make(map[uint64]chan *models.EntityEvent),
 		baseSubID:   0,
 		chanSize:    chanSize,
 	}
@@ -44,7 +44,7 @@ func NewEntityHub(chanSize int) *EntityHub {
 
 // Broadcast sends the message to all subscribers of this hub
 func (h *EntityHub) Broadcast(payload models.EntityEvent) {
-	subsList := []chan models.EntityEvent{}
+	subsList := []chan *models.EntityEvent{}
 	h.subLock.Lock()
 	for _, sub := range h.subscribers {
 		subsList = append(subsList, sub)
@@ -52,8 +52,9 @@ func (h *EntityHub) Broadcast(payload models.EntityEvent) {
 	h.subLock.Unlock()
 
 	for _, sub := range subsList {
+		payloadClone := payload
 		select {
-		case sub <- payload:
+		case sub <- &payloadClone:
 		default:
 			fmt.Println("Channel is blocked. Dropping message:", payload)
 		}
@@ -61,8 +62,8 @@ func (h *EntityHub) Broadcast(payload models.EntityEvent) {
 }
 
 // Subscribe adds a new hub subscriber
-func (h *EntityHub) Subscribe() (chan models.EntityEvent, uint64) {
-	sub := make(chan models.EntityEvent, h.chanSize)
+func (h *EntityHub) Subscribe() (chan *models.EntityEvent, uint64) {
+	sub := make(chan *models.EntityEvent, h.chanSize)
 	id := atomic.AddUint64(&h.baseSubID, 1)
 	h.subLock.Lock()
 	h.subscribers[id] = sub

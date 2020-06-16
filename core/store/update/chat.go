@@ -175,8 +175,9 @@ func newChatXWorldUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection)
 	return chatUpdate{
 		streamID: streamID,
 		chatEvent: models.ChatEvent{
-			ChannelID:   data.ChannelID,
-			ChannelType: channelType,
+			ChannelID:    data.ChannelID,
+			ChannelWorld: new(models.World),
+			ChannelType:  channelType,
 
 			ContentID: data.SpeakerCharacterID,
 			EntityID:  uint64(data.SpeakerEntityID),
@@ -198,8 +199,9 @@ func newEgressChatXWorldUpdate(streamID int, b *xivnet.Block, d *datasheet.Colle
 	return chatUpdate{
 		streamID: streamID,
 		chatEvent: models.ChatEvent{
-			ChannelID:   data.ChannelID,
-			ChannelType: channelType,
+			ChannelID:    data.ChannelID,
+			ChannelWorld: new(models.World),
+			ChannelType:  channelType,
 
 			Message: data.Message.String(),
 		},
@@ -267,7 +269,7 @@ func (u chatUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, [
 
 	// If chat type is Zone, then the channel world is CurrentWorld.
 	if strings.HasPrefix(u.chatEvent.ChannelType, "Zone") {
-		u.chatEvent.ChannelWorld = stream.CurrentWorld
+		u.chatEvent.ChannelWorld = &stream.CurrentWorld
 	}
 
 	// Using ContentID to check if it was an egress chat or not
@@ -278,16 +280,20 @@ func (u chatUpdate) ModifyStore(streams *store.Streams) ([]models.StreamEvent, [
 			charName = entity.Name
 		}
 		u.chatEvent.EntityID = stream.CharacterID
-		u.chatEvent.World = stream.HomeWorld
+		u.chatEvent.World = &stream.HomeWorld
 		u.chatEvent.Name = charName
 	}
 
 	// If no ChannelWorld provided, then channel is assumed to be home world
 	// unless it's cross-world
 	if !strings.HasPrefix(u.chatEvent.ChannelType, "Cross") {
-		if u.chatEvent.ChannelWorld.Name == "" {
-			u.chatEvent.ChannelWorld = stream.HomeWorld
+		if u.chatEvent.ChannelWorld == nil || u.chatEvent.ChannelWorld.Name == "" {
+			u.chatEvent.ChannelWorld = &stream.HomeWorld
 		}
+	}
+
+	if u.chatEvent.ChannelType == "FreeCompanyResult" {
+		u.chatEvent.World = &stream.HomeWorld
 	}
 
 	return []models.StreamEvent{{

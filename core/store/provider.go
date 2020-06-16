@@ -144,7 +144,7 @@ func (p *Provider) Streams() ([]models.Stream, error) {
 
 // Stream returns a specific stream from the store, queried by streamID. This
 // query will return an error if the request exceeds the timeout duration.
-func (p *Provider) Stream(streamID int) (models.Stream, error) {
+func (p *Provider) Stream(streamID int) (*models.Stream, error) {
 	streamChan := make(chan *models.Stream, 1)
 	p.internalRequestChan <- streamRequest{
 		respChan: streamChan,
@@ -153,16 +153,16 @@ func (p *Provider) Stream(streamID int) (models.Stream, error) {
 	select {
 	case resp := <-streamChan:
 		if resp == nil {
-			return models.Stream{}, fmt.Errorf("stream ID %d not found", streamID)
+			return nil, fmt.Errorf("stream ID %d not found", streamID)
 		}
-		return *resp, nil
+		return resp, nil
 	case <-time.After(p.queryTimeout):
 		p.logger.Error("Stream()",
 			zap.Error(ErrRequestTimedOut),
 			zap.Int("streamID", streamID),
 			zap.Duration("timeout-duration", p.queryTimeout),
 		)
-		return models.Stream{}, ErrRequestTimedOut
+		return nil, ErrRequestTimedOut
 	}
 }
 
@@ -170,7 +170,7 @@ func (p *Provider) Stream(streamID int) (models.Stream, error) {
 // streamID and entityID. It returns an error if the stream ID is not found or
 // if the entityID is not found in the stream. This query will return an error
 // if the request exceeds the timeout duration.
-func (p *Provider) Entity(streamID int, entityID uint64) (models.Entity, error) {
+func (p *Provider) Entity(streamID int, entityID uint64) (*models.Entity, error) {
 	entityChan := make(chan *models.Entity, 1)
 	p.internalRequestChan <- entityRequest{
 		respChan: entityChan,
@@ -180,9 +180,9 @@ func (p *Provider) Entity(streamID int, entityID uint64) (models.Entity, error) 
 	select {
 	case resp := <-entityChan:
 		if resp == nil {
-			return models.Entity{}, fmt.Errorf("entity ID %d not found in stream %d", entityID, streamID)
+			return nil, fmt.Errorf("entity ID %d not found in stream %d", entityID, streamID)
 		}
-		return *resp, nil
+		return resp, nil
 	case <-time.After(p.queryTimeout):
 		p.logger.Error("Entity()",
 			zap.Error(ErrRequestTimedOut),
@@ -190,7 +190,7 @@ func (p *Provider) Entity(streamID int, entityID uint64) (models.Entity, error) 
 			zap.Uint64("entityID", entityID),
 			zap.Duration("timeout-duration", p.queryTimeout),
 		)
-		return models.Entity{}, ErrRequestTimedOut
+		return nil, ErrRequestTimedOut
 	}
 }
 

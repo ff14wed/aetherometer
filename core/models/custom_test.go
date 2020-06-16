@@ -18,8 +18,8 @@ var _ = Describe("Custom Types", func() {
 			stream = &models.Stream{
 				ID: 1234,
 				EntitiesMap: map[uint64]*models.Entity{
-					1: &models.Entity{ID: 1, Name: "FooBar", Index: 2},
-					2: &models.Entity{ID: 2, Name: "Baah", Index: 1},
+					1: {ID: 1, Name: "FooBar", Index: 2},
+					2: {ID: 2, Name: "Baah", Index: 1},
 					3: nil,
 				},
 			}

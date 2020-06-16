@@ -10,6 +10,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/dealancer/validate.v2"
 )
 
 var _ = Describe("EquipChange Update", func() {
@@ -24,7 +25,7 @@ var _ = Describe("EquipChange Update", func() {
 		entity    *models.Entity
 		generator update.Generator
 
-		expectedClass models.ClassJob
+		expectedClass *models.ClassJob
 		expectedLevel int
 	)
 
@@ -40,7 +41,7 @@ var _ = Describe("EquipChange Update", func() {
 
 		d.ClassJobData = testassets.ExpectedClassJobData
 
-		expectedClass = models.ClassJob{
+		expectedClass = &models.ClassJob{
 			ID: 0x12,
 		}
 
@@ -71,11 +72,14 @@ var _ = Describe("EquipChange Update", func() {
 
 		Expect(entity.ClassJob).To(Equal(expectedClass))
 		Expect(entity.Level).To(Equal(expectedLevel))
+
+		Expect(validate.Validate(entityEvents)).To(Succeed())
+		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
 	Context("when the ClassJob can be found in the datasheet", func() {
 		BeforeEach(func() {
-			expectedClass = models.ClassJob{
+			expectedClass = &models.ClassJob{
 				ID:           1,
 				Name:         "gladiator",
 				Abbreviation: "GLA",
@@ -104,6 +108,8 @@ var _ = Describe("EquipChange Update", func() {
 
 			Expect(entity.ClassJob).To(Equal(expectedClass))
 
+			Expect(validate.Validate(entityEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
 		})
 	})
 
