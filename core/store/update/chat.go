@@ -25,6 +25,7 @@ const (
 func init() {
 	registerIngressHandler(new(datatypes.ChatFrom), newChatFromUpdate)
 	registerEgressHandler(new(datatypes.ChatTo), newChatToUpdate)
+	registerIngressHandler(new(datatypes.ChatFromXWorld), newChatFromXWorldUpdate)
 
 	registerIngressHandler(new(datatypes.Chat), newChatUpdate)
 	registerEgressHandler(new(datatypes.EgressChat), newEgressChatUpdate)
@@ -70,6 +71,25 @@ func newChatToUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) sto
 			ContentID: data.ToCharacterID,
 			World:     toWorld,
 			Name:      data.ToName.String(),
+
+			Message: data.Message.String(),
+		},
+	}
+}
+func newChatFromXWorldUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
+	data := b.Data.(*datatypes.ChatFromXWorld)
+
+	speakerWorld := d.WorldData.Lookup(int(data.WorldID))
+
+	return chatUpdate{
+		streamID: streamID,
+		chatEvent: models.ChatEvent{
+			ChannelType: "Private",
+
+			ContentID: data.FromCharacterID,
+			EntityID:  uint64(data.FromEntityID),
+			World:     speakerWorld,
+			Name:      data.FromName.String(),
 
 			Message: data.Message.String(),
 		},

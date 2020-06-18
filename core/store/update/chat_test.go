@@ -130,6 +130,50 @@ var _ = Describe("Chat Update", func() {
 		streamValidationTests(testEnv, true)
 	})
 
+	Describe("ChatFrom", func() {
+		BeforeEach(func() {
+			chatData := &datatypes.ChatFromXWorld{
+				FromCharacterID: 0x004000170000001,
+				WorldID:         123,
+				FromEntityID:    0x12345678,
+				FromName:        datatypes.StringToEntityName("Sender"),
+				Message:         datatypes.StringToChatMessage("Private message"),
+			}
+
+			b.Data = chatData
+
+			expectedChatEvent = models.ChatEvent{
+				ChannelID:    0x0,
+				ChannelWorld: &models.World{ID: 456, Name: "Bar"},
+				ChannelType:  "Private",
+
+				ContentID: 0x004000170000001,
+				EntityID:  0x12345678,
+				World:     &models.World{ID: 123, Name: "Foo"},
+				Name:      "Sender",
+				Message:   "Private message",
+			}
+		})
+
+		It("generates a StreamEvent for the chat event", func() {
+			u := generator.Generate(streamID, false, b)
+			Expect(u).ToNot(BeNil())
+			streamEvents, entityEvents, err := u.ModifyStore(streams)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(entityEvents).To(BeEmpty())
+
+			Expect(streamEvents).To(ConsistOf(models.StreamEvent{
+				StreamID: streamID,
+				Type:     expectedChatEvent,
+			}))
+
+			Expect(validate.Validate(streamEvents)).To(Succeed())
+			Expect(validate.Validate(streams)).To(Succeed())
+		})
+
+		streamValidationTests(testEnv, false)
+	})
+
 	Describe("Chat", func() {
 		chatTypes := []uint64{
 			update.ChatTypeParty,
