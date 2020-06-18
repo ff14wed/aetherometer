@@ -251,6 +251,21 @@ var _ = Describe("InitializeHook", func() {
 				Expect(conn.CloseCallCount()).To(Equal(1))
 			})
 
+			Context("when the DLL is already injected", func() {
+				BeforeEach(func() {
+					rpp.InjectDLLReturns(alreadyInjectedErr{})
+				})
+
+				It("does not write an exit envelope before closing", func() {
+					hookConn, err := hook.InitializeHook(streamID, cfg)
+					Expect(err).ToNot(HaveOccurred())
+
+					_ = hookConn.Close()
+					Expect(conn.WriteCallCount()).To(Equal(0))
+					Expect(conn.CloseCallCount()).To(Equal(1))
+				})
+			})
+
 			It("closes at most once", func() {
 				hookConn, err := hook.InitializeHook(streamID, cfg)
 				Expect(err).ToNot(HaveOccurred())
@@ -536,3 +551,8 @@ var zeroBlockPacket = []byte{
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Reserved2 and Reserved3
 	0x78, 0x9c, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01, // BlockData
 }
+
+type alreadyInjectedErr struct{}
+
+func (alreadyInjectedErr) Error() string              { return "Boom" }
+func (alreadyInjectedErr) IsDLLAlreadyInjectedError() {}

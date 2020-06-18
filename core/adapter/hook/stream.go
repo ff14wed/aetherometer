@@ -129,8 +129,13 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 		return nil, err
 	}
 
+	isOwner := true
+
 	err := rpp.InjectDLL(streamID, dllPath)
-	if err != nil {
+	if _, ok := err.(DLLAlreadyInjectedError); ok {
+		isOwner = false
+
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -141,7 +146,7 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 	for i := 0; i < 5; i++ {
 		conn, err = rpp.DialPipe(pipeName, &dialTimeout)
 		if err == nil {
-			return &hookConn{Conn: conn, rpp: rpp}, nil
+			return &hookConn{Conn: conn, rpp: rpp, isOwner: isOwner}, nil
 		}
 		// If we got some sort of error connecting to the pipe, that means
 		// the hook hasn't started the pipe server yet. We need to retry in
@@ -156,7 +161,9 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 
 type hookConn struct {
 	net.Conn
-	rpp  RemoteProcessProvider
+	rpp     RemoteProcessProvider
+	isOwner bool
+
 	once sync.Once
 }
 
@@ -186,9 +193,11 @@ func (h *hookConn) Read(p []byte) (int, error) {
 func (h *hookConn) Close() error {
 	var err error
 	h.once.Do(func() {
-		// The hook should automatically unload itself from FFXIV after
-		// closing
-		_, _ = h.Conn.Write(Envelope{Op: OpExit}.Encode())
+		if h.isOwner {
+			// The hook should automatically unload itself from FFXIV after
+			// closing the owner core process.
+			_, _ = h.Conn.Write(Envelope{Op: OpExit}.Encode())
+		}
 		err = h.Conn.Close()
 	})
 	return err

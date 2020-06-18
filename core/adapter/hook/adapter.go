@@ -39,6 +39,12 @@ type RemoteProcessProvider interface {
 	IsPipeClosed(err error) bool
 }
 
+// DLLAlreadyInjectedError is an error that indicates the DLL has already been
+// injected.
+type DLLAlreadyInjectedError interface {
+	IsDLLAlreadyInjectedError()
+}
+
 // NewAdapter creates a new instance of the hook Adapter
 func NewAdapter(cfg AdapterConfig, logger *zap.Logger) *Adapter {
 	hookLogger := logger.Named("hook-adapter")

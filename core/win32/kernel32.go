@@ -20,6 +20,9 @@ var (
 	procLoadLibraryW       = modkernel32.NewProc("LoadLibraryW")
 	// procFreeLibrary        = modkernel32.NewProc("FreeLibrary")
 	procCreateRemoteThread = modkernel32.NewProc("CreateRemoteThread")
+
+	procModule32FirstW = modkernel32.NewProc("Module32FirstW")
+	procModule32NextW  = modkernel32.NewProc("Module32NextW")
 )
 
 // nolint: golint
@@ -126,6 +129,59 @@ func CreateRemoteThread(hProcess windows.Handle, lpThreadAttributes, dwStackSize
 	hThread = windows.Handle(ret)
 	if ret == 0 {
 		err = fmt.Errorf("CreateRemoteThread failed: code %d", e1)
+	}
+	return
+}
+
+const MAX_MODULE_NAME32 = 255
+
+type ModuleEntry32 struct {
+	Size         uint32
+	ModuleID     uint32
+	ProcessID    uint32
+	GlblcntUsage uint32
+	ProccntUsage uint32
+	BaseAddr     uintptr
+	ModBaseSize  uint32
+	HModule      windows.Handle
+	ModuleName   [MAX_MODULE_NAME32 + 1]uint16
+	ExeFile      [windows.MAX_PATH]uint16
+}
+
+// nolint: golint
+/*
+BOOL Module32FirstW(
+  HANDLE           hSnapshot,
+  LPMODULEENTRY32W lpme
+);
+*/
+func Module32First(snapshot windows.Handle, modEntry *ModuleEntry32) (err error) {
+	r1, _, e1 := syscall.Syscall(procModule32FirstW.Addr(), 2, uintptr(snapshot), uintptr(unsafe.Pointer(modEntry)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = e1
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+// nolint: golint
+/*
+BOOL Module32Next(
+  HANDLE          hSnapshot,
+  LPMODULEENTRY32 lpme
+);;
+*/
+func Module32Next(snapshot windows.Handle, modEntry *ModuleEntry32) (err error) {
+	r1, _, e1 := syscall.Syscall(procModule32NextW.Addr(), 2, uintptr(snapshot), uintptr(unsafe.Pointer(modEntry)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = e1
+		} else {
+			err = syscall.EINVAL
+		}
 	}
 	return
 }

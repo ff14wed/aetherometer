@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"path/filepath"
+	"strings"
 	"time"
 	"unicode/utf16"
 	"unsafe"
@@ -18,14 +20,15 @@ import (
 type Provider struct{}
 
 var pe32Size = uint32(unsafe.Sizeof(windows.ProcessEntry32{})) // nolint: gosec
+var me32Size = uint32(unsafe.Sizeof(ModuleEntry32{}))          // nolint: gosec
 
 // EnumerateProcesses enumerates all processes running on the system and
 // returns a map of ProcessID -> ProcessName
 //
 // API Methods used:
 // CreateToolhelp32Snapshot https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot
-// Process32First https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32first
-// Process32Next https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32next
+// Process32First https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32firstw
+// Process32Next https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-process32nextw
 // CloseHandle https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
 func (p Provider) EnumerateProcesses() (map[uint32]string, error) {
 	snapshotHandle, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
@@ -51,6 +54,39 @@ func (p Provider) EnumerateProcesses() (map[uint32]string, error) {
 	return procMap, nil
 }
 
+// EnumerateProcessModules enumerates all modules loaded inside a process and
+// returns a list of modules
+//
+// API Methods used:
+// CreateToolhelp32Snapshot https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot
+// Module32First https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-module32firstw
+// Module32Next https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-module32nextw
+// CloseHandle https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
+func (p Provider) EnumerateProcessModules(pid uint32) ([]string, error) {
+	snapshotHandle, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPMODULE, pid)
+	if err != nil {
+		return nil, fmt.Errorf("CreateToolhelp32Snapshot error: %s", err.Error())
+	}
+	defer func() {
+		_ = windows.CloseHandle(snapshotHandle)
+	}()
+	var me32 ModuleEntry32
+	me32.Size = me32Size
+	err = Module32First(snapshotHandle, &me32)
+	if err != nil {
+		return nil, fmt.Errorf("Module32First error: %s", err.Error())
+	}
+
+	var modules []string
+	for err == nil {
+		moduleName := string(utf16.Decode(me32.ModuleName[:]))
+		moduleName = strings.Trim(moduleName, "\x00")
+		modules = append(modules, moduleName)
+		err = Module32Next(snapshotHandle, &me32)
+	}
+	return modules, nil
+}
+
 func getWString(s string) []byte {
 	wChars := utf16.Encode(append([]rune(s), 0))
 	sBytes := make([]byte, len(wChars)*2)
@@ -69,6 +105,16 @@ func getRunningTime(handle windows.Handle) (time.Duration, error) {
 	createdAt := time.Unix(0, creationTime.Nanoseconds())
 	return time.Since(createdAt), nil
 }
+
+type ErrDLLAlreadyInjected struct {
+	DLLName string
+}
+
+func (e ErrDLLAlreadyInjected) Error() string {
+	return fmt.Sprintf("DLL %s already injected.", e.DLLName)
+}
+
+func (ErrDLLAlreadyInjected) IsDLLAlreadyInjectedError() {}
 
 // InjectDLL injects a library into another process on the system
 //
@@ -115,6 +161,23 @@ func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
 	windows.SetSecurityInfo(baseHandle, windows.SE_KERNEL_OBJECT, windows.DACL_SECURITY_INFORMATION|windows.UNPROTECTED_DACL_SECURITY_INFORMATION, nil, nil, dacl, nil)
 
 	_ = windows.CloseHandle(baseHandle)
+
+	modules, err := p.EnumerateProcessModules(processID)
+	if err != nil {
+		return fmt.Errorf("EnumerateProcessModules: %s", err)
+	}
+	payloadName := filepath.Base(payloadPath)
+	var alreadyExists bool
+	for _, m := range modules {
+		if m == payloadName {
+			alreadyExists = true
+		}
+	}
+	if alreadyExists {
+		return ErrDLLAlreadyInjected{
+			DLLName: payloadName,
+		}
+	}
 
 	hProcess, err := windows.OpenProcess(
 		windows.PROCESS_QUERY_INFORMATION|
