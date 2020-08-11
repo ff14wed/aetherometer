@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, ipcMain, IpcMessageEvent } from 'electron';
+import { app, protocol, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import {
   createProtocol,
   installVueDevtools,
@@ -16,7 +16,12 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | null;
 
-const store = new Store<number>({
+interface StoreType {
+  width: number;
+  height: number;
+}
+
+const store = new Store<StoreType>({
   defaults: {
     width: 1920,
     height: 1080,
@@ -54,7 +59,7 @@ const createLoadingWindow = async () => {
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
-      devTools: false,
+      devTools: true,
     },
   });
 
@@ -96,22 +101,15 @@ const createMainWindow = async () => {
 
   const window = win;
 
-  ipcMain.on('save-admin-token', (event: IpcMessageEvent, token: string) => {
+  ipcMain.on('save-admin-token', (event: IpcMainEvent, token: string) => {
     coreInst.saveAdminToken(token);
   });
 
-  ipcMain.on('renderer-payload', (event: IpcMessageEvent) => {
+  ipcMain.on('renderer-payload', (event: IpcMainEvent) => {
     event.sender.send('renderer-payload', coreInst.getRendererPayload());
   });
 
-  ipcMain.on('unloading', (event: IpcMessageEvent) => {
-    window.removeAllListeners('focus');
-    window.removeAllListeners('blur');
-    window.removeAllListeners('maximize');
-    window.removeAllListeners('unmaximize');
-    window.removeAllListeners('enter-fullscreen');
-    window.removeAllListeners('leave-fullscreen');
-
+  ipcMain.on('unloading', (event: IpcMainEvent) => {
     setTimeout(() => {
       event.returnValue = true;
     }, 100);

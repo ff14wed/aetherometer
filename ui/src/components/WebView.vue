@@ -5,7 +5,7 @@
     v-bind:style="styleObject"
     v-bind:preload="preload"
     ref="webview"
-    webpreferences="contextIsolation"
+    webpreferences="contextIsolation, worldSafeExecuteJavaScript"
   ></webview>
 </template>
 
@@ -19,10 +19,12 @@ import Plugin from '../stores/plugin';
 const isInternalURL = (cur, target) => {
   const curURL = url.parse(cur);
   const testURL = url.parse(target);
-  return (curURL.protocol === testURL.protocol) &&
-    (curURL.auth === testURL.auth) &&
-    (curURL.host === testURL.host) &&
-    (curURL.path === testURL.path);
+  return (
+    curURL.protocol === testURL.protocol &&
+    curURL.auth === testURL.auth &&
+    curURL.host === testURL.host &&
+    curURL.path === testURL.path
+  );
 };
 
 const isWebURL = (destURL) => {
@@ -73,27 +75,31 @@ export default {
     });
 
     webview.addEventListener('dom-ready', () => {
-      webview.getWebContents().on('before-input-event', (event, input) => {
+      const webViewContents = remote.webContents.fromId(
+        webview.getWebContentsId()
+      );
+
+      webViewContents.on('before-input-event', (event, input) => {
         if (input.type !== 'keyDown') {
           return;
         }
 
         if (input.control && input.shift && input.key === 'J') {
-          webview.getWebContents().openDevTools({ mode: 'undocked' });
+          webViewContents.openDevTools({ mode: 'undocked' });
         }
       });
 
-      webview.getWebContents().on('will-navigate', (event, destURL) => {
+      webViewContents.on('will-navigate', (event, destURL) => {
         if (isInternalURL(this.plugin.url, destURL)) {
           return;
         }
         event.preventDefault();
         webview.stop();
-        webview.getWebContents().stop();
+        webViewContents.stop();
         navigateToExternalURL(this.plugin.url, destURL);
       });
 
-      webview.getWebContents().executeJavaScript( `
+      webViewContents.executeJavaScript(`
         if (window.waitForInit && window.initPlugin) {
           window.initPlugin(${JSON.stringify(this.plugin.params)});
         }
@@ -101,5 +107,4 @@ export default {
     });
   },
 };
-
 </script>

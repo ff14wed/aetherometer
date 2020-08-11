@@ -2,17 +2,17 @@ version: '2'
 
 vars:
   NODE_OS: '{{if eq OS "windows"}}win{{else if eq OS "darwin"}}mac{{else}}{{OS}}{{end}}'
-  PWD:
-    sh: '{{if eq OS "windows"}}cd{{else}}pwd{{end}}'
-  CORE_OUTPUT: "{{.PWD}}/resources/{{.NODE_OS}}/core{{exeExt}}"
-  CORE_OUTPUT_WIN: "{{.PWD}}/resources/win/core.exe"
+  TASKDIR:
+    sh: pwd
+  CORE_OUTPUT: "{{.TASKDIR}}/resources/{{.NODE_OS}}/core{{exeExt}}"
+  CORE_OUTPUT_WIN: "{{.TASKDIR}}/resources/win/core.exe"
   CORE_BUILD_FLAGS: '-trimpath -ldflags="-s -w"'
 
 tasks:
   build-core:
     dir: core
     cmds:
-      - go build -o {{.CORE_OUTPUT}} {{.CORE_BUILD_FLAGS}} main.go
+      - go build -o '{{fromSlash .CORE_OUTPUT}}' {{.CORE_BUILD_FLAGS}} main.go
 
   # For building for Windows on a non-Windows platform
   build-core-windows:
@@ -20,7 +20,7 @@ tasks:
       GOOS: windows
     dir: core
     cmds:
-      - go build -o {{.CORE_OUTPUT_WIN}} {{.CORE_BUILD_FLAGS}} main.go
+      - go build -o '{{fromSlash .CORE_OUTPUT_WIN}}' {{.CORE_BUILD_FLAGS}} main.go
 
   build-ui:
     dir: ui
@@ -44,10 +44,10 @@ tasks:
       PATH: '{{.YARN_GLOBAL_BIN}}{{.PATH_SEP}}{{env "PATH"}}'
     cmds:
       - go clean
-      - "rimraf {{.CORE_OUTPUT}}"
-      - "rimraf {{.CORE_OUTPUT_WIN}}"
-      - "rimraf {{.PWD}}/dist"
-      - "rimraf {{.PWD}}/ui/dist_electron"
+      - rimraf '{{fromSlash .CORE_OUTPUT}}'
+      - rimraf '{{fromSlash .CORE_OUTPUT_WIN}}'
+      - rimraf '{{.TASKDIR}}{{fromSlash "/dist"}}'
+      - rimraf '{{.TASKDIR}}{{fromSlash "/ui/dist_electron"}}'
 
   build:
     cmds:

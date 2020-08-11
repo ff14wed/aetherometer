@@ -1,9 +1,8 @@
 import * as gql from './gql';
 
-import { ApolloLink, execute, makePromise, GraphQLRequest } from 'apollo-link';
+import { ApolloLink, execute, makePromise, GraphQLRequest, FetchResult } from 'apollo-link';
 import { HttpLink } from 'apollo-link-http';
 import { fetch } from 'apollo-env';
-import { ExecutionResultDataDefault } from 'graphql/execution/execute';
 
 import { WebSocketLink } from './wsLink';
 import { onError } from 'apollo-link-error';
@@ -28,7 +27,7 @@ const executeOperation = (
 
   return new Promise<{ [key: string]: any }>((resolve, reject) => {
     makePromise(execute(httpLink, operation))
-      .then((result: ExecutionResultDataDefault) => {
+      .then((result: FetchResult) => {
         if (result.data) {
           resolve(result.data);
         } else {

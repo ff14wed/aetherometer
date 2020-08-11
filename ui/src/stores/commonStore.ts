@@ -1,6 +1,6 @@
 import { action, computed, observable, autorun, IReactionDisposer } from 'mobx';
 import GQLClient from '../api/gqlClient';
-import { ipcRenderer, IpcMessageEvent } from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 
 import Plugin from './plugin';
 import Stream from './stream';
@@ -65,7 +65,7 @@ export default class CommonStore {
 
   @action public init = async () => {
     const payload = await new Promise<RendererPayload>((resolve) => {
-      ipcRenderer.once('renderer-payload', (_: IpcMessageEvent, arg: RendererPayload) => {
+      ipcRenderer.once('renderer-payload', (_: IpcRendererEvent, arg: RendererPayload) => {
         resolve(arg);
       });
       ipcRenderer.send('renderer-payload');
@@ -82,7 +82,7 @@ export default class CommonStore {
 
     this.apiVersion = await this.gqlClient.getAPIVersion();
 
-    const storeDefaultPlugins = this.diskStore.get('defaultPlugins') as Array<{name: string, url: string}> ;
+    const storeDefaultPlugins = this.diskStore.get('defaultPlugins') as Array<{ name: string, url: string }>;
     for (const { name, url } of storeDefaultPlugins) {
       await this.addPlugin('default', name, url);
     }

@@ -63,7 +63,7 @@ export default class Core {
   }
 
   public start = async () => {
-    this.corePort = await getPort({port: 8080});
+    this.corePort = await getPort({ host: '127.0.0.1', port: [8080, 8081, 8082] });
     await this.writeConfigFile();
 
     const cmdOutStream = fs.createWriteStream(this.commandOutLogs, { flags: 'a+' });
@@ -157,7 +157,7 @@ export default class Core {
         if (err) {
           fs.mkdir(this.mapCachePath, (mkdirErr) => {
             if (mkdirErr) { reject(mkdirErr); } else { resolve(); }
-        });
+          });
         } else {
           resolve();
         }

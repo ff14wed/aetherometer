@@ -1,6 +1,6 @@
 <template>
-  <v-app dark>
-    <v-content>
+  <v-app>
+    <v-main>
       <v-container fluid fill-height>
         <v-layout align-center column justify-center>
           <h1 class="display-2 font-weight-thin mb-3">Aetherometer</h1>
@@ -8,7 +8,7 @@
           <v-btn color="error" v-if="displayClose" v-on:click="closeApp">Close</v-btn>
         </v-layout>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

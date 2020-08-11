@@ -1,11 +1,7 @@
 <template>
-  <v-app dark>
-    <v-app-nav-drawer
-      width=260
-      height="calc(100vh - 30px)"
-      :state="state"
-    />
-    <v-content>
+  <v-app>
+    <v-app-nav-drawer width="260" :state="state" />
+    <v-main>
       <v-window v-model="state.selectedNav" vertical>
         <template v-for="stream in state.streams.values()">
           <v-window-item
@@ -31,7 +27,7 @@
           </div>
         </v-window-item>
       </v-window>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
@@ -85,16 +81,18 @@ export default observer({
 </script>
 
 <style>
-  html { overflow-y: auto }
-  .application--wrap {
-    min-height: calc(100vh - 30px);
-  }
-  .titlebar {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-  }
-  .tab-item-wrapper {
-    height: calc(100vh - 30px);
-    display: flex;
-  }
+html {
+  overflow-y: auto;
+}
+.v-application > .v-application--wrap {
+  min-height: calc(100vh - 30px);
+}
+.titlebar {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+.tab-item-wrapper {
+  height: calc(100vh - 30px);
+  display: flex;
+}
 </style>

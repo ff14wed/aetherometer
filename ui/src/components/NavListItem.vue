@@ -1,16 +1,16 @@
 <template>
-  <v-list-tile
+  <v-list-item
     @click="state.selectNav(navID)"
-    active-class="active-tile"
-    :class="{ 'active-tile': navID == state.selectedNav }"
+    active-class="active-item"
+    :class="{ 'active-item': navID == state.selectedNav }"
   >
     <v-nav-icon :showTooltip="showTooltip" :tooltip="name">
       <slot></slot>
     </v-nav-icon>
-    <v-list-tile-content>
-      <v-list-tile-title class="font-weight-light">{{ name }}</v-list-tile-title>
-    </v-list-tile-content>
-  </v-list-tile>
+    <v-list-item-content>
+      <v-list-item-title class="font-weight-light">{{ name }}</v-list-item-title>
+    </v-list-item-content>
+  </v-list-item>
 </template>
 
 <script>
@@ -44,14 +44,8 @@ export default observer({
 </script>
 
 <style>
-  .v-list__tile {
-    margin-left: 10px;
-    margin-right: 5px;
-    padding: 0 6px;
-  }
-
-  .active-tile > a {
-    background-color: #1976d2 !important;
-    border-color: #1976d2 !important;
-  }
+.active-item > a {
+  background-color: #1976d2 !important;
+  border-color: #1976d2 !important;
+}
 </style>
