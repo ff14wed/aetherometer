@@ -1,0 +1,29 @@
+version: 0.3.0.{build}
+
+platform: x64
+
+branches:
+  only:
+    - master
+
+clone_folder: c:\gopath\src\github.com\ff14wed\aetherometer
+
+environment:
+  GOPATH: c:\gopath
+
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - go version
+  - go env
+  - go get -u github.com/go-task/task
+  - go install -v c:\gopath\src\github.com\go-task\task\cmd\task
+
+build_script:
+  - task build
+
+artifacts:
+  - path: dist/aetherometer-*.zip
+    name: bundle
+    type: zip
