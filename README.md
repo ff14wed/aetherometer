@@ -14,11 +14,11 @@ and display this information.
 [**Download for the latest release**](https://github.com/ff14wed/aetherometer/releases)
 
 Download the zip file to a place with sufficient space on your system, and
-extract it. Then run `aetherometer-ui.exe`.
+extract it. Then run `aetherometer.exe`.
 
 Then try out some [plugins](#plugins-list)!
 
-> **Because Aetherometer fundamentally does not read memory, you should 
+> **Because Aetherometer fundamentally does not read memory, you should
   either start Aetherometer before starting any instance of FFXIV, or simply
   switch zones if you are already logged in. Otherwise, Aetherometer will not
   have a complete set of data from the game.**
