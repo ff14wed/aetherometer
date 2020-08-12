@@ -10,6 +10,7 @@ clone_folder: c:\gopath\src\github.com\ff14wed\aetherometer
 
 environment:
   GOPATH: c:\gopath
+  nodejs_version: "Current"
 
 install:
   - echo %PATH%
@@ -19,6 +20,7 @@ install:
   - go env
   - go get -u github.com/go-task/task
   - go install -v c:\gopath\src\github.com\go-task\task\cmd\task
+  - ps: Install-Product node $env:nodejs_version
 
 build_script:
   - task build
