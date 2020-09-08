@@ -39,3 +39,16 @@ init:
       {
           Update-AppveyorBuild -Version "dev-$($env:APPVEYOR_REPO_COMMIT.Substring(0, 7))"
       }
+
+deploy:
+  release: aetherometer-v$(appveyor_build_version)
+  description: 'Aetherometer release'
+  provider: GitHub
+  auth_token:
+    secure: f6hzv2qQpiSfbK7vnNvnn3eXqRWMj8Zz+tITnk8Z9X1z+Ois0ZRW3rpkzDMpr9cX
+  artifact: /dist\\aetherometer.*\.zip/
+  draft: true
+  prerelease: true
+  on:
+    branch: master                 # release from master branch only
+    APPVEYOR_REPO_TAG: true        # deploy on tag push only
