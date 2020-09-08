@@ -1,6 +1,6 @@
 {
   "name": "aetherometer",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0",
   "private": true,
   "description": "A simple interface for managing plugins that read game data.",
   "author": "ff14wed",
