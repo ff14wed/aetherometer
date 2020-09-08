@@ -22,9 +22,10 @@ install:
 
 build_script:
   - task build
+  - copy dist\aetherometer-*.zip .
 
 artifacts:
-  - path: dist/aetherometer-*.zip
+  - path: aetherometer-*.zip
     name: bundle
     type: zip
 
@@ -46,7 +47,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: f6hzv2qQpiSfbK7vnNvnn3eXqRWMj8Zz+tITnk8Z9X1z+Ois0ZRW3rpkzDMpr9cX
-  artifact: /dist\\aetherometer.*\.zip/
+  artifact: /aetherometer.*\.zip/
   draft: true
   prerelease: true
   on:
