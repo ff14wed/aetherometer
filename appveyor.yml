@@ -19,9 +19,7 @@ install:
   - go version
   - go env
   - git clone https://github.com/go-task/task
-  - pushd task
-  - go install -v ./cmd/task
-  - popd
+  - pushd task && go install -v ./cmd/task && popd
   - ps: Install-Product node $env:nodejs_version x64
 
 build_script:
