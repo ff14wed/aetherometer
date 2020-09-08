@@ -18,8 +18,9 @@ install:
   - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
   - go version
   - go env
-  - go get -u github.com/go-task/task
-  - go install -v c:\gopath\src\github.com\go-task\task\cmd\task
+  - git clone https://github.com/go-task/taskt
+  - cd task
+  - go install -v ./cmd/task
   - ps: Install-Product node $env:nodejs_version x64
 
 build_script:

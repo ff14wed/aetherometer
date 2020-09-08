@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 vars:
   NODE_OS: '{{if eq OS "windows"}}win{{else if eq OS "darwin"}}mac{{else}}{{OS}}{{end}}'
