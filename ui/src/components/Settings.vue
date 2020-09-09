@@ -45,6 +45,7 @@
               <v-treeview
                 v-model="tree"
                 :items="state.pluginsTree"
+                selection-type="independent"
                 open-all
                 hoverable
                 selectable
