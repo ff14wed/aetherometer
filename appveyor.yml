@@ -21,6 +21,7 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
 
 build_script:
+  - curl -fsSL -o resources/win/xivhook.dll https://github.com/ff14wed/xivhook/releases/download/0.4.0/xivhook.dll
   - task build
   - copy dist\aetherometer-*.zip .
 
