@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -81,6 +82,12 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 		initPayloadGetter: initPayloadGetter,
 
 		logger: l.Named("auth-handler"),
+	}
+
+	if len(c.AllowOrigins) > 0 {
+		for _, origin := range c.AllowOrigins {
+			a.allowedOrigins[origin] = math.MaxInt32
+		}
 	}
 
 	invalidID := xid.New().String()

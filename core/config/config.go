@@ -24,6 +24,11 @@ type Config struct {
 	// token for queries. CORS validation will still be enforced.
 	DisableAuth bool `toml:"disable_auth"`
 
+	// AllowOrigins allows the listed sites to bypass CORS validation without
+	// having to register them. Note that scheme and subdomain must be provided.
+	// Example: allow_sites = ["https://plugins.foo.com"]
+	AllowOrigins []string `toml:"allow_origins"`
+
 	// Maps provides the configuration for the Map endpoint of the API.
 	Maps MapConfig `toml:"maps"`
 
