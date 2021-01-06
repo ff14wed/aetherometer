@@ -157,7 +157,9 @@ func (d *FrameReader) feedDataAndSendBlocks(
 func (d *FrameReader) runPacketHooks(parsedBlock *xivnet.Block) {
 	if z, ok := parsedBlock.Data.(*datatypes.InitZone); ok {
 		d.pdk = 0
-		if z.TerritoryTypeID != 0x377 {
+		switch z.TerritoryTypeID {
+		case 946, 947, 948, 949:
+		default:
 			d.zoneUsesPDK = false
 			return
 		}
