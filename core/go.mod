@@ -6,7 +6,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.14
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/ff14wed/xivnet/v3 v3.16.1
+	github.com/ff14wed/xivnet/v3 v3.17.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
