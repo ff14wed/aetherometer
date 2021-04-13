@@ -69,14 +69,14 @@ var _ = Describe("Spawn Update", func() {
 			CurrentHP: 29000, DisplayFlags: 256, FateID: 0x1234, MaxHP: 30000,
 			CurrentMP: 11000, MaxMP: 12000,
 
-			ModelChara: 0x5678, Direction: 0x7FFF,
+			ModelChara: 0x5678, Direction: 0x7FFF, MountID: 0,
 			Minion: 0x1234, Index: 10, State: 1, Emote: 0x12, Type: 1,
 			Subtype: 4, Voice: 0x12,
 
 			EnemyType: 0, Level: 60, ClassJob: 15,
 
-			MountInfo: datatypes.MountInfo{
-				ID: 0, Head: 1, Body: 1, Feet: 1, Color: 0x12,
+			ChocoboInfo: datatypes.ChocoboInfo{
+				Head: 1, Body: 1, Feet: 1, Color: 0x12,
 			},
 			StatusLoopVFX: 0x56,
 

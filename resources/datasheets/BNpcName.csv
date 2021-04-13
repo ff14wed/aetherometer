@@ -6056,7 +6056,7 @@ int32,str,sbyte,str,sbyte,sbyte,sbyte,sbyte,sbyte
 6052,"Exdeath",0,"Exdeath",0,1,1,0,1
 6053,"deathly vine",0,"deathly vines",0,0,1,0,0
 6054,"black hole",0,"black holes",0,0,1,0,0
-6055,"Neo Exdeath",0,"Neo Exdeath",0,0,1,0,1
+6055,"_rsv_6055_-1_1_C0_0BNpcName",0,"_rsv_6055_-1_1_C2_0BNpcName",0,0,1,0,1
 6056,"apanda",0,"apandas",0,0,1,0,0
 6057,"Nero",0,"Nero",0,0,1,0,1
 6058,"banshee",0,"banshees",0,0,1,0,0
