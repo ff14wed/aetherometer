@@ -12739,7 +12739,7 @@ int32,Behavior,Battalion,LinkRace,byte,single,ModelChara,BNpcCustomize,NpcEquip,
 12735,0,4,0,0,1.2,1808,0,0,0,0,True,0,0,True,True,True,True,False,0,0,0
 12736,5745,4,0,0,7,864,0,0,0,0,False,0,0,True,True,True,True,False,0,0,0
 12737,0,4,0,2,1,1804,1013,2136,0,0,True,0,0,True,True,True,True,False,0,0,0
-12738,0,4,0,0,1,0,1003,2064,0,0,False,0,0,True,False,False,True,False,0,0,0
+12738,0,4,0,0,1,0,1014,2064,0,0,False,0,0,True,False,False,True,False,0,0,0
 12739,0,4,0,0,1.5,1200,0,0,0,0,False,0,0,True,False,False,False,True,0,0,0
 12740,0,4,0,2,1,0,1041,2135,0,0,True,0,0,True,True,True,True,False,0,0,0
 12741,0,4,0,0,1,55,0,0,0,0,True,0,0,True,True,True,True,False,0,0,0
@@ -13208,9 +13208,9 @@ int32,Behavior,Battalion,LinkRace,byte,single,ModelChara,BNpcCustomize,NpcEquip,
 13204,0,0,0,0,1,0,246,2201,0,0,False,0,0,True,False,False,True,False,0,0,0
 13205,0,0,0,0,1.5,5,0,777,0,0,False,0,0,True,False,False,True,False,0,0,0
 13206,0,13,0,0,1,0,1060,2195,0,0,True,0,0,True,True,True,True,False,0,0,0
-13207,0,4,0,0,1,0,812,2194,0,0,True,0,0,True,True,True,True,False,0,0,0
+13207,0,4,0,0,1,0,1059,2194,0,0,True,0,0,True,True,True,True,False,0,0,0
 13208,0,4,0,0,1,0,213,2059,0,0,True,0,0,True,True,True,True,False,0,0,0
-13209,0,4,0,0,1,0,812,2194,0,0,True,0,0,True,True,True,True,False,0,0,0
+13209,0,4,0,0,1,0,1059,2194,0,0,True,0,0,True,True,True,True,False,0,0,0
 13210,0,4,0,0,1,0,1004,2052,0,0,True,0,0,True,True,True,True,False,0,0,0
 13211,0,0,0,0,1,0,1005,2053,0,0,False,0,0,True,True,True,True,False,0,0,0
 13212,0,4,0,0,1,0,1005,2053,0,0,False,0,0,True,True,True,True,False,0,0,0
