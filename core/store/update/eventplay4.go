@@ -27,6 +27,7 @@ func newEventPlay4Update(streamID int, b *xivnet.Block, d *datasheet.Collection)
 					StepNum:           1,
 					CurrentCondition:  1,
 					PreviousCondition: 1,
+					Durability:        recipeInfo.Durability,
 				},
 			}
 		case 4, 6:
