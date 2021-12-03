@@ -47,7 +47,7 @@ deploy:
   description: 'Aetherometer release'
   provider: GitHub
   auth_token:
-    secure: f6hzv2qQpiSfbK7vnNvnn3eXqRWMj8Zz+tITnk8Z9X1z+Ois0ZRW3rpkzDMpr9cX
+    secure: Zo1txpSJnf9LN5wpLpgsW3FQnFlj/geAdOUJZ7oJRybnUMvgU9NzMueL4v13QUIA
   artifact: /aetherometer.*\.zip/
   draft: true
   prerelease: true
