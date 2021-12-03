@@ -8,7 +8,7 @@ clone_folder: c:\gopath\src\github.com\ff14wed\aetherometer
 
 environment:
   GOPATH: c:\gopath
-  nodejs_version: "Current"
+  nodejs_version: "16"
 
 install:
   - echo %PATH%
