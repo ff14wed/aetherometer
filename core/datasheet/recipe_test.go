@@ -100,8 +100,8 @@ var _ = Describe("Recipe", func() {
 				RecipeLevel: 380,
 				Element:     0,
 				CanHq:       true,
-				Difficulty:  2900,
-				Quality:     14267,
+				Difficulty:  1500,
+				Quality:     6100,
 				Durability:  70,
 			}))
 		})
@@ -122,8 +122,8 @@ var _ = Describe("Recipe", func() {
 				RecipeLevel: 320,
 				Element:     0,
 				CanHq:       true,
-				Difficulty:  2657,
-				Quality:     12511,
+				Difficulty:  1200,
+				Quality:     4800,
 				Durability:  70,
 			}))
 		})

@@ -152,7 +152,7 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 		ItemID:           5056,
 		RecipeElement:    0,
 		DifficultyFactor: 50,
-		QualityFactor:    100,
+		QualityFactor:    80,
 		DurabilityFactor: 67,
 		CanHQ:            true,
 	},
@@ -200,8 +200,8 @@ var ExpectedRecipeData = map[uint32]datasheet.Recipe{
 
 // ExpectedRecipeLevelTableData derives from RecipeLevelTableCSV
 var ExpectedRecipeLevelTableData = map[uint16]datasheet.RecipeLevel{
-	320: datasheet.RecipeLevel{Key: 320, Difficulty: 2657, Quality: 12511, Durability: 70},
-	380: datasheet.RecipeLevel{Key: 380, Difficulty: 2900, Quality: 14267, Durability: 70},
+	320: datasheet.RecipeLevel{Key: 320, Difficulty: 1200, Quality: 4800, Durability: 70},
+	380: datasheet.RecipeLevel{Key: 380, Difficulty: 1500, Quality: 6100, Durability: 70},
 }
 
 // ExpectedItemData derives from ItemCSV
