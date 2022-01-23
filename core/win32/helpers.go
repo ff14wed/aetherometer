@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package win32
@@ -150,8 +151,8 @@ func (p Provider) InjectDLL(processID uint32, payloadPath string) error {
 		return fmt.Errorf("get runningTime time for %d: %s", processID, err)
 	}
 
-	if runningTime < 3*time.Second {
-		time.Sleep(3*time.Second - runningTime)
+	if runningTime < 5*time.Second {
+		time.Sleep(5*time.Second - runningTime)
 	}
 
 	dacl, _, err := sd.DACL()
