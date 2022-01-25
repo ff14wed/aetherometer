@@ -7,6 +7,7 @@ require github.com/wailsapp/wails/v2 v2.0.0-beta.29
 require (
 	github.com/agnivade/levenshtein v1.0.3 // indirect
 	github.com/andybalholm/brotli v1.0.2 // indirect
+	github.com/apenwarr/w32 v0.0.0-20190407065021-aa00fece76ab // indirect
 	github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gabriel-vasile/mimetype v1.3.1 // indirect
@@ -56,6 +57,7 @@ require (
 	github.com/99designs/gqlgen v0.11.3
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Microsoft/go-winio v0.4.16
+	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ff14wed/xivnet/v3 v3.30.0

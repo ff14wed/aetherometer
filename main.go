@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/BurntSushi/toml"
+	"github.com/apenwarr/fixconsole"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -25,7 +26,12 @@ var assets embed.FS
 var icon []byte
 
 func main() {
-	fmt.Println("Starting application...")
+	flag.Usage = func() {
+		fixconsole.FixConsoleIfNeeded()
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	cfgPath := flag.String("c", "", "optional path to TOML config file")
 
 	headless := flag.Bool("headless", false, "run Aetherometer in headless mode.")
@@ -39,11 +45,17 @@ func main() {
 		return
 	}
 
+	loggingOutput := "aetherometer.log"
+	if *headless {
+		loggingOutput = "stdout"
+		fixconsole.FixConsoleIfNeeded()
+	}
+
 	zapCfg := zap.NewDevelopmentConfig()
 	zapCfg.DisableStacktrace = true
 	zapCfg.DisableCaller = true
-	zapCfg.OutputPaths = []string{"stdout"}
-	zapCfg.ErrorOutputPaths = []string{"stdout"}
+	zapCfg.OutputPaths = []string{loggingOutput}
+	zapCfg.ErrorOutputPaths = []string{loggingOutput}
 	zapLogger, err := zapCfg.Build()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v\n", err)
@@ -53,12 +65,11 @@ func main() {
 	}()
 	zap.ReplaceGlobals(zapLogger)
 
-	fmt.Println("setting up config...")
-
 	cfg, err := defaultConfig()
 	if err != nil {
 		zapLogger.Fatal("Error setting up config", zap.Error(err))
 	}
+	zapLogger.Info("Using config", zap.Any("config", cfg))
 
 	if len(*cfgPath) != 0 {
 		_, err = toml.DecodeFile(*cfgPath, &cfg)

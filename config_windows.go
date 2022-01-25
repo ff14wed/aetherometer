@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -20,7 +19,6 @@ func defaultConfig() (config.Config, error) {
 	}
 	dirPath := filepath.Dir(cleanPath)
 
-	fmt.Println("dirPath detected as", dirPath)
 	return config.Config{
 		APIPort:  0,
 		DataPath: filepath.Join(dirPath, "resources", "datasheets"),
