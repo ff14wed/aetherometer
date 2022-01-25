@@ -1,35 +1,29 @@
 package main
 
 import (
-	"flag"
+	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/pprof"
-	"os"
-	"os/signal"
 	"runtime/debug"
-	"syscall"
 	"time"
-
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/BurntSushi/toml"
-	"github.com/ff14wed/aetherometer/core/adapter"
-	"github.com/ff14wed/aetherometer/core/server/handlers"
-	"github.com/ff14wed/aetherometer/core/stream"
-	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/ff14wed/aetherometer/core/adapter"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/datasheet"
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/server"
+	"github.com/ff14wed/aetherometer/core/server/handlers"
 	"github.com/ff14wed/aetherometer/core/store"
 	"github.com/ff14wed/aetherometer/core/store/update"
+	"github.com/ff14wed/aetherometer/core/stream"
+	"github.com/gorilla/websocket"
 	"github.com/thejerf/suture"
+	"go.uber.org/zap"
 )
 
 func addDebugHandlers(srv *server.Server) {
@@ -40,81 +34,65 @@ func addDebugHandlers(srv *server.Server) {
 	srv.AddHandler("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
 }
 
-func main() {
-	zapCfg := zap.NewDevelopmentConfig()
-	zapCfg.DisableStacktrace = true
-	zapCfg.DisableCaller = true
-	zapCfg.OutputPaths = []string{"stdout"}
-	zapCfg.ErrorOutputPaths = []string{"stdout"}
-	logger, err := zapCfg.Build()
-	if err != nil {
-		log.Fatalf("can't initialize zap logger: %v\n", err)
-	}
-	defer func() {
-		_ = logger.Sync()
-	}()
-	zap.ReplaceGlobals(logger)
+// App application struct
+type App struct {
+	ctx    context.Context
+	cfg    config.Config
+	logger *zap.Logger
 
-	cfgPath := flag.String("c", "", "path to TOML config file")
+	appSupervisor *suture.Supervisor
+}
 
-	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s -c [config path]\n", os.Args[0])
-		flag.PrintDefaults()
+// NewApp creates a new App application struct
+func NewApp(cfg config.Config, logger *zap.Logger) *App {
+	return &App{
+		cfg:    cfg,
+		logger: logger,
 	}
+}
 
-	flag.Parse()
-	if len(*cfgPath) == 0 {
-		flag.Usage()
-		logger.Fatal("Must provide path to config argument.")
-	}
-
-	var cfg config.Config
-	_, err = toml.DecodeFile(*cfgPath, &cfg)
-	if err != nil {
-		logger.Fatal("Error reading config file", zap.Error(err))
-	}
-	err = cfg.Validate()
-	if err != nil {
-		logger.Fatal("Error validating config file", zap.Error(err))
-	}
+// startup is called at application startup
+func (b *App) startup(ctx context.Context) {
+	// Perform your setup here
+	b.ctx = ctx
 
 	collection := new(datasheet.Collection)
-	err = collection.Populate(cfg.DataPath)
+	err := collection.Populate(b.cfg.DataPath)
 	if err != nil {
-		logger.Fatal("Error populating data", zap.Error(err))
+		b.logger.Fatal("Error populating data", zap.Error(err))
 	}
 
 	// Since loading datasheets takes up a lot of memory for some reason
 	debug.FreeOSMemory()
 
-	srv := server.New(cfg, logger)
+	srv := server.New(b.cfg, b.logger)
 
 	generator := update.NewGenerator(collection)
 
-	topSupervisor := suture.New("main", suture.Spec{
+	b.appSupervisor = suture.New("main", suture.Spec{
 		Log: func(line string) {
-			logger.Named("supervisor").Info(line)
+			b.logger.Named("supervisor").Info(line)
 		},
 	})
 
-	topSupervisor.ServeBackground()
+	b.appSupervisor.ServeBackground()
 
-	storeProvider := store.NewProvider(logger)
-	topSupervisor.Add(storeProvider)
+	storeProvider := store.NewProvider(b.logger)
+	b.appSupervisor.Add(storeProvider)
 
 	streamSupervisor := suture.New("stream-supervisor", suture.Spec{
 		Log: func(line string) {
-			logger.Named("stream-supervisor").Info(line)
+			b.logger.Named("stream-supervisor").Info(line)
 		},
 	})
-	topSupervisor.Add(streamSupervisor)
+	b.appSupervisor.Add(streamSupervisor)
 
 	sm := stream.NewManager(
 		generator,
 		storeProvider.UpdatesChan(),
 		streamSupervisor,
 		stream.NewHandler,
-		logger,
+		b.logger,
 	)
 
 	streamRequestHandler := func(streamID int, request []byte) (string, error) {
@@ -122,19 +100,19 @@ func main() {
 		return string(b), err
 	}
 
-	topSupervisor.Add(sm)
+	b.appSupervisor.Add(sm)
 
-	adapters, err := stream.BuildAdapterInventory(adapter.Inventory(), cfg, sm.StreamUp(), sm.StreamDown(), logger)
+	adapters, err := stream.BuildAdapterInventory(adapter.Inventory(), b.cfg, sm.StreamUp(), sm.StreamDown(), b.logger)
 	if err != nil {
-		logger.Fatal("Error creating adapter", zap.Error(err))
+		b.logger.Fatal("Error creating adapter", zap.Error(err))
 	}
 	for _, adapter := range adapters {
-		topSupervisor.Add(adapter)
+		b.appSupervisor.Add(adapter)
 	}
 
-	authHandler, err := handlers.NewAuth(cfg, transport.GetInitPayload, logger)
+	authHandler, err := handlers.NewAuth(b.cfg, transport.GetInitPayload, b.logger)
 	if err != nil {
-		logger.Fatal("Error initializing Auth handler", zap.Error(err))
+		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
 
 	queryResolver := models.NewResolver(storeProvider, authHandler, streamRequestHandler)
@@ -166,7 +144,7 @@ func main() {
 	})
 
 	queryHandler := authHandler.Handler(gqlServer)
-	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", cfg, logger))
+	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", b.cfg, b.logger))
 
 	addDebugHandlers(srv)
 
@@ -174,13 +152,22 @@ func main() {
 	srv.AddHandler("/query", queryHandler)
 	srv.AddHandler("/map/", mapHandler)
 
-	topSupervisor.Add(srv)
+	b.appSupervisor.Add(srv)
+}
 
-	signals := make(chan os.Signal, 32)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+// domReady is called after the front-end dom has been loaded
+func (b *App) domReady(ctx context.Context) {
+	// Add your action here
+}
 
-	sig := <-signals
-	logger.Info("Received signal, shutting down...", zap.Stringer("signal", sig))
+// shutdown is called at application termination
+func (b *App) shutdown(ctx context.Context) {
+	// Perform your teardown here
 
-	topSupervisor.Stop()
+	b.appSupervisor.Stop()
+}
+
+// Greet returns a greeting for the given name
+func (b *App) Greet(name string) string {
+	return fmt.Sprintf("Hello %s!", name)
 }

@@ -42,11 +42,17 @@ var _ = Describe("Config", func() {
 
 		Describe("api_port", func() {
 			BeforeEach(func() {
-				c = &config.Config{}
+				c = &config.Config{
+					DataPath: dummyPath,
+					AdminOTP: "dummy-otp",
+					Maps: config.MapConfig{
+						Cache: dummyPath,
+					},
+				}
 			})
 
-			It("errors when zero", func() {
-				Expect(c.Validate()).To(MatchError("config error: api_port must be provided"))
+			It("does not error when zero", func() {
+				Expect(c.Validate()).To(Succeed())
 			})
 		})
 

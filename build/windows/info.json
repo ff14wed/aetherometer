@@ -1,0 +1,14 @@
+{
+	"fixed": {
+		"file_version": "1.0.0"
+	},
+	"info": {
+		"0000": {
+			"ProductVersion": "1.0.0",
+			"CompanyName": "aetherometer",
+			"FileDescription": "aetherometer",
+			"LegalCopyright": "Copyright Flawed 2022",
+			"ProductName": "aetherometer"
+		}
+	}
+}

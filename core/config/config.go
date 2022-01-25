@@ -10,7 +10,7 @@ import (
 // Config stores configuration values for the Aetherometer core
 type Config struct {
 	// APIPort provides the port on which the core API is served.
-	APIPort uint16 `toml:"api_port" validate:"nonempty"`
+	APIPort uint16 `toml:"api_port"`
 
 	// DataPath provides the path to the folder with raw EXD files (in CSV format)
 	// containing game data.

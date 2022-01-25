@@ -1,0 +1,10 @@
+{
+  "name": "aetherometer",
+  "outputfilename": "aetherometer",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "wailsjsdir": "./frontend",
+  "author": {
+    "name": "Flawed"
+  }
+}

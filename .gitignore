@@ -16,3 +16,4 @@ resources/win/core.exe
 resources/linux/core
 resources/mac/core
 resources/win/xivhook.dll
+build/bin
