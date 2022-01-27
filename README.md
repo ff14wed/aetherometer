@@ -1,6 +1,6 @@
 # Aetherometer
 
-[![Build Status](https://travis-ci.com/ff14wed/aetherometer.svg?branch=master)](https://travis-ci.com/ff14wed/aetherometer)
+[![Test](https://github.com/ff14wed/aetherometer/actions/workflows/test.yml/badge.svg)](https://github.com/ff14wed/aetherometer/actions/workflows/test.yml)
 
 **Now updated for Endwalker**
 
