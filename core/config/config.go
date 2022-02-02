@@ -12,10 +12,6 @@ type Config struct {
 	// APIPort provides the port on which the core API is served.
 	APIPort uint16 `toml:"api_port"`
 
-	// DataPath provides the path to the folder with raw EXD files (in CSV format)
-	// containing game data.
-	DataPath string `toml:"data_path" validate:"directory"`
-
 	// AdminOTP provides a one time password that the admin can use to create an
 	// admin token for the API.
 	AdminOTP string `toml:"admin_otp" validate:"nonempty"`
@@ -29,8 +25,7 @@ type Config struct {
 	// Example: allow_sites = ["https://plugins.foo.com"]
 	AllowOrigins []string `toml:"allow_origins"`
 
-	// Maps provides the configuration for the Map endpoint of the API.
-	Maps MapConfig `toml:"maps"`
+	Sources Sources `toml:"sources"`
 
 	// Adapters contains the configuration for all the adapters enabled for
 	// the core API.
@@ -69,10 +64,15 @@ func (a Adapters) IsEnabled(adapterName string) bool {
 	return true
 }
 
-// SourceDirs is a table of directories that provide data used to interpret
-// indexes sent over the network
-type SourceDirs struct {
-	MapsDir string `toml:"maps_dir" validate:"directory"`
+// Sources configures sources that provide data used to interpret indexes sent
+// over the network
+type Sources struct {
+	// DataPath provides the path to the folder with raw EXD files (in CSV format)
+	// containing game data.
+	DataPath string `toml:"data_path" validate:"directory"`
+
+	// Maps provides the configuration for the Map endpoint of the API.
+	Maps MapConfig `toml:"maps"`
 }
 
 func buildError(ctx []string, msg string) error {

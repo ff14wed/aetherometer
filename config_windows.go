@@ -21,10 +21,12 @@ func defaultConfig() (config.Config, error) {
 
 	return config.Config{
 		APIPort:  0,
-		DataPath: filepath.Join(dirPath, "resources", "datasheets"),
 		AdminOTP: "foobar",
-		Maps: config.MapConfig{
-			Cache: filepath.Join(dirPath, "resources", "maps"),
+		Sources: config.Sources{
+			DataPath: filepath.Join(dirPath, "resources", "datasheets"),
+			Maps: config.MapConfig{
+				Cache: filepath.Join(dirPath, "resources", "maps"),
+			},
 		},
 		Adapters: config.Adapters{
 			Hook: config.HookConfig{

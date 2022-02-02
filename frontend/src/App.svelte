@@ -10,9 +10,9 @@
 </script>
 
 <main>
-	<div id="logo"></div>
+	<div id="logo" />
 	<div id="input" data-wails-no-drag>
-		<input id="name" type="text" bind:value={name}>
+		<input id="name" type="text" bind:value={name} />
 		<button class="button" on:click={greet}>Greet</button>
 	</div>
 	{#if greeting}
@@ -21,7 +21,6 @@
 </main>
 
 <style>
-
 	main {
 		height: 100%;
 		width: 100%;
@@ -53,5 +52,4 @@
 		background-repeat: no-repeat;
 		background-image: url("assets/images/logo-dark.svg");
 	}
-
 </style>

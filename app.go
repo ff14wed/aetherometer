@@ -57,7 +57,7 @@ func (b *App) startup(ctx context.Context) {
 	b.ctx = ctx
 
 	collection := new(datasheet.Collection)
-	err := collection.Populate(b.cfg.DataPath)
+	err := collection.Populate(b.cfg.Sources.DataPath)
 	if err != nil {
 		b.logger.Fatal("Error populating data", zap.Error(err))
 	}
