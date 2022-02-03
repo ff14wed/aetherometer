@@ -3,7 +3,12 @@
 
 package main
 
-import "github.com/ff14wed/aetherometer/core/config"
+import (
+	"os"
+	"path/filepath"
+
+	"github.com/ff14wed/aetherometer/core/config"
+)
 
 func defaultConfig() (config.Config, error) {
 	execPath, err := os.Executable()
@@ -18,10 +23,12 @@ func defaultConfig() (config.Config, error) {
 	dirPath := filepath.Dir(cleanPath)
 
 	return config.Config{
-		APIPort:  0,
-		DataPath: filepath.Join(dirPath, "resources", "datasheets"),
-		Maps: config.MapConfig{
-			Cache: filepath.Join(dirPath, "resources", "maps"),
+		APIPort: 0,
+		Sources: config.Sources{
+			DataPath: filepath.Join(dirPath, "resources", "datasheets"),
+			Maps: config.MapConfig{
+				Cache: filepath.Join(dirPath, "resources", "maps"),
+			},
 		},
 		Adapters: config.Adapters{
 			Hook: config.HookConfig{
