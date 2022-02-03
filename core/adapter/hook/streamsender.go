@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:generate counterfeiter io.WriteCloser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . io.WriteCloser
 
 // StreamSender listens for requests and sends data to the hook.
 type StreamSender struct {

@@ -16,7 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:generate counterfeiter . Stream
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Stream
 
 // Stream provides the interface for a long running process responsible for
 // handling data coming from the hook, as well as sending data to the hook
@@ -157,7 +157,7 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 	return nil, err
 }
 
-//go:generate counterfeiter net.Conn
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . net.Conn
 
 type hookConn struct {
 	net.Conn
