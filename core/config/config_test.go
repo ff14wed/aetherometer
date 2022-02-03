@@ -30,8 +30,7 @@ var _ = Describe("Config", func() {
 
 		It("is successful on a correct config", func() {
 			c = &config.Config{
-				APIPort:  9000,
-				AdminOTP: "dummy-otp",
+				APIPort: 9000,
 				Sources: config.Sources{
 					DataPath: dummyPath,
 					Maps: config.MapConfig{
@@ -45,7 +44,6 @@ var _ = Describe("Config", func() {
 		Describe("api_port", func() {
 			BeforeEach(func() {
 				c = &config.Config{
-					AdminOTP: "dummy-otp",
 					Sources: config.Sources{
 						DataPath: dummyPath,
 						Maps: config.MapConfig{
@@ -65,8 +63,7 @@ var _ = Describe("Config", func() {
 
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort:  9000,
-					AdminOTP: "dummy-otp",
+					APIPort: 9000,
 					Sources: config.Sources{
 						DataPath: dataDir,
 					},
@@ -107,8 +104,7 @@ var _ = Describe("Config", func() {
 
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort:  9000,
-					AdminOTP: "dummy-otp",
+					APIPort: 9000,
 					Sources: config.Sources{
 						DataPath: dummyPath,
 						Maps: config.MapConfig{
@@ -204,7 +200,6 @@ var _ = Describe("Config", func() {
 		BeforeEach(func() {
 			lines := []string{
 				`api_port = 9000`,
-				`admin_otp = "dummy-otp"`,
 				`[sources]`,
 				`data_path = "dummy-path"`,
 				`[sources.maps]`,
@@ -216,8 +211,7 @@ var _ = Describe("Config", func() {
 			input = strings.Join(lines, "\n")
 
 			c = &config.Config{
-				APIPort:  9000,
-				AdminOTP: "dummy-otp",
+				APIPort: 9000,
 				Sources: config.Sources{
 					DataPath: "dummy-path",
 					Maps: config.MapConfig{

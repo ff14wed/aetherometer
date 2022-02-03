@@ -20,8 +20,7 @@ func defaultConfig() (config.Config, error) {
 	dirPath := filepath.Dir(cleanPath)
 
 	return config.Config{
-		APIPort:  0,
-		AdminOTP: "foobar",
+		APIPort: 0,
 		Sources: config.Sources{
 			DataPath: filepath.Join(dirPath, "resources", "datasheets"),
 			Maps: config.MapConfig{

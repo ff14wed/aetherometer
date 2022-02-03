@@ -9,11 +9,10 @@ import (
 )
 
 type FakeAuthProvider struct {
-	AddPluginStub        func(context.Context, string) (string, error)
+	AddPluginStub        func(string) (string, error)
 	addPluginMutex       sync.RWMutex
 	addPluginArgsForCall []struct {
-		arg1 context.Context
-		arg2 string
+		arg1 string
 	}
 	addPluginReturns struct {
 		result1 string
@@ -34,24 +33,10 @@ type FakeAuthProvider struct {
 	authorizePluginTokenReturnsOnCall map[int]struct {
 		result1 error
 	}
-	CreateAdminTokenStub        func(context.Context) (string, error)
-	createAdminTokenMutex       sync.RWMutex
-	createAdminTokenArgsForCall []struct {
-		arg1 context.Context
-	}
-	createAdminTokenReturns struct {
-		result1 string
-		result2 error
-	}
-	createAdminTokenReturnsOnCall map[int]struct {
-		result1 string
-		result2 error
-	}
-	RemovePluginStub        func(context.Context, string) (bool, error)
+	RemovePluginStub        func(string) (bool, error)
 	removePluginMutex       sync.RWMutex
 	removePluginArgsForCall []struct {
-		arg1 context.Context
-		arg2 string
+		arg1 string
 	}
 	removePluginReturns struct {
 		result1 bool
@@ -65,17 +50,16 @@ type FakeAuthProvider struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAuthProvider) AddPlugin(arg1 context.Context, arg2 string) (string, error) {
+func (fake *FakeAuthProvider) AddPlugin(arg1 string) (string, error) {
 	fake.addPluginMutex.Lock()
 	ret, specificReturn := fake.addPluginReturnsOnCall[len(fake.addPluginArgsForCall)]
 	fake.addPluginArgsForCall = append(fake.addPluginArgsForCall, struct {
-		arg1 context.Context
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("AddPlugin", []interface{}{arg1, arg2})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("AddPlugin", []interface{}{arg1})
 	fake.addPluginMutex.Unlock()
 	if fake.AddPluginStub != nil {
-		return fake.AddPluginStub(arg1, arg2)
+		return fake.AddPluginStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -90,17 +74,17 @@ func (fake *FakeAuthProvider) AddPluginCallCount() int {
 	return len(fake.addPluginArgsForCall)
 }
 
-func (fake *FakeAuthProvider) AddPluginCalls(stub func(context.Context, string) (string, error)) {
+func (fake *FakeAuthProvider) AddPluginCalls(stub func(string) (string, error)) {
 	fake.addPluginMutex.Lock()
 	defer fake.addPluginMutex.Unlock()
 	fake.AddPluginStub = stub
 }
 
-func (fake *FakeAuthProvider) AddPluginArgsForCall(i int) (context.Context, string) {
+func (fake *FakeAuthProvider) AddPluginArgsForCall(i int) string {
 	fake.addPluginMutex.RLock()
 	defer fake.addPluginMutex.RUnlock()
 	argsForCall := fake.addPluginArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeAuthProvider) AddPluginReturns(result1 string, result2 error) {
@@ -189,80 +173,16 @@ func (fake *FakeAuthProvider) AuthorizePluginTokenReturnsOnCall(i int, result1 e
 	}{result1}
 }
 
-func (fake *FakeAuthProvider) CreateAdminToken(arg1 context.Context) (string, error) {
-	fake.createAdminTokenMutex.Lock()
-	ret, specificReturn := fake.createAdminTokenReturnsOnCall[len(fake.createAdminTokenArgsForCall)]
-	fake.createAdminTokenArgsForCall = append(fake.createAdminTokenArgsForCall, struct {
-		arg1 context.Context
-	}{arg1})
-	fake.recordInvocation("CreateAdminToken", []interface{}{arg1})
-	fake.createAdminTokenMutex.Unlock()
-	if fake.CreateAdminTokenStub != nil {
-		return fake.CreateAdminTokenStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.createAdminTokenReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeAuthProvider) CreateAdminTokenCallCount() int {
-	fake.createAdminTokenMutex.RLock()
-	defer fake.createAdminTokenMutex.RUnlock()
-	return len(fake.createAdminTokenArgsForCall)
-}
-
-func (fake *FakeAuthProvider) CreateAdminTokenCalls(stub func(context.Context) (string, error)) {
-	fake.createAdminTokenMutex.Lock()
-	defer fake.createAdminTokenMutex.Unlock()
-	fake.CreateAdminTokenStub = stub
-}
-
-func (fake *FakeAuthProvider) CreateAdminTokenArgsForCall(i int) context.Context {
-	fake.createAdminTokenMutex.RLock()
-	defer fake.createAdminTokenMutex.RUnlock()
-	argsForCall := fake.createAdminTokenArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeAuthProvider) CreateAdminTokenReturns(result1 string, result2 error) {
-	fake.createAdminTokenMutex.Lock()
-	defer fake.createAdminTokenMutex.Unlock()
-	fake.CreateAdminTokenStub = nil
-	fake.createAdminTokenReturns = struct {
-		result1 string
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeAuthProvider) CreateAdminTokenReturnsOnCall(i int, result1 string, result2 error) {
-	fake.createAdminTokenMutex.Lock()
-	defer fake.createAdminTokenMutex.Unlock()
-	fake.CreateAdminTokenStub = nil
-	if fake.createAdminTokenReturnsOnCall == nil {
-		fake.createAdminTokenReturnsOnCall = make(map[int]struct {
-			result1 string
-			result2 error
-		})
-	}
-	fake.createAdminTokenReturnsOnCall[i] = struct {
-		result1 string
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeAuthProvider) RemovePlugin(arg1 context.Context, arg2 string) (bool, error) {
+func (fake *FakeAuthProvider) RemovePlugin(arg1 string) (bool, error) {
 	fake.removePluginMutex.Lock()
 	ret, specificReturn := fake.removePluginReturnsOnCall[len(fake.removePluginArgsForCall)]
 	fake.removePluginArgsForCall = append(fake.removePluginArgsForCall, struct {
-		arg1 context.Context
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("RemovePlugin", []interface{}{arg1, arg2})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("RemovePlugin", []interface{}{arg1})
 	fake.removePluginMutex.Unlock()
 	if fake.RemovePluginStub != nil {
-		return fake.RemovePluginStub(arg1, arg2)
+		return fake.RemovePluginStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -277,17 +197,17 @@ func (fake *FakeAuthProvider) RemovePluginCallCount() int {
 	return len(fake.removePluginArgsForCall)
 }
 
-func (fake *FakeAuthProvider) RemovePluginCalls(stub func(context.Context, string) (bool, error)) {
+func (fake *FakeAuthProvider) RemovePluginCalls(stub func(string) (bool, error)) {
 	fake.removePluginMutex.Lock()
 	defer fake.removePluginMutex.Unlock()
 	fake.RemovePluginStub = stub
 }
 
-func (fake *FakeAuthProvider) RemovePluginArgsForCall(i int) (context.Context, string) {
+func (fake *FakeAuthProvider) RemovePluginArgsForCall(i int) string {
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
 	argsForCall := fake.removePluginArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeAuthProvider) RemovePluginReturns(result1 bool, result2 error) {
@@ -323,8 +243,6 @@ func (fake *FakeAuthProvider) Invocations() map[string][][]interface{} {
 	defer fake.addPluginMutex.RUnlock()
 	fake.authorizePluginTokenMutex.RLock()
 	defer fake.authorizePluginTokenMutex.RUnlock()
-	fake.createAdminTokenMutex.RLock()
-	defer fake.createAdminTokenMutex.RUnlock()
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -21,8 +21,7 @@ import (
 
 var _ = Describe("Auth", func() {
 	var (
-		auth     *handlers.Auth
-		adminOTP string
+		auth *handlers.Auth
 
 		logBuf *testhelpers.LogBuffer
 		once   sync.Once
@@ -43,124 +42,17 @@ var _ = Describe("Auth", func() {
 		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
-		adminOTP = "one-time-password"
-		cfg := config.Config{
-			AdminOTP: adminOTP,
-		}
+		cfg := config.Config{}
 		auth, err = handlers.NewAuth(cfg, nil, logger)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Describe("CreateAdminToken", func() {
-		It("successfully creates a token that passes admin validation", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			token, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
-		})
-
-		It("does not allow a token to be created twice", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			_, err = auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError("No more admin tokens can be created."))
-		})
-
-		It("does not create a token if the OTP is incorrect", func() {
-			ctx := handlers.ContextWithToken("incorrect")
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError(handlers.AuthError))
-		})
-
-		It("allows creation of a token after a failed attempt", func() {
-			ctx := handlers.ContextWithToken("incorrect")
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError(handlers.AuthError))
-
-			ctx = handlers.ContextWithToken(adminOTP)
-			token, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
-		})
-	})
-
-	Describe("AuthorizeAdminToken", func() {
-		It("rejects valid tokens that contain the incorrect admin ID", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			oldToken, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			auth.ResetOTPUsed()
-			_, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(oldToken)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
-		It("rejects the token if it was signed with the wrong key", func() {
-			altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-			Expect(err).ToNot(HaveOccurred())
-			ctx := handlers.ContextWithToken("altotp")
-			token, err := altAuth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
-		Context("when the authorization token is sent via websockets", func() {
-			var adminToken string
-
-			BeforeEach(func() {
-				cfg := config.Config{
-					AdminOTP: adminOTP,
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
-					return transport.InitPayload{"Authorization": adminToken}
-				}, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("successfully validates the token", func() {
-				ctx := handlers.ContextWithToken(adminOTP)
-				var err error
-				adminToken, err = auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(auth.AuthorizeAdminToken(context.Background())).To(Succeed())
-			})
-
-			It("rejects invalid tokens", func() {
-				adminToken = "invalid-token"
-				Expect(auth.AuthorizeAdminToken(context.Background())).To(MatchError(handlers.AuthError))
-			})
-		})
-	})
-
 	Describe("AddPlugin", func() {
-		var adminToken string
-
-		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
 		It("authorizes the plugin to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+			apiToken, err := auth.AddPlugin("https://example.com/foo/plugin")
 			Expect(err).ToNot(HaveOccurred())
 
-			ctx = handlers.ContextWithToken(apiToken)
+			ctx := handlers.ContextWithToken(apiToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 
@@ -171,61 +63,34 @@ var _ = Describe("Auth", func() {
 		})
 
 		It("returns an error if the plugin URL is invalid", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, ":bad-url.com")
+			apiToken, err := auth.AddPlugin(":bad-url.com")
 			Expect(err).To(BeAssignableToTypeOf(new(url.Error)))
 			Expect(apiToken).To(BeEmpty())
 		})
 
 		It("returns an error if the plugin URL is missing the scheme", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, "example.com/foo/plugin")
-			Expect(err).To(MatchError("Could not parse plugin URL."))
+			apiToken, err := auth.AddPlugin("example.com/foo/plugin")
+			Expect(err).To(MatchError("could not parse plugin URL"))
 			Expect(apiToken).To(BeEmpty())
-		})
-
-		Context("when the incorrect admin token has been provided", func() {
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				adminToken, err = altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("does not authorize the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				apiToken, err := auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-				Expect(err).To(MatchError(handlers.AuthError))
-				Expect(apiToken).To(BeEmpty())
-
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-			})
 		})
 	})
 
 	Describe("RemovePlugin", func() {
-		var adminToken, apiToken string
+		var apiToken string
 
 		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
 			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(adminToken)
-			apiToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+			apiToken, err = auth.AddPlugin("https://example.com/foo/plugin")
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("revokes authorization for the plugin to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			removed, err := auth.RemovePlugin(ctx, apiToken)
+			removed, err := auth.RemovePlugin(apiToken)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(removed).To(BeTrue())
 
-			ctx = handlers.ContextWithToken(apiToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+			ctx := handlers.ContextWithToken(apiToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
 
 			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
@@ -234,15 +99,14 @@ var _ = Describe("Auth", func() {
 		})
 
 		It("removes the token if even if it doesn't exist or no longer exists", func() {
-			ctx := handlers.ContextWithToken(adminToken)
 			for i := 0; i < 3; i++ {
-				removed, err := auth.RemovePlugin(ctx, apiToken)
+				removed, err := auth.RemovePlugin(apiToken)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(removed).To(BeTrue())
 			}
 
-			ctx = handlers.ContextWithToken(apiToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+			ctx := handlers.ContextWithToken(apiToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
 		})
 
@@ -250,22 +114,20 @@ var _ = Describe("Auth", func() {
 			var altAPIToken string
 
 			BeforeEach(func() {
-				ctx := handlers.ContextWithToken(adminToken)
 				var err error
-				altAPIToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+				altAPIToken, err = auth.AddPlugin("https://example.com/foo/plugin")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("continues to allow the origin when removing a single plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
 				for i := 0; i < 3; i++ {
-					removed, err := auth.RemovePlugin(ctx, apiToken)
+					removed, err := auth.RemovePlugin(apiToken)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(removed).To(BeTrue())
 				}
 
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				ctx := handlers.ContextWithToken(apiToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 
 				ctx = handlers.ContextWithToken(altAPIToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
@@ -273,43 +135,20 @@ var _ = Describe("Auth", func() {
 			})
 
 			It("no longer allows the origin when removing both plugins", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-
-				removed, err := auth.RemovePlugin(ctx, apiToken)
+				removed, err := auth.RemovePlugin(apiToken)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(removed).To(BeTrue())
 
-				removed, err = auth.RemovePlugin(ctx, altAPIToken)
+				removed, err = auth.RemovePlugin(altAPIToken)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(removed).To(BeTrue())
 
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				ctx := handlers.ContextWithToken(apiToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 
 				ctx = handlers.ContextWithToken(altAPIToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 				Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-			})
-		})
-
-		Context("when the incorrect admin token has been provided", func() {
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				adminToken, err = altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("does not revoke authorization for the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				removed, err := auth.RemovePlugin(ctx, apiToken)
-				Expect(err).To(MatchError(handlers.AuthError))
-				Expect(removed).To(BeFalse())
-
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 			})
 		})
 
@@ -317,24 +156,18 @@ var _ = Describe("Auth", func() {
 			var altAPIToken string
 
 			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
+				altAuth, err := handlers.NewAuth(config.Config{}, nil, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				altAdminToken, err := altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				ctx = handlers.ContextWithToken(altAdminToken)
-				altAPIToken, err = altAuth.AddPlugin(ctx, "https://example.com/foo/plugin")
+				altAPIToken, err = altAuth.AddPlugin("https://example.com/foo/plugin")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("does not revoke authorization for the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				removed, err := auth.RemovePlugin(ctx, altAPIToken)
-				Expect(err).To(MatchError(handlers.AuthError))
+				removed, err := auth.RemovePlugin(altAPIToken)
+				Expect(err).To(MatchError(handlers.ErrAuth))
 				Expect(removed).To(BeFalse())
 
-				ctx = handlers.ContextWithToken(apiToken)
+				ctx := handlers.ContextWithToken(apiToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 				Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 			})
@@ -342,34 +175,9 @@ var _ = Describe("Auth", func() {
 	})
 
 	Describe("AuthorizePluginToken", func() {
-		var adminToken string
-
-		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("authorizes requests with the admin token to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-		})
-
-		It("rejects valid tokens that contain the incorrect admin ID", func() {
-			auth.ResetOTPUsed()
-			ctx := handlers.ContextWithToken(adminOTP)
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(adminToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
 		Context("when auth is disabled", func() {
 			BeforeEach(func() {
 				cfg := config.Config{
-					AdminOTP:    adminOTP,
 					DisableAuth: true,
 				}
 				var err error
@@ -386,24 +194,19 @@ var _ = Describe("Auth", func() {
 			var apiToken string
 
 			BeforeEach(func() {
-				cfg := config.Config{
-					AdminOTP: adminOTP,
-				}
+				cfg := config.Config{}
+				apiToken = ""
+
 				var err error
 				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
 					return transport.InitPayload{"Authorization": apiToken}
 				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
-
-				ctx := handlers.ContextWithToken(adminOTP)
-				adminToken, err = auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("successfully validates the token", func() {
-				ctx := handlers.ContextWithToken(adminToken)
 				var err error
-				apiToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+				apiToken, err = auth.AddPlugin("https://example.com/foo/plugin")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(auth.AuthorizePluginToken(context.Background())).To(Succeed())
@@ -411,7 +214,7 @@ var _ = Describe("Auth", func() {
 
 			It("rejects invalid tokens", func() {
 				apiToken = "invalid-token"
-				Expect(auth.AuthorizePluginToken(context.Background())).To(MatchError(handlers.AuthError))
+				Expect(auth.AuthorizePluginToken(context.Background())).To(MatchError(handlers.ErrAuth))
 			})
 		})
 	})
@@ -420,37 +223,39 @@ var _ = Describe("Auth", func() {
 		It("adds the auth token to the request context", func() {
 			req, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).ToNot(HaveOccurred())
-			req.Header.Set("Authorization", "Bearer "+adminOTP)
 
-			var token string
+			apiToken, err := auth.AddPlugin("https://example.com/foo/plugin")
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Header.Set("Authorization", "Bearer "+apiToken)
+
+			var receivedCtx context.Context
 			authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				token, err = auth.CreateAdminToken(r.Context())
-				Expect(err).ToNot(HaveOccurred())
+				receivedCtx = r.Context()
 			}))
 
 			rw := httptest.NewRecorder()
 			authHandler.ServeHTTP(rw, req)
 
-			Expect(token).ToNot(BeEmpty())
+			Expect(receivedCtx).ToNot(BeNil())
 
-			ctx := handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
+			Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
 		})
 
 		It("calls the provided next handler even if there is no Authorization header", func() {
 			req, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			var token string
+			var receivedCtx context.Context
 			authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				token, err = auth.CreateAdminToken(r.Context())
+				receivedCtx = r.Context()
 			}))
 
 			rw := httptest.NewRecorder()
 			authHandler.ServeHTTP(rw, req)
 
-			Expect(token).To(BeEmpty())
-			Expect(err).To(MatchError(handlers.AuthError))
+			Expect(receivedCtx).ToNot(BeNil())
+			Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
 		})
 
 		It("does not allow unknown origins in the preflight request", func() {
@@ -474,13 +279,7 @@ var _ = Describe("Auth", func() {
 
 		Context("when the preflight request is for a plugin that has been authorized", func() {
 			BeforeEach(func() {
-				ctx := handlers.ContextWithToken(adminOTP)
-				var err error
-				adminToken, err := auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				ctx = handlers.ContextWithToken(adminToken)
-				_, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+				_, err := auth.AddPlugin("https://example.com/foo/plugin")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -523,7 +322,6 @@ var _ = Describe("Auth", func() {
 				Expect(auth.AllowOriginFunc("http://foo.com")).To(BeFalse())
 				Expect(auth.AllowOriginFunc("http://bar.com")).To(BeFalse())
 				cfg := config.Config{
-					AdminOTP:     adminOTP,
 					AllowOrigins: []string{"http://foo.com", "http://bar.com"},
 				}
 				var err error

@@ -12,10 +12,6 @@ type Config struct {
 	// APIPort provides the port on which the core API is served.
 	APIPort uint16 `toml:"api_port"`
 
-	// AdminOTP provides a one time password that the admin can use to create an
-	// admin token for the API.
-	AdminOTP string `toml:"admin_otp" validate:"nonempty"`
-
 	// DisableAuth allows starting the API server without requiring an auth
 	// token for queries. CORS validation will still be enforced.
 	DisableAuth bool `toml:"disable_auth"`

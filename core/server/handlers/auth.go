@@ -7,18 +7,17 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
-	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/rs/cors"
-	"github.com/rs/xid"
 	"go.uber.org/zap"
 )
 
@@ -28,8 +27,8 @@ type ctxKey struct {
 
 var authCtxKey = &ctxKey{name: "auth"}
 
-var AuthError = errors.New(
-	"Unauthorized: The request lacks valid authentication credentials for the target resource.",
+var ErrAuth = errors.New(
+	"unauthorized error: the request lacks valid authentication credentials for the target resource",
 )
 
 // InitPayloadGetter provides an alternate method of retrieving credentials
@@ -42,10 +41,6 @@ type InitPayloadGetter func(context.Context) transport.InitPayload
 // It also handles the registration and deregistration of plugins
 // and updates its authorizer methods accordingly.
 type Auth struct {
-	otpUsed  int32
-	adminOTP string
-	adminID  atomic.Value
-
 	disableAuth bool
 
 	allowedPlugins map[string]string
@@ -73,7 +68,6 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 	a := &Auth{
 		privKey: key,
 
-		adminOTP:    c.AdminOTP,
 		disableAuth: c.DisableAuth,
 
 		allowedPlugins: make(map[string]string),
@@ -89,9 +83,6 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 			a.allowedOrigins[origin] = math.MaxInt32
 		}
 	}
-
-	invalidID := xid.New().String()
-	a.adminID.Store(invalidID)
 
 	a.cors = cors.New(cors.Options{
 		AllowOriginFunc:  a.AllowOriginFunc,
@@ -136,63 +127,33 @@ func (a *Auth) AllowOriginFunc(origin string) bool {
 	return count > 0
 }
 
-// CreateAdminToken returns a persistent token that is authorized to not only
-// the same requests that plugins can make, but also register or unregister
-// plugins.
-func (a *Auth) CreateAdminToken(ctx context.Context) (string, error) {
-	authString, _ := ctx.Value(authCtxKey).(string)
-	if authString != a.adminOTP {
-		return "", AuthError
-	}
-
-	swapped := atomic.CompareAndSwapInt32(&a.otpUsed, 0, 1)
-	if !swapped {
-		return "", errors.New("No more admin tokens can be created.")
-	}
-
-	adminID := xid.New().String()
-	a.adminID.Store(adminID)
-
-	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"adminID": adminID,
-	})
-
-	adminToken, err := t.SignedString(a.privKey)
-	if err != nil {
-		return "", err
-	}
-
-	return adminToken, nil
-}
-
 // AddPlugin registers the provided plugin URL in the system and returns the
 // token that the plugin can use to make requests. If the plugin URL cannot be
 // parsed, it fails to create a token and returns an error.
-func (a *Auth) AddPlugin(ctx context.Context, pluginURL string) (string, error) {
-	if err := a.AuthorizeAdminToken(ctx); err != nil {
-		return "", err
-	}
-
+func (a *Auth) AddPlugin(pluginURL string) (string, error) {
 	parsedURL, err := url.Parse(pluginURL)
 	if err != nil {
 		return "", err
 	}
 	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return "", errors.New("Could not parse plugin URL.")
+		return "", errors.New("could not parse plugin URL")
 	}
 
 	origin := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
 
-	guid := xid.New().String()
+	pluginID, err := generateRandomString(32)
+	if err != nil {
+		return "", errors.New("system error: could not generate plugin ID")
+	}
 
 	a.allowedLock.Lock()
-	a.allowedPlugins[guid] = origin
+	a.allowedPlugins[pluginID] = origin
 	a.allowedOrigins[origin] += 1
 	a.allowedLock.Unlock()
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"url": pluginURL,
-		"id":  guid,
+		"id":  pluginID,
 	})
 
 	apiToken, err := t.SignedString(a.privKey)
@@ -200,7 +161,7 @@ func (a *Auth) AddPlugin(ctx context.Context, pluginURL string) (string, error) 
 		return "", err
 	}
 
-	a.logger.Debug("Added Plugin", zap.String("url", pluginURL), zap.String("id", guid))
+	a.logger.Debug("Added Plugin", zap.String("url", pluginURL), zap.String("id", pluginID))
 	return apiToken, nil
 }
 
@@ -209,11 +170,7 @@ func (a *Auth) AddPlugin(ctx context.Context, pluginURL string) (string, error) 
 // provided that this token is still a valid token.
 // If all plugins corresponding to a particular origin are removed, this origin
 // will no longer be allowed in the CORS mechanism.
-func (a *Auth) RemovePlugin(ctx context.Context, apiToken string) (bool, error) {
-	if err := a.AuthorizeAdminToken(ctx); err != nil {
-		return false, err
-	}
-
+func (a *Auth) RemovePlugin(apiToken string) (bool, error) {
 	claims, err := a.extractClaimsFromToken(apiToken)
 	if err != nil {
 		return false, err
@@ -231,24 +188,7 @@ func (a *Auth) RemovePlugin(ctx context.Context, apiToken string) (bool, error) 
 		return true, nil
 	}
 
-	return false, AuthError
-}
-
-// AuthorizeAdminToken checks to make sure that the provided admin token
-// is valid and is authorized to make admin-level requests.
-func (a *Auth) AuthorizeAdminToken(ctx context.Context) error {
-	claims, err := a.extractClaimsFromCtx(ctx)
-	if err != nil {
-		return err
-	}
-	if adminID, found := claims["adminID"]; found {
-		correctID := a.adminID.Load().(string)
-		if adminID.(string) != correctID {
-			return AuthError
-		}
-		return nil
-	}
-	return AuthError
+	return false, ErrAuth
 }
 
 // AuthorizePluginToken checks to make sure that the provided plugin token
@@ -263,23 +203,15 @@ func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
 		return err
 	}
 
-	if adminID, found := claims["adminID"]; found {
-		correctID := a.adminID.Load().(string)
-		if adminID.(string) != correctID {
-			return AuthError
-		}
-		return nil
-	}
-
 	if pluginID, found := claims["id"]; found {
 		a.allowedLock.RLock()
 		defer a.allowedLock.RUnlock()
 		if _, allowed := a.allowedPlugins[pluginID.(string)]; !allowed {
-			return AuthError
+			return ErrAuth
 		}
 		return nil
 	}
-	return AuthError
+	return ErrAuth
 }
 
 func (a *Auth) extractClaimsFromCtx(ctx context.Context) (jwt.MapClaims, error) {
@@ -292,14 +224,27 @@ func (a *Auth) extractClaimsFromCtx(ctx context.Context) (jwt.MapClaims, error) 
 
 func (a *Auth) extractClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
 	if len(tokenString) == 0 {
-		return nil, AuthError
+		return nil, ErrAuth
 	}
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		return &a.privKey.PublicKey, nil
 	})
 	if err != nil || !token.Valid {
-		return nil, AuthError
+		return nil, ErrAuth
 	}
 	return claims, nil
+}
+
+func generateRandomString(length int) (string, error) {
+	const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	s := make([]byte, length)
+	for i := 0; i < length; i++ {
+		c, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		if err != nil {
+			return "", err
+		}
+		s[i] = chars[c.Int64()]
+	}
+	return string(s), nil
 }

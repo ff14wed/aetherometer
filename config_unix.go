@@ -20,7 +20,6 @@ func defaultConfig() (config.Config, error) {
 	return config.Config{
 		APIPort:  0,
 		DataPath: filepath.Join(dirPath, "resources", "datasheets"),
-		AdminOTP: "foobar",
 		Maps: config.MapConfig{
 			Cache: filepath.Join(dirPath, "resources", "maps"),
 		},

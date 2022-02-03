@@ -190,9 +190,6 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddPlugin         func(childComplexity int, pluginURL string) int
-		CreateAdminToken  func(childComplexity int) int
-		RemovePlugin      func(childComplexity int, apiToken string) int
 		SendStreamRequest func(childComplexity int, request StreamRequest) int
 	}
 
@@ -350,9 +347,6 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	SendStreamRequest(ctx context.Context, request StreamRequest) (string, error)
-	CreateAdminToken(ctx context.Context) (string, error)
-	AddPlugin(ctx context.Context, pluginURL string) (string, error)
-	RemovePlugin(ctx context.Context, apiToken string) (bool, error)
 }
 type QueryResolver interface {
 	APIVersion(ctx context.Context) (string, error)
@@ -1065,37 +1059,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MapInfo.TerritoryType(childComplexity), true
-
-	case "Mutation.addPlugin":
-		if e.complexity.Mutation.AddPlugin == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addPlugin_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddPlugin(childComplexity, args["pluginURL"].(string)), true
-
-	case "Mutation.createAdminToken":
-		if e.complexity.Mutation.CreateAdminToken == nil {
-			break
-		}
-
-		return e.complexity.Mutation.CreateAdminToken(childComplexity), true
-
-	case "Mutation.removePlugin":
-		if e.complexity.Mutation.RemovePlugin == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_removePlugin_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RemovePlugin(childComplexity, args["apiToken"].(string)), true
 
 	case "Mutation.sendStreamRequest":
 		if e.complexity.Mutation.SendStreamRequest == nil {
@@ -2049,10 +2012,6 @@ scalar Uint
 
 type Mutation {
   sendStreamRequest(request: StreamRequest!): String!
-
-  createAdminToken: String!
-  addPlugin(pluginURL: String!): String!
-  removePlugin(apiToken: String!): Boolean!
 }
 
 input StreamRequest {
@@ -2066,34 +2025,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) field_Mutation_addPlugin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["pluginURL"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["pluginURL"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_removePlugin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["apiToken"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["apiToken"] = arg0
-	return args, nil
-}
 
 func (ec *executionContext) field_Mutation_sendStreamRequest_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -5557,122 +5488,6 @@ func (ec *executionContext) _Mutation_sendStreamRequest(ctx context.Context, fie
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_createAdminToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateAdminToken(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_addPlugin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addPlugin_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddPlugin(rctx, args["pluginURL"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_removePlugin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_removePlugin_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemovePlugin(rctx, args["apiToken"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NPCInfo_nameID(ctx context.Context, field graphql.CollectedField, obj *NPCInfo) (ret graphql.Marshaler) {
@@ -10311,21 +10126,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "sendStreamRequest":
 			out.Values[i] = ec._Mutation_sendStreamRequest(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createAdminToken":
-			out.Values[i] = ec._Mutation_createAdminToken(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "addPlugin":
-			out.Values[i] = ec._Mutation_addPlugin(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "removePlugin":
-			out.Values[i] = ec._Mutation_removePlugin(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

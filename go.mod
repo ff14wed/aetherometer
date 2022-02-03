@@ -68,7 +68,6 @@ require (
 	github.com/onsi/ginkgo v1.13.0
 	github.com/onsi/gomega v1.10.1
 	github.com/rs/cors v1.7.0
-	github.com/rs/xid v1.2.1
 	github.com/thejerf/suture v3.0.3+incompatible
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.uber.org/zap v1.15.0

@@ -10,7 +10,7 @@ import (
 // Minor breaking changes are introduced with new minor versions of the API.
 // Major API changes and rewrites will be introduced with new major versions
 // of the API
-const AetherometerAPIVersion = "v0.2.2-beta"
+const AetherometerAPIVersion = "v0.3"
 
 // StreamRequestHandler defines the type of a client request handler that can
 // be attached to the resolver.
@@ -58,28 +58,9 @@ func (r *mutationResolver) SendStreamRequest(ctx context.Context, req StreamRequ
 		return "", err
 	}
 	if r.handler == nil {
-		return "", errors.New("Request handler is missing")
+		return "", errors.New("request handler is missing")
 	}
 	return r.handler(req.StreamID, []byte(req.Data))
-}
-
-// CreateAdminToken creates a token that is used to authorize the AddPlugin
-// and RemovePlugin mutations. It can only be called once and will fail
-// the subsequent attempts.
-func (r *mutationResolver) CreateAdminToken(ctx context.Context) (string, error) {
-	return r.auth.CreateAdminToken(ctx)
-}
-
-// AddPlugin registers the pluginURL with the API. It returns the apiToken
-// that the plugin can use to authenticate with the API .
-func (r *mutationResolver) AddPlugin(ctx context.Context, pluginURL string) (string, error) {
-	return r.auth.AddPlugin(ctx, pluginURL)
-}
-
-// RemovePlugin revokes the access rights for the plugin associated with the API
-// token.
-func (r *mutationResolver) RemovePlugin(ctx context.Context, apiToken string) (bool, error) {
-	return r.auth.RemovePlugin(ctx, apiToken)
 }
 
 type queryResolver struct{ *Resolver }
