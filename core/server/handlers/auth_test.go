@@ -316,23 +316,5 @@ var _ = Describe("Auth", func() {
 		It("always allows cross-origin requests from localhost", func() {
 			Expect(auth.AllowOriginFunc("http://localhost:9001")).To(BeTrue())
 		})
-
-		Context("when allowed origins are provided in the config", func() {
-			BeforeEach(func() {
-				Expect(auth.AllowOriginFunc("http://foo.com")).To(BeFalse())
-				Expect(auth.AllowOriginFunc("http://bar.com")).To(BeFalse())
-				cfg := config.Config{
-					AllowOrigins: []string{"http://foo.com", "http://bar.com"},
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("allows the provided origins", func() {
-				Expect(auth.AllowOriginFunc("http://foo.com")).To(BeTrue())
-				Expect(auth.AllowOriginFunc("http://bar.com")).To(BeTrue())
-			})
-		})
 	})
 })

@@ -16,16 +16,17 @@ type Config struct {
 	// token for queries. CORS validation will still be enforced.
 	DisableAuth bool `toml:"disable_auth"`
 
-	// AllowOrigins allows the listed sites to bypass CORS validation without
-	// having to register them. Note that scheme and subdomain must be provided.
-	// Example: allow_sites = ["https://plugins.foo.com"]
-	AllowOrigins []string `toml:"allow_origins"`
-
+	// Sources contains configuration for data sources.
 	Sources Sources `toml:"sources"`
 
 	// Adapters contains the configuration for all the adapters enabled for
 	// the core API.
 	Adapters Adapters `toml:"adapters"`
+
+	// Plugins is a name -> URL dictionary that allows the listed plugins to
+	// access the API and pass CORS validation.  Note that the plugin scheme
+	// must be provided.
+	Plugins map[string]string `toml:"plugins"`
 }
 
 // Maps sets the configuration for the Map endpoint of the API.
@@ -60,8 +61,8 @@ func (a Adapters) IsEnabled(adapterName string) bool {
 	return true
 }
 
-// Sources configures sources that provide data used to interpret indexes sent
-// over the network
+// Sources stores configuration for sources that provide data used to interpret
+// indexes sent over the network
 type Sources struct {
 	// DataPath provides the path to the folder with raw EXD files (in CSV format)
 	// containing game data.

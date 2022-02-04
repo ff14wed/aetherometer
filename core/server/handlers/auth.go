@@ -78,9 +78,9 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 		logger: l.Named("auth-handler"),
 	}
 
-	if len(c.AllowOrigins) > 0 {
-		for _, origin := range c.AllowOrigins {
-			a.allowedOrigins[origin] = math.MaxInt32
+	if len(c.Plugins) > 0 {
+		for _, plugin := range c.Plugins {
+			a.allowedOrigins[plugin] = math.MaxInt32
 		}
 	}
 

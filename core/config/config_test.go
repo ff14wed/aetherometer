@@ -202,11 +202,13 @@ var _ = Describe("Config", func() {
 				`api_port = 9000`,
 				`[sources]`,
 				`data_path = "dummy-path"`,
-				`[sources.maps]`,
-				`cache = "some-map-dir"`,
-				`api_path = "www.maps.com"`,
+				`maps.cache = "some-map-dir"`,
+				`maps.api_path = "www.maps.com"`,
 				`[adapters.hook]`,
 				`enabled = true`,
+				`[plugins]`,
+				`"My Plugin" = "https://foo.com/my/plugin"`,
+				`"Other Plugin" = "https://bar.com/other/plugin"`,
 			}
 			input = strings.Join(lines, "\n")
 
@@ -223,6 +225,10 @@ var _ = Describe("Config", func() {
 					Hook: config.HookConfig{
 						Enabled: true,
 					},
+				},
+				Plugins: map[string]string{
+					"My Plugin":    "https://foo.com/my/plugin",
+					"Other Plugin": "https://bar.com/other/plugin",
 				},
 			}
 		})
