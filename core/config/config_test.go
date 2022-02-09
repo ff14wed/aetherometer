@@ -172,7 +172,7 @@ var _ = Describe("Config", func() {
 
 			Context("when the adapter has no Enabled option", func() {
 				It("returns true", func() {
-					Expect(a.IsEnabled("Test")).To(BeTrue())
+					Expect(a.IsEnabled("test")).To(BeTrue())
 				})
 			})
 

@@ -27,7 +27,7 @@ var _ = Describe("BuildAdapterInventory", func() {
 		testBuilder = new(streamfakes.FakeAdapterBuilder)
 		inventory = []stream.AdapterInfo{
 			{Name: "Hook", Builder: hookBuilder},
-			{Name: "Test", Builder: testBuilder},
+			{Name: "test", Builder: testBuilder},
 		}
 
 		streamUp = make(chan stream.Provider)
@@ -48,7 +48,7 @@ var _ = Describe("BuildAdapterInventory", func() {
 			adapters, err := stream.BuildAdapterInventory(inventory, cfg, streamUp, streamDown, logger)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(adapters).To(HaveLen(1))
-			Expect(adapters).To(HaveKey("Test"))
+			Expect(adapters).To(HaveKey("test"))
 			Expect(testBuilder.BuildCallCount()).To(Equal(1))
 		})
 	})
@@ -67,7 +67,7 @@ var _ = Describe("BuildAdapterInventory", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(adapters).To(HaveLen(2))
 			Expect(adapters).To(HaveKey("Hook"))
-			Expect(adapters).To(HaveKey("Test"))
+			Expect(adapters).To(HaveKey("test"))
 			Expect(hookBuilder.BuildCallCount()).To(Equal(1))
 			Expect(testBuilder.BuildCallCount()).To(Equal(1))
 

@@ -14,7 +14,7 @@ type Config struct {
 
 	// DisableAuth allows starting the API server without requiring an auth
 	// token for queries. CORS validation will still be enforced.
-	DisableAuth bool `toml:"disable_auth"`
+	DisableAuth bool `toml:"disable_auth,omitempty"`
 
 	// Sources contains configuration for data sources.
 	Sources Sources `toml:"sources"`
@@ -44,8 +44,8 @@ type Adapters struct {
 	// Hook provides the configuration for the Hook adapter.
 	Hook HookConfig `toml:"hook"`
 
-	// Test is for testing purposes only. Do not use.
-	Test struct{}
+	//lint:ignore U1000 test is for testing purposes only. Do not use.
+	test struct{}
 }
 
 // IsEnabled returns whether or not the provided adapter name is enabled
