@@ -137,12 +137,16 @@ var _ = Describe("Provider", func() {
 		cp.WaitUntilReady()
 		originalCfg := cp.Config()
 
+		sub, _ := cp.NotifyHub.Subscribe()
+
 		Expect(appendToFile(configFile, "[plugins]\n"+`"Some Plugin" = "https://bar.com/some/plugin"`+"\n")).To(Succeed())
 
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Detected config file change"))
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Successfully applied config change"))
 		cfg := cp.Config()
 		Expect(cfg.Plugins).To(HaveKeyWithValue("Some Plugin", "https://bar.com/some/plugin"))
+
+		Expect(sub).To(Receive(), "Config Provider should emit events upon config file change")
 
 		Expect(cfg).ToNot(Equal(originalCfg))
 	})
@@ -151,7 +155,11 @@ var _ = Describe("Provider", func() {
 		It("adds the plugin and syncs changes to the config to disk", func() {
 			cp.WaitUntilReady()
 
+			sub, _ := cp.NotifyHub.Subscribe()
+
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
+
+			Expect(sub).To(Receive(), "Config Provider should emit an event when a plugin is added")
 
 			cfg := cp.Config()
 			Expect(cfg.Plugins).To(HaveKeyWithValue("Other Plugin", "https://foo.com/bar/plugin"))
@@ -205,6 +213,8 @@ var _ = Describe("Provider", func() {
 		It("removes the plugin and syncs changes to the config to disk", func() {
 			cp.WaitUntilReady()
 
+			sub, _ := cp.NotifyHub.Subscribe()
+
 			lines := []string{
 				`api_port = 9000`,
 				`[sources]`,
@@ -222,7 +232,11 @@ var _ = Describe("Provider", func() {
 			Eventually(logBuf).Should(gbytes.Say("config-provider.*Detected config file change"))
 			Eventually(logBuf).Should(gbytes.Say("config-provider.*Successfully applied config change"))
 
+			Expect(sub).To(Receive(), "Config Provider should emit an event when the config file is changed")
+
 			Expect(cp.RemovePlugin("My Plugin")).To(Succeed())
+
+			Expect(sub).To(Receive(), "Config Provider should emit an event when a plugin is removed")
 
 			cfg := cp.Config()
 			Expect(cfg.Plugins).ToNot(HaveKeyWithValue("My Plugin", "https://foo.com/my/plugin"))
@@ -284,12 +298,16 @@ var _ = Describe("Provider", func() {
 	})
 
 	It("doesn't watch files anymore after shutdown", func() {
+		sub, _ := cp.NotifyHub.Subscribe()
+
 		supervisor.Stop()
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Stopping..."))
 
 		Expect(appendToFile(configFile, "[plugins]\n"+`"Some Plugin" = "https://bar.com/some/plugin"`+"\n")).To(Succeed())
 
 		Consistently(logBuf).ShouldNot(gbytes.Say("config-provider.*Detected config file change"))
+
+		Expect(sub).ToNot(Receive(), "Config Provider should not emit events after it's stopped")
 
 		cfg := cp.Config()
 		Expect(cfg.Plugins).To(BeEmpty())

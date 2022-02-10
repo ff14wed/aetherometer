@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/toml"
+	"github.com/ff14wed/aetherometer/core/hub"
 	"github.com/fsnotify/fsnotify"
 	"go.uber.org/zap"
 )
@@ -17,6 +18,8 @@ import (
 // It returns a current snapshot of the config whenever it is polled for a
 // config file.
 type Provider struct {
+	NotifyHub *hub.NotifyHub
+
 	logger *zap.Logger
 
 	configFile string
@@ -24,7 +27,7 @@ type Provider struct {
 	savedConfig Config
 	configLock  sync.RWMutex
 
-	writeEvent chan struct{}
+	internalWriteEvent chan struct{}
 
 	ready    chan struct{}
 	stop     chan struct{}
@@ -38,6 +41,8 @@ func NewProvider(
 	defaultConfig Config,
 ) *Provider {
 	return &Provider{
+		NotifyHub: hub.NewNotifyHub(5),
+
 		logger: logger.Named("config-provider"),
 
 		configFile: configFile,
@@ -45,7 +50,7 @@ func NewProvider(
 		savedConfig: defaultConfig,
 		configLock:  sync.RWMutex{},
 
-		writeEvent: make(chan struct{}),
+		internalWriteEvent: make(chan struct{}),
 
 		ready:    make(chan struct{}),
 		stop:     make(chan struct{}),
@@ -96,7 +101,7 @@ func (p *Provider) Serve() {
 				return
 			}
 			p.logger.Error("FS watcher error", zap.Error(err))
-		case <-p.writeEvent:
+		case <-p.internalWriteEvent:
 			// If we are writing to disk, consume the next watcher event
 			ok := consumeNextWriteEvent(watcher.Events)
 			if !ok {
@@ -161,6 +166,13 @@ func (p *Provider) Config() Config {
 	return p.savedConfig
 }
 
+// updateConfig overwrites the savedConfig with cfg
+// It is expected to be used inside a critical section
+func (p *Provider) updateConfig(cfg Config) {
+	p.savedConfig = cfg
+	p.NotifyHub.Broadcast()
+}
+
 // readConfig reads the saved config file from disk
 func (p *Provider) readConfig() error {
 	cfg := Config{}
@@ -174,7 +186,7 @@ func (p *Provider) readConfig() error {
 	}
 	p.configLock.Lock()
 	defer p.configLock.Unlock()
-	p.savedConfig = cfg
+	p.updateConfig(cfg)
 
 	return nil
 }
@@ -195,47 +207,52 @@ func (p *Provider) writeConfig() error {
 // AddPlugin adds the given plugin to the configuration
 // It errors if the plugin name already exists.
 func (p *Provider) AddPlugin(name string, pluginURL string) error {
-	p.configLock.Lock()
-	cfg := p.savedConfig
-	if cfg.Plugins == nil {
-		cfg.Plugins = make(map[string]string)
-	} else {
-		cfg.Plugins = copyMap(cfg.Plugins)
-	}
-	if _, ok := cfg.Plugins[name]; ok {
-		p.configLock.Unlock()
-		return fmt.Errorf(`plugin "%s" already exists`, name)
-	}
-	cfg.Plugins[name] = pluginURL
-	p.savedConfig = cfg
-	p.configLock.Unlock()
+	err := func() error {
+		p.configLock.Lock()
+		defer p.configLock.Unlock()
 
-	p.writeEvent <- struct{}{}
+		if _, ok := p.savedConfig.Plugins[name]; ok {
+			return fmt.Errorf(`plugin "%s" already exists`, name)
+		}
 
+		cfg := p.savedConfig
+		if cfg.Plugins == nil {
+			cfg.Plugins = make(map[string]string)
+		} else {
+			cfg.Plugins = copyMap(cfg.Plugins)
+		}
+		cfg.Plugins[name] = pluginURL
+		p.updateConfig(cfg)
+
+		return nil
+	}()
+
+	if err != nil {
+		return err
+	}
+
+	p.internalWriteEvent <- struct{}{}
 	return p.writeConfig()
 }
 
 // RemovePlugin removes the plugin with the given name from the configuration.
 // If the plugin doesn't exist, it is a no-op.
 func (p *Provider) RemovePlugin(name string) error {
-	p.configLock.Lock()
-	cfg := p.savedConfig
-	if cfg.Plugins == nil {
-		p.configLock.Unlock()
-		return nil
-	}
-	cfg.Plugins = copyMap(cfg.Plugins)
+	func() {
+		p.configLock.Lock()
+		defer p.configLock.Unlock()
 
-	if _, ok := cfg.Plugins[name]; !ok {
-		p.configLock.Unlock()
-		return nil
-	}
-	delete(cfg.Plugins, name)
-	p.savedConfig = cfg
-	p.configLock.Unlock()
+		if p.savedConfig.Plugins != nil {
+			if _, ok := p.savedConfig.Plugins[name]; ok {
+				cfg := p.savedConfig
+				cfg.Plugins = copyMap(cfg.Plugins)
+				delete(cfg.Plugins, name)
+				p.updateConfig(cfg)
+			}
+		}
+	}()
 
-	p.writeEvent <- struct{}{}
-
+	p.internalWriteEvent <- struct{}{}
 	return p.writeConfig()
 }
 
