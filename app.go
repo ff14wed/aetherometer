@@ -36,18 +36,20 @@ func addDebugHandlers(srv *server.Server) {
 
 // App application struct
 type App struct {
-	ctx    context.Context
-	cfg    config.Config
-	logger *zap.Logger
+	ctx         context.Context
+	cfgProvider *config.Provider
+	logger      *zap.Logger
 
 	appSupervisor *suture.Supervisor
+
+	collection *datasheet.Collection
 }
 
 // NewApp creates a new App application struct
-func NewApp(cfg config.Config, logger *zap.Logger) *App {
+func NewApp(cfgProvider *config.Provider, logger *zap.Logger) *App {
 	return &App{
-		cfg:    cfg,
-		logger: logger,
+		cfgProvider: cfgProvider,
+		logger:      logger,
 	}
 }
 
@@ -56,19 +58,6 @@ func (b *App) startup(ctx context.Context) {
 	// Perform your setup here
 	b.ctx = ctx
 
-	collection := new(datasheet.Collection)
-	err := collection.Populate(b.cfg.Sources.DataPath)
-	if err != nil {
-		b.logger.Fatal("Error populating data", zap.Error(err))
-	}
-
-	// Since loading datasheets takes up a lot of memory for some reason
-	debug.FreeOSMemory()
-
-	srv := server.New(b.cfg, b.logger)
-
-	generator := update.NewGenerator(collection)
-
 	b.appSupervisor = suture.New("main", suture.Spec{
 		Log: func(line string) {
 			b.logger.Named("supervisor").Info(line)
@@ -76,6 +65,19 @@ func (b *App) startup(ctx context.Context) {
 	})
 
 	b.appSupervisor.ServeBackground()
+
+	b.appSupervisor.Add(b.cfgProvider)
+
+	b.cfgProvider.WaitUntilReady()
+
+	b.collection = new(datasheet.Collection)
+
+	cfg := b.cfgProvider.Config()
+	srv := server.New(cfg, b.logger)
+
+	b.ReloadDatasheets(b.collection)
+
+	generator := update.NewGenerator(b.collection)
 
 	storeProvider := store.NewProvider(b.logger)
 	b.appSupervisor.Add(storeProvider)
@@ -102,7 +104,7 @@ func (b *App) startup(ctx context.Context) {
 
 	b.appSupervisor.Add(sm)
 
-	adapters, err := stream.BuildAdapterInventory(adapter.Inventory(), b.cfg, sm.StreamUp(), sm.StreamDown(), b.logger)
+	adapters, err := stream.BuildAdapterInventory(adapter.Inventory(), cfg, sm.StreamUp(), sm.StreamDown(), b.logger)
 	if err != nil {
 		b.logger.Fatal("Error creating adapter", zap.Error(err))
 	}
@@ -110,7 +112,7 @@ func (b *App) startup(ctx context.Context) {
 		b.appSupervisor.Add(adapter)
 	}
 
-	authHandler, err := handlers.NewAuth(b.cfg, transport.GetInitPayload, b.logger)
+	authHandler, err := handlers.NewAuth(cfg, transport.GetInitPayload, b.logger)
 	if err != nil {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
@@ -144,7 +146,7 @@ func (b *App) startup(ctx context.Context) {
 	})
 
 	queryHandler := authHandler.Handler(gqlServer)
-	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", b.cfg, b.logger))
+	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", cfg, b.logger))
 
 	addDebugHandlers(srv)
 
@@ -165,6 +167,19 @@ func (b *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 
 	b.appSupervisor.Stop()
+}
+
+// ReloadDatasheets reloads datasheets from the filepath
+func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
+	cfg := b.cfgProvider.Config()
+	err := collection.Populate(cfg.Sources.DataPath)
+	if err != nil {
+		b.logger.Fatal("Error populating data", zap.Error(err))
+	}
+
+	// Since loading datasheets takes up a lot of memory for some reason
+	debug.FreeOSMemory()
+
 }
 
 // Greet returns a greeting for the given name

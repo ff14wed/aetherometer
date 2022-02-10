@@ -10,8 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/BurntSushi/toml"
 	"github.com/apenwarr/fixconsole"
+	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -32,7 +32,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	cfgPath := flag.String("c", "", "optional path to TOML config file")
+	cfgPath := flag.String("c", "config.toml", "optional path to TOML config file")
 
 	headless := flag.Bool("headless", false, "run Aetherometer in headless mode.")
 
@@ -45,17 +45,17 @@ func main() {
 		return
 	}
 
-	loggingOutput := "aetherometer.log"
+	var outputLogPath string = "aetherometer.log"
 	if *headless {
-		loggingOutput = "stdout"
+		outputLogPath = "stdout"
 		fixconsole.FixConsoleIfNeeded()
 	}
 
 	zapCfg := zap.NewDevelopmentConfig()
 	zapCfg.DisableStacktrace = true
 	zapCfg.DisableCaller = true
-	zapCfg.OutputPaths = []string{loggingOutput}
-	zapCfg.ErrorOutputPaths = []string{loggingOutput}
+	zapCfg.OutputPaths = []string{outputLogPath}
+	zapCfg.ErrorOutputPaths = []string{outputLogPath}
 	zapLogger, err := zapCfg.Build()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v\n", err)
@@ -65,24 +65,17 @@ func main() {
 	}()
 	zap.ReplaceGlobals(zapLogger)
 
-	cfg, err := defaultConfig()
+	if len(*cfgPath) == 0 {
+		zapLogger.Fatal("Config path cannot be empty")
+	}
+
+	defaultCfg, err := defaultConfig()
 	if err != nil {
-		zapLogger.Fatal("Error setting up config", zap.Error(err))
+		zapLogger.Fatal("Error setting up default config", zap.Error(err))
 	}
-	zapLogger.Info("Using config", zap.Any("config", cfg))
+	cfgProvider := config.NewProvider(zapLogger, *cfgPath, defaultCfg)
 
-	if len(*cfgPath) != 0 {
-		_, err = toml.DecodeFile(*cfgPath, &cfg)
-		if err != nil {
-			zapLogger.Fatal("Error reading config file", zap.Error(err))
-		}
-		err = cfg.Validate()
-		if err != nil {
-			zapLogger.Fatal("Error validating config file", zap.Error(err))
-		}
-	}
-
-	app := NewApp(cfg, zapLogger)
+	app := NewApp(cfgProvider, zapLogger)
 
 	// Do not start the GUI in headless mode.
 	if *headless {

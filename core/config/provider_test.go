@@ -86,6 +86,13 @@ var _ = Describe("Provider", func() {
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
 	})
 
+	Describe("WaitUntilReady", func() {
+		It("blocks until the provider is running", func() {
+			cp.WaitUntilReady()
+			Expect(logBuf).Should(gbytes.Say("config-provider.*Running"))
+		})
+	})
+
 	It(`logs "Stopping..." on shutdown`, func() {
 		supervisor.Stop()
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Stopping..."))
@@ -93,7 +100,7 @@ var _ = Describe("Provider", func() {
 
 	It("writes the default config to the config file path if it does not already exist", func() {
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Writing default config"))
-		Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+		cp.WaitUntilReady()
 		configBytes, err := ioutil.ReadFile(configFile)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(string(configBytes)).To(ContainSubstring("api_port = 9000"))
@@ -120,14 +127,14 @@ var _ = Describe("Provider", func() {
 
 		It("does not overwrite the existing file", func() {
 			Consistently(logBuf).ShouldNot(gbytes.Say("config-provider.*Writing default config"))
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 			cfg := cp.Config()
 			Expect(cfg.Plugins).To(HaveKeyWithValue("My Plugin", "https://foo.com/my/plugin"))
 		})
 	})
 
 	It("updates the saved config upon config file change", func() {
-		Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+		cp.WaitUntilReady()
 		originalCfg := cp.Config()
 
 		Expect(appendToFile(configFile, "[plugins]\n"+`"Some Plugin" = "https://bar.com/some/plugin"`+"\n")).To(Succeed())
@@ -142,7 +149,7 @@ var _ = Describe("Provider", func() {
 
 	Describe("AddPlugin", func() {
 		It("adds the plugin and syncs changes to the config to disk", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 
@@ -157,7 +164,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("does not allow duplicate plugins to be added", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(MatchError(`plugin "Other Plugin" already exists`))
@@ -165,7 +172,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("respects file changes", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 			Consistently(logBuf).ShouldNot(gbytes.Say("config-provider.*Detected config file change"))
@@ -179,7 +186,8 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("mutates the config without mutating references to it", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
+
 			Expect(cp.AddPlugin("Some Plugin", "https://foo.com/some/plugin")).To(Succeed())
 
 			cfg := cp.Config()
@@ -195,7 +203,7 @@ var _ = Describe("Provider", func() {
 
 	Describe("RemovePlugin", func() {
 		It("removes the plugin and syncs changes to the config to disk", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			lines := []string{
 				`api_port = 9000`,
@@ -227,7 +235,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("does nothing if the plugin does not exist", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 			Expect(cp.RemovePlugin("Other Plugin")).To(Succeed())
@@ -237,7 +245,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("does nothing if no plugins were ever added", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.RemovePlugin("Other Plugin")).To(Succeed())
 
@@ -245,7 +253,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("respects file changes", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
 
 			Expect(cp.AddPlugin("Some Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 			Expect(cp.RemovePlugin("Some Plugin")).To(Succeed())
@@ -260,7 +268,8 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("mutates the config without mutating references to it", func() {
-			Eventually(logBuf).Should(gbytes.Say("config-provider.*Running"))
+			cp.WaitUntilReady()
+
 			Expect(cp.AddPlugin("Some Plugin", "https://foo.com/some/plugin")).To(Succeed())
 
 			cfg := cp.Config()

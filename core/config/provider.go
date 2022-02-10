@@ -26,6 +26,7 @@ type Provider struct {
 
 	writeEvent chan struct{}
 
+	ready    chan struct{}
 	stop     chan struct{}
 	stopDone chan struct{}
 }
@@ -46,6 +47,7 @@ func NewProvider(
 
 		writeEvent: make(chan struct{}),
 
+		ready:    make(chan struct{}),
 		stop:     make(chan struct{}),
 		stopDone: make(chan struct{}),
 	}
@@ -70,7 +72,10 @@ func (p *Provider) Serve() {
 		return
 	}
 	defer close(p.stopDone)
+
 	p.logger.Info("Running")
+	close(p.ready)
+
 	for {
 		select {
 		case event, ok := <-watcher.Events:
@@ -114,6 +119,11 @@ func consumeNextWriteEvent(fsEvents chan fsnotify.Event) (ok bool) {
 			return true
 		}
 	}
+}
+
+// WaitUntilReady blocks until the config provider is up and running
+func (p *Provider) WaitUntilReady() {
+	<-p.ready
 }
 
 // Stop will shutdown this service and wait on it to stop before returning
