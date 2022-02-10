@@ -48,7 +48,7 @@ var _ = Describe("Provider", func() {
 		Expect(f.Close()).To(Succeed())
 		Expect(os.RemoveAll(configFile)).To(Succeed())
 
-		cp = config.NewProvider(logger, configFile, config.Config{
+		defaultCfg := config.Config{
 			APIPort: 9000,
 			Sources: config.Sources{
 				DataPath: os.TempDir(),
@@ -62,7 +62,8 @@ var _ = Describe("Provider", func() {
 					Enabled: false,
 				},
 			},
-		})
+		}
+		cp = config.NewProvider(configFile, defaultCfg, logger)
 
 		supervisor = suture.New("test-configprovider", suture.Spec{
 			Log: func(line string) {

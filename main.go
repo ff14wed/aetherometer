@@ -73,7 +73,7 @@ func main() {
 	if err != nil {
 		zapLogger.Fatal("Error setting up default config", zap.Error(err))
 	}
-	cfgProvider := config.NewProvider(zapLogger, *cfgPath, defaultCfg)
+	cfgProvider := config.NewProvider(*cfgPath, defaultCfg, zapLogger)
 
 	app := NewApp(cfgProvider, zapLogger)
 

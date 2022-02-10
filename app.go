@@ -65,16 +65,14 @@ func (b *App) startup(ctx context.Context) {
 	})
 
 	b.appSupervisor.ServeBackground()
-
 	b.appSupervisor.Add(b.cfgProvider)
-
 	b.cfgProvider.WaitUntilReady()
 
-	b.collection = new(datasheet.Collection)
-
 	cfg := b.cfgProvider.Config()
+
 	srv := server.New(cfg, b.logger)
 
+	b.collection = new(datasheet.Collection)
 	b.ReloadDatasheets(b.collection)
 
 	generator := update.NewGenerator(b.collection)

@@ -36,9 +36,9 @@ type Provider struct {
 
 // NewProvider creates a new config provider.
 func NewProvider(
-	logger *zap.Logger,
 	configFile string,
 	defaultConfig Config,
+	logger *zap.Logger,
 ) *Provider {
 	return &Provider{
 		NotifyHub: hub.NewNotifyHub(5),
