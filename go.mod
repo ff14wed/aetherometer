@@ -2,14 +2,35 @@ module github.com/ff14wed/aetherometer
 
 go 1.17
 
-require github.com/wailsapp/wails/v2 v2.0.0-beta.29
+require (
+	github.com/99designs/gqlgen v0.16.0
+	github.com/BurntSushi/toml v1.0.0
+	github.com/Microsoft/go-winio v0.5.1
+	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/ff14wed/xivnet/v3 v3.30.0
+	github.com/fsnotify/fsnotify v1.4.9
+	github.com/gorilla/websocket v1.4.2
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
+	github.com/mitchellh/mapstructure v1.4.3 // indirect
+	github.com/onsi/ginkgo v1.13.0
+	github.com/onsi/gomega v1.10.1
+	github.com/rs/cors v1.8.2
+	github.com/thejerf/suture v4.0.1+incompatible
+	github.com/vektah/gqlparser/v2 v2.3.1
+	github.com/wailsapp/wails/v2 v2.0.0-beta.29
+	go.uber.org/zap v1.20.0
+	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
+	gopkg.in/dealancer/validate.v2 v2.1.0
+)
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/apenwarr/w32 v0.0.0-20190407065021-aa00fece76ab // indirect
 	github.com/fasthttp/websocket v1.4.6 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gofiber/fiber/v2 v2.26.0 // indirect
@@ -51,26 +72,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-)
-
-require (
-	github.com/99designs/gqlgen v0.16.0
-	github.com/BurntSushi/toml v1.0.0
-	github.com/Microsoft/go-winio v0.5.1
-	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/ff14wed/xivnet/v3 v3.30.0
-	github.com/gorilla/websocket v1.4.2
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
-	github.com/onsi/ginkgo v1.13.0
-	github.com/onsi/gomega v1.10.1
-	github.com/rs/cors v1.8.2
-	github.com/thejerf/suture v4.0.1+incompatible
-	github.com/vektah/gqlparser/v2 v2.3.1
-	go.uber.org/zap v1.20.0
-	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
-	gopkg.in/dealancer/validate.v2 v2.1.0
 )
