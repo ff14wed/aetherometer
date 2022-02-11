@@ -2,9 +2,9 @@ package hub_test
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"github.com/ff14wed/aetherometer/core/hub"
-	"go.uber.org/atomic"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +14,7 @@ var _ = Describe("NotifyHub", func() {
 	It("broadcasts messages to multiple subscribers", func() {
 		h := hub.NewNotifyHub(5)
 
-		var countReceived atomic.Uint32
+		var countReceived uint32
 		wg := sync.WaitGroup{}
 
 		subscriber := func() {
@@ -24,7 +24,7 @@ var _ = Describe("NotifyHub", func() {
 
 			wg.Done()
 			<-sub
-			countReceived.Add(1)
+			atomic.AddUint32(&countReceived, 1)
 		}
 		wg.Add(5)
 		for i := 0; i < 5; i++ {
@@ -35,7 +35,7 @@ var _ = Describe("NotifyHub", func() {
 
 		h.Broadcast()
 		Eventually(func() int {
-			return int(countReceived.Load())
+			return int(atomic.LoadUint32(&countReceived))
 		}).Should(Equal(5), "Not all subscribers received messages")
 	})
 
