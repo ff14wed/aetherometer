@@ -238,13 +238,14 @@ func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
 		return err
 	}
 
-	if pluginID, found := claims["id"]; found {
-		if _, allowed := a.authConfig.allowedPluginIDs[pluginID.(string)]; !allowed {
-			return ErrAuth
-		}
-		return nil
+	pluginID, found := claims["id"]
+	if !found {
+		return ErrAuth
 	}
-	return ErrAuth
+	if _, allowed := a.authConfig.allowedPluginIDs[pluginID.(string)]; !allowed {
+		return ErrAuth
+	}
+	return nil
 }
 
 // GetRegisteredPlugins returns a copy of the map containing all the plugins
