@@ -2,9 +2,11 @@ package handlers_test
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"sync"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -21,6 +23,9 @@ import (
 
 var _ = Describe("Auth", func() {
 	var (
+		cp         *config.Provider
+		configFile string
+
 		auth *handlers.Auth
 
 		logBuf *testhelpers.LogBuffer
@@ -42,68 +47,98 @@ var _ = Describe("Auth", func() {
 		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
+		f, err := ioutil.TempFile("", "authtest")
+		Expect(err).ToNot(HaveOccurred())
+		configFile = f.Name()
+
 		cfg := config.Config{}
-		auth, err = handlers.NewAuth(cfg, nil, logger)
+		cp = config.NewProvider(configFile, cfg, logger)
+
+		auth, err = handlers.NewAuth(cp, nil, logger)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Describe("AddPlugin", func() {
-		It("authorizes the plugin to access the API", func() {
-			apiToken, err := auth.AddPlugin("https://example.com/foo/plugin")
-			Expect(err).ToNot(HaveOccurred())
+	AfterEach(func() {
+		_ = os.Remove(configFile)
+	})
 
-			ctx := handlers.ContextWithToken(apiToken)
+	Describe("adding a plugin", func() {
+		It("authorizes the plugin to access the API", func() {
+			oldPlugins := auth.GetRegisteredPlugins()
+
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).ToNot(Equal(oldPlugins))
+			pluginInfo := plugins["Foo Plugin"]
+
+			ctx := handlers.ContextWithToken(pluginInfo.APIToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 
 			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
 			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
-			Eventually(logBuf).Should(gbytes.Say("Added Plugin"))
+			Eventually(logBuf).Should(gbytes.Say("Generated new plugin auth"))
 			Eventually(logBuf).Should(gbytes.Say("https://example.com.*id"))
 		})
 
 		It("returns an error if the plugin URL is invalid", func() {
-			apiToken, err := auth.AddPlugin(":bad-url.com")
-			Expect(err).To(BeAssignableToTypeOf(new(url.Error)))
-			Expect(apiToken).To(BeEmpty())
+			Expect(cp.AddPlugin("Bad Plugin", ":bad-url.com")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(BeAssignableToTypeOf(new(url.Error)))
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(BeEmpty())
 		})
 
 		It("returns an error if the plugin URL is missing the scheme", func() {
-			apiToken, err := auth.AddPlugin("example.com/foo/plugin")
-			Expect(err).To(MatchError("could not parse plugin URL"))
-			Expect(apiToken).To(BeEmpty())
+			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(BeEmpty())
+		})
+
+		It("does not change the registered plugins list if a bad plugin URL is added", func() {
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(HaveKey("Foo Plugin"))
+
+			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
+
+			plugins = auth.GetRegisteredPlugins()
+			Expect(plugins).To(HaveKey("Foo Plugin"))
+			Expect(plugins).ToNot(HaveKey("Bad Plugin"))
+
+			pluginInfo := plugins["Foo Plugin"]
+			ctx := handlers.ContextWithToken(pluginInfo.APIToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
+			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 		})
 	})
 
-	Describe("RemovePlugin", func() {
+	Describe("removing a plugin", func() {
+		const pluginName = "Foo Plugin"
 		var apiToken string
 
 		BeforeEach(func() {
-			var err error
-			apiToken, err = auth.AddPlugin("https://example.com/foo/plugin")
-			Expect(err).ToNot(HaveOccurred())
+			Expect(cp.AddPlugin(pluginName, "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+
+			plugins := auth.GetRegisteredPlugins()
+			pluginInfo := plugins[pluginName]
+
+			apiToken = pluginInfo.APIToken
+			ctx := handlers.ContextWithToken(apiToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
+			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 		})
 
 		It("revokes authorization for the plugin to access the API", func() {
-			removed, err := auth.RemovePlugin(apiToken)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(removed).To(BeTrue())
-
-			ctx := handlers.ContextWithToken(apiToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
-			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-
-			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
-			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
-			Eventually(logBuf).Should(gbytes.Say("Deleted Plugin.*id"))
-		})
-
-		It("removes the token if even if it doesn't exist or no longer exists", func() {
-			for i := 0; i < 3; i++ {
-				removed, err := auth.RemovePlugin(apiToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
-			}
+			Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
 
 			ctx := handlers.ContextWithToken(apiToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
@@ -111,20 +146,22 @@ var _ = Describe("Auth", func() {
 		})
 
 		Context("when adding a second plugin with the same origin", func() {
+			const altPluginName string = "Bar Plugin"
 			var altAPIToken string
 
 			BeforeEach(func() {
-				var err error
-				altAPIToken, err = auth.AddPlugin("https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.AddPlugin(altPluginName, "https://example.com/bar/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
+
+				plugins := auth.GetRegisteredPlugins()
+				pluginInfo := plugins[altPluginName]
+
+				altAPIToken = pluginInfo.APIToken
 			})
 
 			It("continues to allow the origin when removing a single plugin", func() {
-				for i := 0; i < 3; i++ {
-					removed, err := auth.RemovePlugin(apiToken)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(removed).To(BeTrue())
-				}
+				Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 
 				ctx := handlers.ContextWithToken(apiToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
@@ -135,13 +172,9 @@ var _ = Describe("Auth", func() {
 			})
 
 			It("no longer allows the origin when removing both plugins", func() {
-				removed, err := auth.RemovePlugin(apiToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
-
-				removed, err = auth.RemovePlugin(altAPIToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
+				Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+				Expect(cp.RemovePlugin(altPluginName)).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 
 				ctx := handlers.ContextWithToken(apiToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
@@ -151,38 +184,13 @@ var _ = Describe("Auth", func() {
 				Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
 			})
 		})
-
-		Context("when the provided api token is invalid", func() {
-			var altAPIToken string
-
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				altAPIToken, err = altAuth.AddPlugin("https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("does not revoke authorization for the plugin", func() {
-				removed, err := auth.RemovePlugin(altAPIToken)
-				Expect(err).To(MatchError(handlers.ErrAuth))
-				Expect(removed).To(BeFalse())
-
-				ctx := handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
-			})
-		})
 	})
 
 	Describe("AuthorizePluginToken", func() {
 		Context("when auth is disabled", func() {
 			BeforeEach(func() {
-				cfg := config.Config{
-					DisableAuth: true,
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.SetDisableAuth(true)).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 			})
 
 			It("authorizes requests with no token to access the API", func() {
@@ -191,30 +199,72 @@ var _ = Describe("Auth", func() {
 		})
 
 		Context("when the authorization token is sent via websockets", func() {
-			var apiToken string
+			type authTestKeyType string
+			const authTestKey authTestKeyType = "authTest-apiToken"
 
 			BeforeEach(func() {
-				cfg := config.Config{}
-				apiToken = ""
-
 				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
+				auth, err = handlers.NewAuth(cp, func(ctx context.Context) transport.InitPayload {
+					apiToken := ctx.Value(authTestKey).(string)
 					return transport.InitPayload{"Authorization": apiToken}
 				}, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("successfully validates the token", func() {
-				var err error
-				apiToken, err = auth.AddPlugin("https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 
-				Expect(auth.AuthorizePluginToken(context.Background())).To(Succeed())
+				plugins := auth.GetRegisteredPlugins()
+				pluginInfo := plugins["Foo Plugin"]
+
+				apiToken := pluginInfo.APIToken
+
+				ctx := context.Background()
+				ctx = context.WithValue(ctx, authTestKey, apiToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			})
 
 			It("rejects invalid tokens", func() {
-				apiToken = "invalid-token"
-				Expect(auth.AuthorizePluginToken(context.Background())).To(MatchError(handlers.ErrAuth))
+				ctx := context.Background()
+				ctx = context.WithValue(ctx, authTestKey, "invalid-token")
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
+			})
+		})
+
+		Context("when the provided api token is no longer valid", func() {
+			var (
+				altAPIToken   string
+				altConfigFile string
+			)
+
+			BeforeEach(func() {
+
+				f, err := ioutil.TempFile("", "authtest")
+				Expect(err).ToNot(HaveOccurred())
+				altConfigFile = f.Name()
+
+				cfg := config.Config{}
+				altCP := config.NewProvider(altConfigFile, cfg, zap.NewNop())
+
+				altAuth, err := handlers.NewAuth(altCP, nil, zap.NewNop())
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(altCP.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(altAuth.RefreshConfig()).To(Succeed())
+
+				plugins := altAuth.GetRegisteredPlugins()
+				pluginInfo := plugins["Foo Plugin"]
+				altAPIToken = pluginInfo.APIToken
+			})
+
+			AfterEach(func() {
+				_ = os.Remove(altConfigFile)
+			})
+
+			It("rejects the api token", func() {
+				ctx := handlers.ContextWithToken(altAPIToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			})
 		})
 	})
@@ -224,8 +274,12 @@ var _ = Describe("Auth", func() {
 			req, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			apiToken, err := auth.AddPlugin("https://example.com/foo/plugin")
-			Expect(err).ToNot(HaveOccurred())
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+
+			plugins := auth.GetRegisteredPlugins()
+			pluginInfo := plugins["Foo Plugin"]
+			apiToken := pluginInfo.APIToken
 
 			req.Header.Set("Authorization", "Bearer "+apiToken)
 
@@ -279,8 +333,8 @@ var _ = Describe("Auth", func() {
 
 		Context("when the preflight request is for a plugin that has been authorized", func() {
 			BeforeEach(func() {
-				_, err := auth.AddPlugin("https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 			})
 
 			It("allows the origin in the preflight request", func() {

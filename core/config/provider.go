@@ -41,7 +41,7 @@ func NewProvider(
 	logger *zap.Logger,
 ) *Provider {
 	return &Provider{
-		NotifyHub: hub.NewNotifyHub(5),
+		NotifyHub: hub.NewNotifyHub(10),
 
 		logger: logger.Named("config-provider"),
 
@@ -50,7 +50,7 @@ func NewProvider(
 		savedConfig: defaultConfig,
 		configLock:  sync.RWMutex{},
 
-		internalWriteEvent: make(chan struct{}),
+		internalWriteEvent: make(chan struct{}, 10),
 
 		ready:    make(chan struct{}),
 		stop:     make(chan struct{}),
@@ -204,6 +204,14 @@ func (p *Provider) writeConfig() error {
 	return os.WriteFile(p.configFile, configBytes.Bytes(), 0644)
 }
 
+func (p *Provider) sendInternalWriteEvent() {
+	// Don't worry if the channel is blocked
+	select {
+	case p.internalWriteEvent <- struct{}{}:
+	default:
+	}
+}
+
 // AddPlugin adds the given plugin to the configuration
 // It errors if the plugin name already exists.
 func (p *Provider) AddPlugin(name string, pluginURL string) error {
@@ -230,8 +238,7 @@ func (p *Provider) AddPlugin(name string, pluginURL string) error {
 	if err != nil {
 		return err
 	}
-
-	p.internalWriteEvent <- struct{}{}
+	p.sendInternalWriteEvent()
 	return p.writeConfig()
 }
 
@@ -252,8 +259,23 @@ func (p *Provider) RemovePlugin(name string) error {
 		}
 	}()
 
-	p.internalWriteEvent <- struct{}{}
+	p.sendInternalWriteEvent()
 	return p.writeConfig()
+}
+
+// SetDisableAuth sets the value of the DisableAuth field in the configuration.
+func (p *Provider) SetDisableAuth(disableAuth bool) error {
+	func() {
+		p.configLock.Lock()
+		defer p.configLock.Unlock()
+
+		p.savedConfig.DisableAuth = disableAuth
+		p.NotifyHub.Broadcast()
+	}()
+
+	p.sendInternalWriteEvent()
+	return p.writeConfig()
+
 }
 
 func copyMap(src map[string]string) map[string]string {

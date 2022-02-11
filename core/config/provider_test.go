@@ -46,7 +46,7 @@ var _ = Describe("Provider", func() {
 		Expect(err).ToNot(HaveOccurred())
 		configFile = f.Name()
 		Expect(f.Close()).To(Succeed())
-		Expect(os.RemoveAll(configFile)).To(Succeed())
+		Expect(os.Remove(configFile)).To(Succeed())
 
 		defaultCfg := config.Config{
 			APIPort: 9000,
@@ -80,7 +80,7 @@ var _ = Describe("Provider", func() {
 
 	AfterEach(func() {
 		supervisor.Stop()
-		_ = os.RemoveAll(configFile)
+		_ = os.Remove(configFile)
 	})
 
 	It(`logs "Running" on startup`, func() {
@@ -295,6 +295,42 @@ var _ = Describe("Provider", func() {
 
 			Expect(cfg.Plugins).To(HaveKeyWithValue("Some Plugin", "https://foo.com/some/plugin"))
 			Expect(len(cfg.Plugins)).To(Equal(1))
+		})
+	})
+
+	Describe("SetDisableAuth", func() {
+		It("sets the disable_auth field and syncs changes to the config to disk", func() {
+			cp.WaitUntilReady()
+
+			sub, _ := cp.NotifyHub.Subscribe()
+
+			Expect(cp.SetDisableAuth(true)).To(Succeed())
+
+			Expect(sub).To(Receive(), "Config Provider should emit an event when a field is changed")
+
+			cfg := cp.Config()
+			Expect(cfg.DisableAuth).To(BeTrue())
+
+			configBytes, err := ioutil.ReadFile(configFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(configBytes)).To(ContainSubstring(`disable_auth = true`))
+
+			Consistently(logBuf).ShouldNot(gbytes.Say("config-provider.*Detected config file change"))
+		})
+
+		It("mutates the config without mutating references to it", func() {
+			cp.WaitUntilReady()
+
+			Expect(cp.SetDisableAuth(true)).To(Succeed())
+
+			cfg := cp.Config()
+			Expect(cfg.DisableAuth).To(BeTrue())
+
+			Expect(cp.SetDisableAuth(false)).To(Succeed())
+
+			newCfg := cp.Config()
+			Expect(cfg.DisableAuth).To(BeTrue())
+			Expect(newCfg.DisableAuth).To(BeFalse())
 		})
 	})
 

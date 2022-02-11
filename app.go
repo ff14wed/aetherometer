@@ -110,7 +110,7 @@ func (b *App) startup(ctx context.Context) {
 		b.appSupervisor.Add(adapter)
 	}
 
-	authHandler, err := handlers.NewAuth(cfg, transport.GetInitPayload, b.logger)
+	authHandler, err := handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
 	if err != nil {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
