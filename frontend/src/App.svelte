@@ -1,45 +1,25 @@
 <script>
-	let name = "";
-	let greeting = "";
+	import { onMount } from "svelte";
 
-	function greet() {
-		window.go.main.App.Greet(name).then((result) => {
-			greeting = result;
-		});
-	}
+	let plugins = [];
+
+	onMount(async () => {
+		await window.go.main.App.WaitForStartup();
+		plugins = Object.entries(await window.go.main.App.GetPlugins());
+	});
 </script>
 
 <main>
 	<div id="logo" />
-	<div id="input" data-wails-no-drag>
-		<input id="name" type="text" bind:value={name} />
-		<button class="button" on:click={greet}>Greet</button>
-	</div>
-	{#if greeting}
-		<div id="result">{greeting}</div>
-	{/if}
+	{#each plugins as [name, pluginInfo]}
+		<div>{name} - {pluginInfo.PluginID} - {pluginInfo.PluginURL}</div>
+	{/each}
 </main>
 
 <style>
 	main {
 		height: 100%;
 		width: 100%;
-	}
-
-	#result {
-		margin-top: 1rem;
-		font-size: 1.5rem;
-	}
-
-	button {
-		-webkit-appearance: default-button;
-		padding: 6px;
-	}
-
-	#name {
-		border-radius: 3px;
-		outline: none;
-		-webkit-font-smoothing: antialiased;
 	}
 
 	#logo {

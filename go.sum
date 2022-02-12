@@ -151,8 +151,8 @@ github.com/leaanthony/go-ansi-parser v1.2.0 h1:CcBhxqkxPATj7Lgdp9EgPUGv2o3FGkg3A
 github.com/leaanthony/go-ansi-parser v1.2.0/go.mod h1:+vva/2y4alzVmmIEpk9QDhA7vLC5zKDTRwfZGOp3IWU=
 github.com/leaanthony/go-common-file-dialog v1.0.3 h1:O0uGjKnWtdEADGrkg+TyAAbZylykMwwx/MNEXn9fp+Y=
 github.com/leaanthony/go-common-file-dialog v1.0.3/go.mod h1:TGhEc9eSJgRsupZ+iH1ZgAOnEo9zp05cRH2j08RPrF0=
-github.com/leaanthony/go-webview2 v1.0.2 h1:IjTbpAXUig33G3LUqf+8EClZutg2Z/C1cbxqhHKPxbU=
-github.com/leaanthony/go-webview2 v1.0.2/go.mod h1:iX54IaVk1FnDqMuHJ47VYLPQOcVqQiOe9SJACt9CAbU=
+github.com/leaanthony/go-webview2 v1.0.3-0.20220125181555-00f20a61c17d h1:xJZ3wwHc0BgvXz3NL2PUMGa3Ee4jPuTFeK/N7LDnV74=
+github.com/leaanthony/go-webview2 v1.0.3-0.20220125181555-00f20a61c17d/go.mod h1:iX54IaVk1FnDqMuHJ47VYLPQOcVqQiOe9SJACt9CAbU=
 github.com/leaanthony/gosod v1.0.3 h1:Fnt+/B6NjQOVuCWOKYRREZnjGyvg+mEhd1nkkA04aTQ=
 github.com/leaanthony/gosod v1.0.3/go.mod h1:BJ2J+oHsQIyIQpnLPjnqFGTMnOZXDbvWtRCSG7jGxs4=
 github.com/leaanthony/idgen v1.0.0/go.mod h1:4nBZnt8ml/f/ic/EVQuLxuj817RccT2fyrUaZFxrcVA=
@@ -161,7 +161,6 @@ github.com/leaanthony/slicer v1.6.0 h1:1RFP5uiPJvT93TAHi+ipd3NACobkW53yUiBqZheE/
 github.com/leaanthony/slicer v1.6.0/go.mod h1:o/Iz29g7LN0GqH3aMjWAe90381nyZlDNquK+mtH2Fj8=
 github.com/leaanthony/typescriptify-golang-structs v0.1.7 h1:yoznzWzyxkO/iWdlpq+aPcuJ5Y/hpjq/lmgMFmpjwl0=
 github.com/leaanthony/typescriptify-golang-structs v0.1.7/go.mod h1:cWtOkiVhMF77e6phAXUcfNwYmMwCJ67Sij24lfvi9Js=
-github.com/leaanthony/winc v0.0.0-20220117090042-fdd739b32c58/go.mod h1:OPfk8SNMAKRcSv8Vw1QL0yupmwcRtJyXZUgtMoaHUGc=
 github.com/leaanthony/winc v0.0.0-20220202120322-32d63aaf77de h1:6z+HQCLE8m0cH4N8TauSdjmAJ1Su/aATTkCQyxGU55M=
 github.com/leaanthony/winc v0.0.0-20220202120322-32d63aaf77de/go.mod h1:OPfk8SNMAKRcSv8Vw1QL0yupmwcRtJyXZUgtMoaHUGc=
 github.com/leaanthony/winicon v1.0.0/go.mod h1:en5xhijl92aphrJdmRPlh4NI1L6wq3gEm0LpXAPghjU=
@@ -271,8 +270,8 @@ github.com/valyala/tcplisten v1.0.0/go.mod h1:T0xQ8SeCZGxckz9qRXTfG43PvQ/mcWh7Fw
 github.com/vektah/gqlparser/v2 v2.2.0/go.mod h1:i3mQIGIrbK2PD1RrCeMTlVbkF2FJ6WkU1KJlJlC+3F4=
 github.com/vektah/gqlparser/v2 v2.3.1 h1:blIC0fCxGIr9pVjsc+BVI8XjYUtc2nCFRfnmP7FuFMk=
 github.com/vektah/gqlparser/v2 v2.3.1/go.mod h1:i3mQIGIrbK2PD1RrCeMTlVbkF2FJ6WkU1KJlJlC+3F4=
-github.com/wailsapp/wails/v2 v2.0.0-beta.29 h1:A7XeAfSKPZ1jOe679DxrRJMQWYGFis8k4Uq75c/hs+M=
-github.com/wailsapp/wails/v2 v2.0.0-beta.29/go.mod h1:xIDhOXCiVWQlZX4ILtWGwri0uqgKiIgdppGvRnhY7CY=
+github.com/wailsapp/wails/v2 v2.0.0-beta.30 h1:mqXVP3WW+BqoMwVEUx2Jdm5A8eFH5SvizBTDWTgSpU4=
+github.com/wailsapp/wails/v2 v2.0.0-beta.30/go.mod h1:i/ODmLsPbcGNQpS0Z4prv1dVL1DSsK0+2bvK0COmadU=
 github.com/wzshiming/ctc v1.2.3/go.mod h1:2tVAtIY7SUyraSk0JxvwmONNPFL4ARavPuEsg5+KA28=
 github.com/wzshiming/winseq v0.0.0-20200112104235-db357dc107ae/go.mod h1:VTAq37rkGeV+WOybvZwjXiJOicICdpLCN8ifpISjK20=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=

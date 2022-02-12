@@ -152,7 +152,7 @@ func (p *Provider) ensureConfigFile() (ok bool) {
 	} else {
 		readErr := p.readConfig()
 		if readErr != nil {
-			p.logger.Error("Unable to read config file", zap.Error(err))
+			p.logger.Error("Unable to read config file", zap.Error(readErr))
 			return false
 		}
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"runtime/debug"
@@ -42,7 +41,10 @@ type App struct {
 
 	appSupervisor *suture.Supervisor
 
-	collection *datasheet.Collection
+	collection  *datasheet.Collection
+	authHandler *handlers.Auth
+
+	ready chan struct{}
 }
 
 // NewApp creates a new App application struct
@@ -50,12 +52,15 @@ func NewApp(cfgProvider *config.Provider, logger *zap.Logger) *App {
 	return &App{
 		cfgProvider: cfgProvider,
 		logger:      logger,
+		ready:       make(chan struct{}),
 	}
 }
 
 // startup is called at application startup
 func (b *App) startup(ctx context.Context) {
-	// Perform your setup here
+	b.logger.Info("====================================")
+	b.logger.Info("Starting Aetherometer...")
+
 	b.ctx = ctx
 
 	b.appSupervisor = suture.New("main", suture.Spec{
@@ -110,12 +115,12 @@ func (b *App) startup(ctx context.Context) {
 		b.appSupervisor.Add(adapter)
 	}
 
-	authHandler, err := handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
+	b.authHandler, err = handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
 	if err != nil {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
 
-	queryResolver := models.NewResolver(storeProvider, authHandler, streamRequestHandler)
+	queryResolver := models.NewResolver(storeProvider, b.authHandler, streamRequestHandler)
 
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -143,8 +148,8 @@ func (b *App) startup(ctx context.Context) {
 		Cache: lru.New(100),
 	})
 
-	queryHandler := authHandler.Handler(gqlServer)
-	mapHandler := authHandler.Handler(handlers.NewMapHandler("/map/", cfg, b.logger))
+	queryHandler := b.authHandler.Handler(gqlServer)
+	mapHandler := b.authHandler.Handler(handlers.NewMapHandler("/map/", cfg, b.logger))
 
 	addDebugHandlers(srv)
 
@@ -153,6 +158,8 @@ func (b *App) startup(ctx context.Context) {
 	srv.AddHandler("/map/", mapHandler)
 
 	b.appSupervisor.Add(srv)
+
+	close(b.ready)
 }
 
 // domReady is called after the front-end dom has been loaded
@@ -167,6 +174,10 @@ func (b *App) shutdown(ctx context.Context) {
 	b.appSupervisor.Stop()
 }
 
+func (b *App) WaitForStartup() {
+	<-b.ready
+}
+
 // ReloadDatasheets reloads datasheets from the filepath
 func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
 	cfg := b.cfgProvider.Config()
@@ -177,10 +188,8 @@ func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
 
 	// Since loading datasheets takes up a lot of memory for some reason
 	debug.FreeOSMemory()
-
 }
 
-// Greet returns a greeting for the given name
-func (b *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s!", name)
+func (b *App) GetPlugins() map[string]handlers.PluginInfo {
+	return b.authHandler.GetRegisteredPlugins()
 }
