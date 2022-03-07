@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"runtime/debug"
@@ -22,6 +23,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/gorilla/websocket"
 	"github.com/thejerf/suture"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
 )
 
@@ -41,8 +43,10 @@ type App struct {
 
 	appSupervisor *suture.Supervisor
 
-	collection  *datasheet.Collection
-	authHandler *handlers.Auth
+	collection    *datasheet.Collection
+	srv           *server.Server
+	storeProvider *store.Provider
+	authHandler   *handlers.Auth
 
 	ready chan struct{}
 }
@@ -75,15 +79,15 @@ func (b *App) startup(ctx context.Context) {
 
 	cfg := b.cfgProvider.Config()
 
-	srv := server.New(cfg, b.logger)
+	b.srv = server.New(cfg, b.logger)
 
 	b.collection = new(datasheet.Collection)
 	b.ReloadDatasheets(b.collection)
 
 	generator := update.NewGenerator(b.collection)
 
-	storeProvider := store.NewProvider(b.logger)
-	b.appSupervisor.Add(storeProvider)
+	b.storeProvider = store.NewProvider(b.logger)
+	b.appSupervisor.Add(b.storeProvider)
 
 	streamSupervisor := suture.New("stream-supervisor", suture.Spec{
 		Log: func(line string) {
@@ -94,7 +98,7 @@ func (b *App) startup(ctx context.Context) {
 
 	sm := stream.NewManager(
 		generator,
-		storeProvider.UpdatesChan(),
+		b.storeProvider.UpdatesChan(),
 		streamSupervisor,
 		stream.NewHandler,
 		b.logger,
@@ -115,12 +119,15 @@ func (b *App) startup(ctx context.Context) {
 		b.appSupervisor.Add(adapter)
 	}
 
+	appEventWatcher := NewAppEventWatcher(b.storeProvider.StreamEventSource(), ctx, b.logger)
+	b.appSupervisor.Add(appEventWatcher)
+
 	b.authHandler, err = handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
 	if err != nil {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
 
-	queryResolver := models.NewResolver(storeProvider, b.authHandler, streamRequestHandler)
+	queryResolver := models.NewResolver(b.storeProvider, b.authHandler, streamRequestHandler)
 
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -151,13 +158,13 @@ func (b *App) startup(ctx context.Context) {
 	queryHandler := b.authHandler.Handler(gqlServer)
 	mapHandler := b.authHandler.Handler(handlers.NewMapHandler("/map/", cfg, b.logger))
 
-	addDebugHandlers(srv)
+	addDebugHandlers(b.srv)
 
-	srv.AddHandler("/playground", handlers.Playground("GraphQL playground", "/query"))
-	srv.AddHandler("/query", queryHandler)
-	srv.AddHandler("/map/", mapHandler)
+	b.srv.AddHandler("/playground", handlers.Playground("GraphQL playground", "/query"))
+	b.srv.AddHandler("/query", queryHandler)
+	b.srv.AddHandler("/map/", mapHandler)
 
-	b.appSupervisor.Add(srv)
+	b.appSupervisor.Add(b.srv)
 
 	close(b.ready)
 }
@@ -190,6 +197,103 @@ func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
 	debug.FreeOSMemory()
 }
 
+func (b *App) GetAPIURL() string {
+	addr := b.srv.Address()
+	if addr == nil {
+		return ""
+	}
+	return fmt.Sprintf("http://localhost:%d/query", addr.Port)
+}
+
+type StreamInfo struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+func (b *App) GetStreams() []StreamInfo {
+	streams, err := b.storeProvider.Streams()
+	if err != nil {
+		return nil
+	}
+	var infos []StreamInfo
+	for _, s := range streams {
+		if char, ok := s.EntitiesMap[s.CharacterID]; ok {
+			infos = append(infos, StreamInfo{
+				ID:   s.ID,
+				Name: char.Name,
+			})
+		} else {
+			infos = append(infos, StreamInfo{
+				ID: s.ID,
+			})
+		}
+	}
+	return infos
+}
+
 func (b *App) GetPlugins() map[string]handlers.PluginInfo {
 	return b.authHandler.GetRegisteredPlugins()
+}
+
+func (b *App) GetConfig() config.Config {
+	return b.cfgProvider.Config()
+}
+
+func (b *App) AddPlugin(name string, url string) error {
+	return b.cfgProvider.AddPlugin(name, url)
+}
+
+func (b *App) RemovePlugin(name string) error {
+	return b.cfgProvider.RemovePlugin(name)
+}
+
+// AppEventWatcher emits app events whenever events are triggered
+type AppEventWatcher struct {
+	ses    models.StreamEventSource
+	ctx    context.Context
+	logger *zap.Logger
+
+	stop     chan struct{}
+	stopDone chan struct{}
+}
+
+// NewAppEventWatcher returns a new AppEventWatcher
+func NewAppEventWatcher(streamEventSource models.StreamEventSource, ctx context.Context, logger *zap.Logger) *AppEventWatcher {
+	return &AppEventWatcher{
+		ses:    streamEventSource,
+		ctx:    ctx,
+		logger: logger.Named("app-event-watcher"),
+
+		stop:     make(chan struct{}),
+		stopDone: make(chan struct{}),
+	}
+}
+
+// Serve runs the service for the app event watcher
+func (s *AppEventWatcher) Serve() {
+	defer close(s.stopDone)
+	ch, id := s.ses.Subscribe()
+	s.logger.Info("Running")
+
+	for {
+		select {
+		case event := <-ch:
+			_, isAddStream := event.Type.(models.AddStream)
+			_, isRemoveStream := event.Type.(models.RemoveStream)
+			_, isUpdateIDs := event.Type.(models.UpdateIDs)
+			if isAddStream || isRemoveStream || isUpdateIDs {
+				runtime.EventsEmit(s.ctx, "StreamChange")
+			}
+		case <-s.stop:
+			s.logger.Info("Stopping...")
+			s.ses.Unsubscribe(id)
+			return
+		}
+	}
+}
+
+// Stop will shutdown this service and wait on it to stop before returning.
+func (s *AppEventWatcher) Stop() {
+	close(s.stop)
+	<-s.stopDone
 }
