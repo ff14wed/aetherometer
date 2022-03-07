@@ -12,8 +12,8 @@ type Config struct {
 	// APIPort provides the port on which the core API is served.
 	APIPort uint16 `toml:"api_port"`
 
-	// DisableAuth allows starting the API server without requiring an auth
-	// token for queries. CORS validation will still be enforced.
+	// DisableAuth allows plugins to query the API server without an auth token.
+	// CORS validation is still enforced.
 	DisableAuth bool `toml:"disable_auth,omitempty"`
 
 	// Sources contains configuration for data sources.
@@ -27,16 +27,6 @@ type Config struct {
 	// access the API and pass CORS validation.  Note that the plugin scheme
 	// must be provided.
 	Plugins map[string]string `toml:"plugins"`
-}
-
-// Maps sets the configuration for the Map endpoint of the API.
-type MapConfig struct {
-	// Cache provides the path of the maps on the local disk.
-	Cache string `toml:"cache" validate:"directory"`
-
-	// APIPath provides the URL of an xivapi environment serving the maps if the
-	// map could not be found on the local disk. Defaults to https://xivapi.com.
-	APIPath string `toml:"api_path"`
 }
 
 // Adapters stores configuration structs for adapters
@@ -70,6 +60,16 @@ type Sources struct {
 
 	// Maps provides the configuration for the Map endpoint of the API.
 	Maps MapConfig `toml:"maps"`
+}
+
+// Maps sets the configuration for the Map endpoint of the API.
+type MapConfig struct {
+	// Cache provides the path of the maps on the local disk.
+	Cache string `toml:"cache" validate:"directory"`
+
+	// APIPath provides the URL of an xivapi environment serving the maps if the
+	// map could not be found on the local disk. Defaults to https://xivapi.com.
+	APIPath string `toml:"api_path"`
 }
 
 func buildError(ctx []string, msg string) error {
