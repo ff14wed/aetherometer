@@ -15,6 +15,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/adapter"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/datasheet"
+	"github.com/ff14wed/aetherometer/core/hub"
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/server"
 	"github.com/ff14wed/aetherometer/core/server/handlers"
@@ -89,6 +90,22 @@ func (b *App) startup(ctx context.Context) {
 	b.storeProvider = store.NewProvider(b.logger)
 	b.appSupervisor.Add(b.storeProvider)
 
+	var err error
+
+	b.authHandler, err = handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
+	if err != nil {
+		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
+	}
+
+	appEventWatcher := NewAppEventWatcher(
+		b.storeProvider.StreamEventSource(),
+		b.cfgProvider.NotifyHub,
+		b.authHandler,
+		ctx,
+		b.logger,
+	)
+	b.appSupervisor.Add(appEventWatcher)
+
 	streamSupervisor := suture.New("stream-supervisor", suture.Spec{
 		Log: func(line string) {
 			b.logger.Named("stream-supervisor").Info(line)
@@ -117,14 +134,6 @@ func (b *App) startup(ctx context.Context) {
 	}
 	for _, adapter := range adapters {
 		b.appSupervisor.Add(adapter)
-	}
-
-	appEventWatcher := NewAppEventWatcher(b.storeProvider.StreamEventSource(), ctx, b.logger)
-	b.appSupervisor.Add(appEventWatcher)
-
-	b.authHandler, err = handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
-	if err != nil {
-		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
 
 	queryResolver := models.NewResolver(b.storeProvider, b.authHandler, streamRequestHandler)
@@ -224,7 +233,8 @@ func (b *App) GetStreams() []StreamInfo {
 			})
 		} else {
 			infos = append(infos, StreamInfo{
-				ID: s.ID,
+				ID:   s.ID,
+				Name: fmt.Sprintf("Stream %d", s.ID),
 			})
 		}
 	}
@@ -249,7 +259,10 @@ func (b *App) RemovePlugin(name string) error {
 
 // AppEventWatcher emits app events whenever events are triggered
 type AppEventWatcher struct {
-	ses    models.StreamEventSource
+	ses         models.StreamEventSource
+	cfgNotify   *hub.NotifyHub
+	authHandler *handlers.Auth
+
 	ctx    context.Context
 	logger *zap.Logger
 
@@ -258,11 +271,19 @@ type AppEventWatcher struct {
 }
 
 // NewAppEventWatcher returns a new AppEventWatcher
-func NewAppEventWatcher(streamEventSource models.StreamEventSource, ctx context.Context, logger *zap.Logger) *AppEventWatcher {
+func NewAppEventWatcher(
+	streamEventSource models.StreamEventSource,
+	cfgNotify *hub.NotifyHub,
+	authHandler *handlers.Auth,
+	ctx context.Context,
+	logger *zap.Logger,
+) *AppEventWatcher {
 	return &AppEventWatcher{
-		ses:    streamEventSource,
-		ctx:    ctx,
-		logger: logger.Named("app-event-watcher"),
+		ses:         streamEventSource,
+		cfgNotify:   cfgNotify,
+		authHandler: authHandler,
+		ctx:         ctx,
+		logger:      logger.Named("app-event-watcher"),
 
 		stop:     make(chan struct{}),
 		stopDone: make(chan struct{}),
@@ -272,21 +293,26 @@ func NewAppEventWatcher(streamEventSource models.StreamEventSource, ctx context.
 // Serve runs the service for the app event watcher
 func (s *AppEventWatcher) Serve() {
 	defer close(s.stopDone)
-	ch, id := s.ses.Subscribe()
+	streamCh, streamChID := s.ses.Subscribe()
+	cfgNotifyCh, cfgNotifyChID := s.cfgNotify.Subscribe()
 	s.logger.Info("Running")
 
 	for {
 		select {
-		case event := <-ch:
+		case event := <-streamCh:
 			_, isAddStream := event.Type.(models.AddStream)
 			_, isRemoveStream := event.Type.(models.RemoveStream)
 			_, isUpdateIDs := event.Type.(models.UpdateIDs)
 			if isAddStream || isRemoveStream || isUpdateIDs {
 				runtime.EventsEmit(s.ctx, "StreamChange")
 			}
+		case <-cfgNotifyCh:
+			s.authHandler.RefreshConfig()
+			runtime.EventsEmit(s.ctx, "ConfigChange")
 		case <-s.stop:
 			s.logger.Info("Stopping...")
-			s.ses.Unsubscribe(id)
+			s.ses.Unsubscribe(streamChID)
+			s.cfgNotify.Unsubscribe(cfgNotifyChID)
 			return
 		}
 	}
