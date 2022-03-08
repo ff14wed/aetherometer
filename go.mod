@@ -9,7 +9,7 @@ require (
 	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/ff14wed/xivnet/v3 v3.30.0
+	github.com/ff14wed/xivnet/v3 v3.31.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
