@@ -1,35 +1,131 @@
-<script>
+<script lang="ts">
+	import Shell from "./lib/Shell.svelte";
+	import Tabs from "./lib/Tabs.svelte";
+	import Tab from "./lib/Tab.svelte";
+	import TabContent from "./lib/TabContent.svelte";
+	import { selectedTabID } from "./lib/stores/stores";
+
+	import { Content, ToastNotification } from "carbon-components-svelte";
+
 	import { onMount } from "svelte";
 
-	let plugins = [];
+	import type { runtime } from "../wailsjs/runtime";
+	import go from "../wailsjs/go/bindings";
+	import type { StreamInfo } from "../wailsjs/go/models";
+
+	function sleep(ms) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+	interface PluginInfo {
+		PluginID: string;
+		PluginURL: string;
+	}
+
+	let registeredPlugins: { [name: string]: PluginInfo } = {};
+
+	function generatePluginList(
+		streams: StreamInfo[],
+		pluginObj: { [name: string]: PluginInfo }
+	) {
+		let plugins = [];
+		for (const stream of streams) {
+			for (const [name, pluginInfo] of Object.entries(pluginObj)) {
+				plugins.push({
+					name: `${name} - ${stream.name}`,
+					id: `${pluginInfo.PluginID}-${stream.id}`,
+					url: pluginInfo.PluginURL,
+				});
+			}
+		}
+		return plugins;
+	}
+
+	let activeStreams: StreamInfo[] = [];
 
 	onMount(async () => {
 		await window.go.main.App.WaitForStartup();
-		plugins = Object.entries(await window.go.main.App.GetPlugins());
+
+		// Load initial streams (though normally there aren't any)
+		activeStreams = (await window.go.main.App.GetStreams()) || [];
+		registeredPlugins = (await window.go.main.App.GetPlugins()) || {};
+
+		console.log("Active streams", activeStreams);
+		console.log("Registered Plugins", registeredPlugins);
+
+		window.runtime.EventsOn("StreamChange", async () => {
+			activeStreams = (await window.go.main.App.GetStreams()) || [];
+			console.log("Updating active streams", activeStreams);
+		});
+
+		window.runtime.EventsOn("ConfigChange", async () => {
+			registeredPlugins = (await window.go.main.App.GetPlugins()) || {};
+			console.log("Updating registered Plugins", registeredPlugins);
+		});
 	});
+
+	$: plugins = generatePluginList(activeStreams, registeredPlugins);
 </script>
 
-<main>
-	<div id="logo" />
-	{#each plugins as [name, pluginInfo]}
-		<div>{name} - {pluginInfo.PluginID} - {pluginInfo.PluginURL}</div>
-	{/each}
-</main>
+<Shell company="XIV" platformName="Aetherometer">
+	<Tabs autoWidth bind:selectedTabID={$selectedTabID}>
+		{#each plugins as plugin (plugin.id)}
+			<Tab label={plugin.name} id={plugin.id} />
+		{/each}
+	</Tabs>
+</Shell>
+<section>
+	<div class:cx--spacer={true} />
+	<div class:cx--content={true}>
+		{#if activeStreams.length === 0}
+			<div class:cx--padding={true}>
+				<ToastNotification
+					lowContrast
+					hideCloseButton
+					kind="warning-alt"
+					title="No FFXIV processes detected."
+					subtitle="Please launch the game and/or change zones."
+					caption="If streams are still not detected, please check the application log."
+				/>
+			</div>
+		{:else}
+			{#each plugins as plugin (plugin.id)}
+				<TabContent id={plugin.id} label={plugin.name}>
+					<iframe
+						sandbox="allow-same-origin allow-scripts allow-downloads"
+						class:cx--iframe={true}
+						title={plugin.name}
+						src={plugin.url}
+					/>
+				</TabContent>
+			{/each}
+		{/if}
+	</div>
+</section>
 
 <style>
-	main {
-		height: 100%;
-		width: 100%;
+	section {
+		display: flex;
+		flex-flow: column;
+		height: 100vh;
 	}
 
-	#logo {
-		width: 40%;
-		height: 40%;
-		padding-top: 20%;
-		margin: auto;
-		display: block;
-		background-position: center;
-		background-repeat: no-repeat;
-		background-image: url("assets/images/logo-dark.svg");
+	.cx--spacer {
+		height: 3rem;
+		width: 100%;
+		flex: 0 0 auto;
+		clear: both;
+	}
+
+	.cx--content {
+		flex: 1;
+	}
+
+	.cx--padding {
+		padding: 2rem;
+	}
+
+	.cx--iframe {
+		height: 100%;
+		width: 100%;
 	}
 </style>

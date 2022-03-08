@@ -2,9 +2,11 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
-import {terser} from 'rollup-plugin-terser';
+import { terser } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
 import postcss from 'rollup-plugin-postcss'
+import autoPreprocess from 'svelte-preprocess';
+import typescript from '@rollup/plugin-typescript';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -42,8 +44,10 @@ export default {
 			compilerOptions: {
 				// enable run-time checks when not in production
 				dev: !production
-			}
+			},
+			preprocess: autoPreprocess()
 		}),
+		typescript({ sourceMap: !production }),
 		postcss({
 			minimize: true,
 		}),
@@ -59,9 +63,9 @@ export default {
 		commonjs(),
 		copy({
 			targets: [
-				{src: 'src/index.html', dest: 'dist/'},
-				{src: 'src/global.css', dest: 'dist/'},
-				{src: 'src/assets', dest: 'dist/'},
+				{ src: 'src/index.html', dest: 'dist/' },
+				{ src: 'src/global.css', dest: 'dist/' },
+				{ src: 'src/assets', dest: 'dist/' },
 			]
 		}),
 

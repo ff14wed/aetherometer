@@ -26,7 +26,7 @@ type Config struct {
 	// Plugins is a name -> URL dictionary that allows the listed plugins to
 	// access the API and pass CORS validation.  Note that the plugin scheme
 	// must be provided.
-	Plugins map[string]string `toml:"plugins"`
+	Plugins map[string]string `toml:"plugins" json:"Plugins"`
 }
 
 // Adapters stores configuration structs for adapters
