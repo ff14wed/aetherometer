@@ -34,6 +34,10 @@
 		await window.go.main.App.WaitForStartup();
 
 		config = (await window.go.main.App.GetConfig()) || config;
+		if (!config.Plugins) {
+			config.Plugins = {};
+		}
+
 		appVersion = (await window.go.main.App.GetVersion()) || "";
 		apiVersion = (await window.go.main.App.GetAPIVersion()) || "";
 		apiURL = (await window.go.main.App.GetAPIURL()) || "";
@@ -41,6 +45,9 @@
 
 		window.runtime.EventsOn("ConfigChange", async () => {
 			config = (await window.go.main.App.GetConfig()) || config;
+			if (!config.Plugins) {
+				config.Plugins = {};
+			}
 			console.log("Updating config", config);
 		});
 	});

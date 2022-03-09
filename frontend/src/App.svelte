@@ -84,7 +84,17 @@
 					kind="warning-alt"
 					title="No FFXIV processes detected."
 					subtitle="Please launch the game and/or change zones."
-					caption="If streams are still not detected, please check the application log."
+					caption="If streams are still not detected, please check the application log (can be found in the settings page)."
+				/>
+			</div>
+		{:else if plugins.length === 0}
+			<div class:padding={true}>
+				<ToastNotification
+					lowContrast
+					hideCloseButton
+					kind="warning-alt"
+					title="No plugins registered."
+					subtitle="Please go to the settings page and add plugins."
 				/>
 			</div>
 		{:else}
