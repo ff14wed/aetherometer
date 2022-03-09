@@ -5,7 +5,7 @@
 	import TabContent from "./lib/TabContent.svelte";
 	import { selectedTabID } from "./lib/stores/stores";
 
-	import { Content, ToastNotification } from "carbon-components-svelte";
+	import { InlineNotification } from "carbon-components-svelte";
 
 	import { onMount } from "svelte";
 
@@ -78,18 +78,17 @@
 	<div class:content={true}>
 		{#if activeStreams.length === 0}
 			<div class:padding={true}>
-				<ToastNotification
+				<InlineNotification
 					lowContrast
 					hideCloseButton
 					kind="warning-alt"
 					title="No FFXIV processes detected."
-					subtitle="Please launch the game and/or change zones."
-					caption="If streams are still not detected, please check the application log (can be found in the settings page)."
+					subtitle="Please launch the game and/or change zones. If streams are still not detected, please check the application log (can be found in the settings page)."
 				/>
 			</div>
 		{:else if plugins.length === 0}
 			<div class:padding={true}>
-				<ToastNotification
+				<InlineNotification
 					lowContrast
 					hideCloseButton
 					kind="warning-alt"
