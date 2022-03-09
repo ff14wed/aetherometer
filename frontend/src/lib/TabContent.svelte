@@ -12,7 +12,7 @@
 	role="tabpanel"
 	aria-labelledby={label}
 	aria-hidden={!selected}
-	class:cx--hidden={!selected}
+	class:hidden={!selected}
 	{id}
 	{...$$restProps}
 >
@@ -25,7 +25,7 @@
 		width: 100%;
 		display: flex;
 	}
-	.cx--hidden {
+	.hidden {
 		display: none;
 	}
 </style>

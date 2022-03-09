@@ -26,6 +26,8 @@ require (
 	gopkg.in/dealancer/validate.v2 v2.1.0
 )
 
+require github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
+
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect

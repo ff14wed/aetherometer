@@ -16,6 +16,7 @@
 
 	import Add16 from "carbon-icons-svelte/lib/Add16";
 	import Delete16 from "carbon-icons-svelte/lib/Delete16";
+	import FolderOpen16 from "carbon-icons-svelte/lib/FolderOpen16";
 	import { onMount } from "svelte";
 
 	export let open = false;
@@ -24,10 +25,19 @@
 		Plugins: {},
 	};
 
+	let appVersion = "";
+	let apiVersion = "";
+	let apiURL = "";
+	let appDirectory = "";
+
 	onMount(async () => {
 		await window.go.main.App.WaitForStartup();
 
 		config = (await window.go.main.App.GetConfig()) || config;
+		appVersion = (await window.go.main.App.GetVersion()) || "";
+		apiVersion = (await window.go.main.App.GetAPIVersion()) || "";
+		apiURL = (await window.go.main.App.GetAPIURL()) || "";
+		appDirectory = (await window.go.main.App.GetAppDirectory()) || "";
 
 		window.runtime.EventsOn("ConfigChange", async () => {
 			config = (await window.go.main.App.GetConfig()) || config;
@@ -44,8 +54,18 @@
 		await window.go.main.App.RemovePlugin(name);
 	}
 
+	async function openAppDirectory() {
+		await window.go.main.App.OpenAppDirectory();
+	}
+
 	let newPluginName;
 	let newPluginURL;
+
+	$: infoTable = {
+		"App version": appVersion,
+		"API version": apiVersion,
+		"API URL": apiURL,
+	};
 </script>
 
 <Modal
@@ -57,16 +77,38 @@
 	on:close
 	size="lg"
 >
+	<h4>Aetherometer Info</h4>
+	<div class:app-info={true}>
+		{#each Object.entries(infoTable) as [name, info]}
+			<div style="font-weight: bold" class:info-cell={true}>{name}:</div>
+			<div class:info-cell={true}>{info}</div>
+		{/each}
+		<div style="font-weight: bold" class:info-cell={true}>
+			App/log directory:
+		</div>
+		<div class:info-cell={true}>
+			{appDirectory}
+			<Button
+				iconDescription="Open Directory"
+				icon={FolderOpen16}
+				size="small"
+				on:click={openAppDirectory}
+			/>
+		</div>
+	</div>
+
+	<h4>Loaded Plugins</h4>
+	<br />
 	<Form>
 		<FormGroup>
 			<StructuredList condensed>
 				<StructuredListHead>
 					<StructuredListRow head>
 						<StructuredListCell head>
-							<div class:cx--plugin={true}>Plugin Name</div>
+							<div class:plugin={true}>Name</div>
 						</StructuredListCell>
 						<StructuredListCell head>
-							<div class:cx--plugin={true}>Plugin URL</div>
+							<div class:plugin={true}>URL</div>
 						</StructuredListCell>
 						<StructuredListCell head />
 					</StructuredListRow>
@@ -75,14 +117,10 @@
 					{#each Object.entries(config.Plugins) as [name, url]}
 						<StructuredListRow>
 							<StructuredListCell>
-								<div class:cx--plugin={true}>
-									{name}
-								</div>
+								<div class:plugin={true}>{name}</div>
 							</StructuredListCell>
 							<StructuredListCell>
-								<div class:cx--plugin={true}>
-									{url}
-								</div>
+								<div class:plugin={true}>{url}</div>
 							</StructuredListCell>
 							<StructuredListCell>
 								<Button
@@ -131,7 +169,22 @@
 </Modal>
 
 <style>
-	.cx--plugin {
+	.app-info {
+		margin: 2rem;
+		display: grid;
+		grid-column-gap: 20px;
+		grid-row-gap: 5px;
+		grid-template-columns: max-content auto;
+		grid-auto-rows: minmax(18px, auto);
+	}
+
+	.info-cell {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.plugin {
 		padding: 0 1rem;
 	}
 

@@ -74,10 +74,10 @@
 	</Tabs>
 </Shell>
 <section>
-	<div class:cx--spacer={true} />
-	<div class:cx--content={true}>
+	<div class:spacer={true} />
+	<div class:content={true}>
 		{#if activeStreams.length === 0}
-			<div class:cx--padding={true}>
+			<div class:padding={true}>
 				<ToastNotification
 					lowContrast
 					hideCloseButton
@@ -92,7 +92,7 @@
 				<TabContent id={plugin.id} label={plugin.name}>
 					<iframe
 						sandbox="allow-same-origin allow-scripts allow-downloads"
-						class:cx--iframe={true}
+						class:iframe={true}
 						title={plugin.name}
 						src={plugin.url}
 					/>
@@ -109,24 +109,24 @@
 		height: 100vh;
 	}
 
-	.cx--spacer {
+	.spacer {
 		height: 3rem;
 		width: 100%;
 		flex: 0 0 auto;
 		clear: both;
 	}
 
-	.cx--content {
+	.content {
 		flex: 1;
 		margin: 2px;
 		user-select: none;
 	}
 
-	.cx--padding {
+	.padding {
 		padding: 2rem;
 	}
 
-	.cx--iframe {
+	.iframe {
 		height: 100%;
 		width: 100%;
 	}

@@ -23,6 +23,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/store/update"
 	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/gorilla/websocket"
+	"github.com/skratchdot/open-golang/open"
 	"github.com/thejerf/suture"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
@@ -42,6 +43,8 @@ type App struct {
 	cfgProvider *config.Provider
 	logger      *zap.Logger
 
+	version string
+
 	appSupervisor *suture.Supervisor
 
 	collection    *datasheet.Collection
@@ -53,9 +56,10 @@ type App struct {
 }
 
 // NewApp creates a new App application struct
-func NewApp(cfgProvider *config.Provider, logger *zap.Logger) *App {
+func NewApp(cfgProvider *config.Provider, version string, logger *zap.Logger) *App {
 	return &App{
 		cfgProvider: cfgProvider,
+		version:     version,
 		logger:      logger,
 		ready:       make(chan struct{}),
 	}
@@ -83,7 +87,7 @@ func (b *App) startup(ctx context.Context) {
 	b.srv = server.New(cfg, b.logger)
 
 	b.collection = new(datasheet.Collection)
-	b.ReloadDatasheets(b.collection)
+	b.reloadDatasheets(b.collection)
 
 	generator := update.NewGenerator(b.collection)
 
@@ -195,7 +199,7 @@ func (b *App) WaitForStartup() {
 }
 
 // ReloadDatasheets reloads datasheets from the filepath
-func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
+func (b *App) reloadDatasheets(collection *datasheet.Collection) {
 	cfg := b.cfgProvider.Config()
 	err := collection.Populate(cfg.Sources.DataPath)
 	if err != nil {
@@ -206,12 +210,32 @@ func (b *App) ReloadDatasheets(collection *datasheet.Collection) {
 	debug.FreeOSMemory()
 }
 
+func (b *App) GetVersion() string {
+	return b.version
+}
+
+func (b *App) GetAPIVersion() string {
+	return models.AetherometerAPIVersion
+}
+
 func (b *App) GetAPIURL() string {
 	addr := b.srv.Address()
 	if addr == nil {
 		return ""
 	}
 	return fmt.Sprintf("http://localhost:%d/query", addr.Port)
+}
+
+func (b *App) GetAppDirectory() string {
+	dirPath, _ := getCurrentDirectory()
+	return dirPath
+}
+
+func (b *App) OpenAppDirectory() {
+	dirPath := b.GetAppDirectory()
+	if dirPath != "" {
+		open.Start(dirPath)
+	}
 }
 
 type StreamInfo struct {

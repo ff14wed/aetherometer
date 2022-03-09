@@ -1,23 +1,16 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/ff14wed/aetherometer/core/config"
 )
 
 func defaultConfig() (config.Config, error) {
-	execPath, err := os.Executable()
+	dirPath, err := getCurrentDirectory()
 	if err != nil {
 		return config.Config{}, err
 	}
-
-	cleanPath, err := filepath.EvalSymlinks(execPath)
-	if err != nil {
-		return config.Config{}, err
-	}
-	dirPath := filepath.Dir(cleanPath)
 
 	return config.Config{
 		APIPort: 0,
