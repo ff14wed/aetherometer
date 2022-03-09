@@ -106,72 +106,68 @@
 
 	<h4>Loaded Plugins</h4>
 	<br />
-	<Form>
-		<FormGroup>
-			<StructuredList condensed>
-				<StructuredListHead>
-					<StructuredListRow head>
-						<StructuredListCell head>
-							<div class:plugin={true}>Name</div>
-						</StructuredListCell>
-						<StructuredListCell head>
-							<div class:plugin={true}>URL</div>
-						</StructuredListCell>
-						<StructuredListCell head />
-					</StructuredListRow>
-				</StructuredListHead>
-				<StructuredListBody>
-					{#each Object.entries(config.Plugins) as [name, url]}
-						<StructuredListRow>
-							<StructuredListCell>
-								<div class:plugin={true}>{name}</div>
-							</StructuredListCell>
-							<StructuredListCell>
-								<div class:plugin={true}>{url}</div>
-							</StructuredListCell>
-							<StructuredListCell>
-								<Button
-									iconDescription="Delete Plugin"
-									icon={Delete16}
-									size="small"
-									kind="danger"
-									on:click={() => deletePlugin(name)}
-								/>
-							</StructuredListCell>
-						</StructuredListRow>
-					{/each}
-					<StructuredListRow>
-						<StructuredListCell>
-							<TextInput
-								hideLabel
-								labelText="Plugin Name"
-								placeholder="Enter plugin name..."
-								size="sm"
-								bind:value={newPluginName}
-							/>
-						</StructuredListCell>
-						<StructuredListCell>
-							<TextInput
-								hideLabel
-								labelText="Plugin URL"
-								placeholder="eg. https://plugins.com/foo/"
-								size="sm"
-								bind:value={newPluginURL}
-							/>
-						</StructuredListCell>
-						<StructuredListCell>
-							<Button
-								iconDescription="Add Plugin"
-								icon={Add16}
-								size="small"
-								on:click={addPlugin}
-							/>
-						</StructuredListCell>
-					</StructuredListRow>
-				</StructuredListBody>
-			</StructuredList>
-		</FormGroup>
-	</Form>
+	<StructuredList condensed>
+		<StructuredListHead>
+			<StructuredListRow head>
+				<StructuredListCell head>
+					<div class:plugin={true}>Name</div>
+				</StructuredListCell>
+				<StructuredListCell head>
+					<div class:plugin={true}>URL</div>
+				</StructuredListCell>
+				<StructuredListCell head />
+			</StructuredListRow>
+		</StructuredListHead>
+		<StructuredListBody>
+			{#each Object.entries(config.Plugins) as [name, url]}
+				<StructuredListRow>
+					<StructuredListCell>
+						<div class:plugin={true}>{name}</div>
+					</StructuredListCell>
+					<StructuredListCell>
+						<div class:plugin={true}>{url}</div>
+					</StructuredListCell>
+					<StructuredListCell>
+						<Button
+							iconDescription="Delete Plugin"
+							icon={Delete16}
+							size="small"
+							kind="danger"
+							on:click={() => deletePlugin(name)}
+						/>
+					</StructuredListCell>
+				</StructuredListRow>
+			{/each}
+			<StructuredListRow>
+				<StructuredListCell>
+					<TextInput
+						hideLabel
+						labelText="Plugin Name"
+						placeholder="Enter plugin name..."
+						size="sm"
+						bind:value={newPluginName}
+					/>
+				</StructuredListCell>
+				<StructuredListCell>
+					<TextInput
+						hideLabel
+						labelText="Plugin URL"
+						placeholder="eg. https://plugins.com/foo/"
+						size="sm"
+						bind:value={newPluginURL}
+					/>
+				</StructuredListCell>
+				<StructuredListCell>
+					<Button
+						iconDescription="Add Plugin"
+						icon={Add16}
+						size="small"
+						on:click={addPlugin}
+					/>
+				</StructuredListCell>
+			</StructuredListRow>
+		</StructuredListBody>
+	</StructuredList>
 	<p>Settings are automatically saved.</p>
 </Modal>
 
@@ -193,6 +189,10 @@
 
 	.plugin {
 		padding: 0 1rem;
+	}
+
+	:global(.bx--structured-list) {
+		margin-bottom: 2rem;
 	}
 
 	:global(.bx--structured-list-td) {

@@ -123,10 +123,10 @@ func main() {
 	// Start run wails app if not headless mode
 	err = wails.Run(&options.App{
 		Title:             "aetherometer",
-		Width:             1920,
-		Height:            1080,
-		MinWidth:          720,
-		MinHeight:         570,
+		Width:             1280,
+		Height:            720,
+		MinWidth:          880,
+		MinHeight:         680,
 		DisableResize:     false,
 		Fullscreen:        false,
 		Frameless:         true,
