@@ -20,7 +20,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/thejerf/suture v4.0.1+incompatible
 	github.com/vektah/gqlparser/v2 v2.3.1
-	github.com/wailsapp/wails/v2 v2.0.0-beta.30
+	github.com/wailsapp/wails/v2 v2.0.0-beta.33
 	go.uber.org/zap v1.20.0
 	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
 	gopkg.in/dealancer/validate.v2 v2.1.0
@@ -47,7 +47,7 @@ require (
 	github.com/leaanthony/gosod v1.0.3 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect
 	github.com/leaanthony/typescriptify-golang-structs v0.1.7 // indirect
-	github.com/leaanthony/winc v0.0.0-20220202120322-32d63aaf77de // indirect
+	github.com/leaanthony/winc v0.0.0-20220208061147-37b059b9dc3b // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/nxadm/tail v1.4.4 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect

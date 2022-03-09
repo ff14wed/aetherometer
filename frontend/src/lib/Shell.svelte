@@ -10,6 +10,18 @@
 	import HeaderButton from "./HeaderButton.svelte";
 	import Settings from "./Settings.svelte";
 
+	function minimize() {
+		window.runtime.WindowMinimise();
+	}
+
+	function maximize() {
+		window.runtime.WindowMaximise();
+	}
+
+	function quit() {
+		window.runtime.Quit();
+	}
+
 	let openSettings = false;
 </script>
 
@@ -22,9 +34,9 @@
 			icon={SettingsAdjust20}
 			on:click={() => (openSettings = true)}
 		/>
-		<HeaderButton aria-label="Minimize" icon={Subtract20} />
-		<HeaderButton aria-label="Maximize" icon={Stop16} />
-		<HeaderButton aria-label="Close" icon={Close20} isClose />
+		<HeaderButton aria-label="Minimize" icon={Subtract20} on:click={minimize} />
+		<HeaderButton aria-label="Maximize" icon={Stop16} on:click={maximize} />
+		<HeaderButton aria-label="Close" icon={Close20} isClose on:click={quit} />
 	</HeaderUtilities>
 </Header>
 

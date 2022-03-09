@@ -80,5 +80,6 @@ limitations under the License.
 	}
 	:global(.cx--header__button > svg) {
 		fill: #fff;
+		vertical-align: middle;
 	}
 </style>
