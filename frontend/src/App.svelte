@@ -119,6 +119,7 @@
 	.cx--content {
 		flex: 1;
 		margin: 2px;
+		user-select: none;
 	}
 
 	.cx--padding {

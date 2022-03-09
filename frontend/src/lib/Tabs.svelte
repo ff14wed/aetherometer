@@ -237,5 +237,6 @@ limitations under the License.
 	}
 	.cx--tabs--scrollable {
 		min-width: 0;
+		user-select: none;
 	}
 </style>
