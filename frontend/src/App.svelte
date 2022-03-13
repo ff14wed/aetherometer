@@ -16,6 +16,7 @@
 	interface PluginInfo {
 		PluginID: string;
 		PluginURL: string;
+		APIToken: string;
 	}
 
 	let registeredPlugins: { [name: string]: PluginInfo } = {};
@@ -31,13 +32,29 @@
 					name: `${name} - ${stream.name}`,
 					id: `${pluginInfo.PluginID}-${stream.id}`,
 					url: pluginInfo.PluginURL,
+					streamID: stream.id,
+					token: pluginInfo.APIToken,
 				});
 			}
 		}
 		return plugins;
 	}
 
+	function iframeURL(
+		url: string,
+		apiURL: string,
+		streamID: number,
+		token: string
+	): string {
+		let target = new URL(url);
+		target.searchParams.set("apiURL", apiURL);
+		target.searchParams.set("streamID", streamID.toString());
+		target.searchParams.set("apiToken", token);
+		return target.toString();
+	}
+
 	let activeStreams: StreamInfo[] = [];
+	let apiURL = "";
 
 	onMount(async () => {
 		await window.go.main.App.WaitForStartup();
@@ -45,6 +62,7 @@
 		// Load initial streams (though normally there aren't any)
 		activeStreams = (await window.go.main.App.GetStreams()) || [];
 		registeredPlugins = (await window.go.main.App.GetPlugins()) || {};
+		apiURL = (await window.go.main.App.GetAPIURL()) || "";
 
 		console.log("Active streams", activeStreams);
 		console.log("Registered Plugins", registeredPlugins);
@@ -100,7 +118,7 @@
 						sandbox="allow-same-origin allow-scripts allow-downloads"
 						class:iframe={true}
 						title={plugin.name}
-						src={plugin.url}
+						src={iframeURL(plugin.url, apiURL, plugin.streamID, plugin.token)}
 					/>
 				</TabContent>
 			{/each}
