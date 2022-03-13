@@ -25,14 +25,16 @@ limitations under the License.
 	/** Set to `true` to disable the tab */
 	export let disabled = false;
 	/** Specify the tabindex */
-	export let tabindex = 0;
+	export let tabindex = null;
 	/** Set an id for the top-level element */
 	export let id = "ccs-" + Math.random().toString(36);
 	/** Obtain a reference to the anchor HTML element */
 	export let ref = null;
-	import { onMount, afterUpdate, getContext, tick } from "svelte";
-	const { selectedTab, useAutoWidth, add, update, change } = getContext("Tabs");
-	add({ id, label, disabled });
+	import { onMount, afterUpdate, getContext, tick, onDestroy } from "svelte";
+	const { selectedTab, useAutoWidth, refresh, update, change, remove } =
+		getContext("Tabs");
+
+	$: refresh({ id, label, disabled, index: tabindex });
 	let didMount = false;
 	$: selected = $selectedTab === id;
 	onMount(() => {
@@ -45,6 +47,9 @@ limitations under the License.
 			ref.focus();
 			ref.scrollIntoView({ behavior: "smooth" });
 		}
+	});
+	onDestroy(() => {
+		remove(id);
 	});
 </script>
 

@@ -13,9 +13,6 @@
 	import go from "../wailsjs/go/bindings";
 	import type { StreamInfo } from "../wailsjs/go/models";
 
-	function sleep(ms) {
-		return new Promise((resolve) => setTimeout(resolve, ms));
-	}
 	interface PluginInfo {
 		PluginID: string;
 		PluginURL: string;
@@ -68,8 +65,8 @@
 
 <Shell company="XIV" platformName="Aetherometer">
 	<Tabs autoWidth bind:selectedTabID={$selectedTabID}>
-		{#each plugins as plugin (plugin.id)}
-			<Tab label={plugin.name} id={plugin.id} />
+		{#each plugins as plugin, idx (plugin.id)}
+			<Tab label={plugin.name} id={plugin.id} tabindex={idx} />
 		{/each}
 	</Tabs>
 </Shell>

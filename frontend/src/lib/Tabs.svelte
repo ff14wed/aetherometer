@@ -38,9 +38,9 @@ limitations under the License.
 	import { cubicOut } from "svelte/easing";
 
 	const dispatch = createEventDispatcher();
-	const tabs = writable([]);
-	const tabsById = derived(tabs, (_) =>
-		_.reduce((a, c) => ({ ...a, [c.id]: c }), {})
+	const tabsById = writable({});
+	const tabs = derived(tabsById, (v) =>
+		Object.values(v).sort((a, b) => a.index - b.index)
 	);
 	const useAutoWidth = writable(autoWidth);
 	const selectedTab = writable(undefined);
@@ -48,8 +48,10 @@ limitations under the License.
 		tabs,
 		selectedTab,
 		useAutoWidth,
-		add: (data) => {
-			tabs.update((_) => [..._, { ...data, index: _.length }]);
+		refresh: (data) => {
+			tabsById.update((v) => {
+				return { ...v, [data.id]: data };
+			});
 		},
 		update: (id) => {
 			currentIndex = $tabsById[id].index;
@@ -75,6 +77,15 @@ limitations under the License.
 			currentIndex = index;
 			dispatch("change", currentIndex);
 		},
+		remove: (id) => {
+			tabsById.update((oldTabs) => {
+				const {
+					[id]: {},
+					...newTabs
+				} = oldTabs;
+				return newTabs;
+			});
+		},
 	});
 	afterUpdate(() => {
 		checkScroll();
@@ -82,6 +93,11 @@ limitations under the License.
 	});
 
 	let currentIndex = selected;
+	$: {
+		if (selected >= $tabs.length && $tabs.length > 0) {
+			selected = $tabs.length - 1;
+		}
+	}
 	$: currentIndex = selected;
 	$: currentTab = $tabs[currentIndex] || undefined;
 	$: {
