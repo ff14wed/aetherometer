@@ -215,63 +215,56 @@ func (p *Provider) sendInternalWriteEvent() {
 // AddPlugin adds the given plugin to the configuration
 // It errors if the plugin name already exists.
 func (p *Provider) AddPlugin(name string, pluginURL string) error {
-	err := func() error {
-		p.configLock.Lock()
-		defer p.configLock.Unlock()
-
-		if _, ok := p.savedConfig.Plugins[name]; ok {
-			return fmt.Errorf(`plugin "%s" already exists`, name)
+	return p.MutateConfig(func(cfg Config) (Config, error) {
+		if _, ok := cfg.Plugins[name]; ok {
+			return cfg, fmt.Errorf(`plugin "%s" already exists`, name)
 		}
 
-		cfg := p.savedConfig
 		if cfg.Plugins == nil {
 			cfg.Plugins = make(map[string]string)
 		} else {
 			cfg.Plugins = copyMap(cfg.Plugins)
 		}
 		cfg.Plugins[name] = pluginURL
-		p.updateConfig(cfg)
 
+		return cfg, nil
+	})
+}
+
+// RemovePlugin removes the plugin with the given name from the configuration.
+// If the plugin doesn't exist, it is a no-op.
+func (p *Provider) RemovePlugin(name string) error {
+	return p.MutateConfig(func(cfg Config) (Config, error) {
+		if cfg.Plugins != nil {
+			if _, ok := cfg.Plugins[name]; ok {
+				cfg.Plugins = copyMap(cfg.Plugins)
+				delete(cfg.Plugins, name)
+				return cfg, nil
+			}
+		}
+		return cfg, nil
+	})
+}
+
+// MutateConfig provides a callback that allows the caller to safely mutate
+// the configuration
+func (p *Provider) MutateConfig(mutate func(Config) (Config, error)) error {
+	err := func() error {
+		p.configLock.Lock()
+		defer p.configLock.Unlock()
+
+		newCfg, err := mutate(p.savedConfig)
+		if err != nil {
+			return err
+		}
+
+		p.updateConfig(newCfg)
 		return nil
 	}()
 
 	if err != nil {
 		return err
 	}
-	p.sendInternalWriteEvent()
-	return p.writeConfig()
-}
-
-// RemovePlugin removes the plugin with the given name from the configuration.
-// If the plugin doesn't exist, it is a no-op.
-func (p *Provider) RemovePlugin(name string) error {
-	func() {
-		p.configLock.Lock()
-		defer p.configLock.Unlock()
-
-		if p.savedConfig.Plugins != nil {
-			if _, ok := p.savedConfig.Plugins[name]; ok {
-				cfg := p.savedConfig
-				cfg.Plugins = copyMap(cfg.Plugins)
-				delete(cfg.Plugins, name)
-				p.updateConfig(cfg)
-			}
-		}
-	}()
-
-	p.sendInternalWriteEvent()
-	return p.writeConfig()
-}
-
-// SetDisableAuth sets the value of the DisableAuth field in the configuration.
-func (p *Provider) SetDisableAuth(disableAuth bool) error {
-	func() {
-		p.configLock.Lock()
-		defer p.configLock.Unlock()
-
-		p.savedConfig.DisableAuth = disableAuth
-		p.NotifyHub.Broadcast()
-	}()
 
 	p.sendInternalWriteEvent()
 	return p.writeConfig()

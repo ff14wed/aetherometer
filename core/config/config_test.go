@@ -200,6 +200,8 @@ var _ = Describe("Config", func() {
 		BeforeEach(func() {
 			lines := []string{
 				`api_port = 9000`,
+				`disable_auth = false`,
+				`local_token = "some-token"`,
 				`[sources]`,
 				`data_path = "dummy-path"`,
 				`maps.cache = "some-map-dir"`,
@@ -213,7 +215,9 @@ var _ = Describe("Config", func() {
 			input = strings.Join(lines, "\n")
 
 			c = &config.Config{
-				APIPort: 9000,
+				APIPort:     9000,
+				DisableAuth: false,
+				LocalToken:  "some-token",
 				Sources: config.Sources{
 					DataPath: "dummy-path",
 					Maps: config.MapConfig{

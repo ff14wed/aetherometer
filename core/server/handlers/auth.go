@@ -25,6 +25,7 @@ type ctxKey struct {
 }
 
 var authCtxKey = &ctxKey{name: "auth"}
+var originCtxKey = &ctxKey{name: "origin"}
 
 var ErrAuth = errors.New(
 	"unauthorized error: the request lacks valid authentication credentials for the target resource",
@@ -42,6 +43,7 @@ type PluginInfo struct {
 }
 type authConfig struct {
 	disableAuth bool
+	localToken  string
 
 	// plugins maps -> plugin name -> (pluginID, apiToken)
 	plugins map[string]PluginInfo
@@ -65,15 +67,13 @@ type Auth struct {
 
 	privKey *rsa.PrivateKey
 
-	initPayloadGetter InitPayloadGetter
-
 	logger *zap.Logger
 }
 
 // NewAuth creates a new instance of Auth. InitPayloadGetter provides a
 // way to grab credentials from the context when the connection is made
 // via Websockets.
-func NewAuth(cp *config.Provider, initPayloadGetter InitPayloadGetter, l *zap.Logger) (*Auth, error) {
+func NewAuth(cp *config.Provider, l *zap.Logger) (*Auth, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
@@ -91,8 +91,6 @@ func NewAuth(cp *config.Provider, initPayloadGetter InitPayloadGetter, l *zap.Lo
 			allowedPluginIDs: make(map[string]struct{}),
 			allowedOrigins:   make(map[string]struct{}),
 		},
-
-		initPayloadGetter: initPayloadGetter,
 
 		logger: l.Named("auth-handler"),
 	}
@@ -143,6 +141,7 @@ func (a *Auth) RefreshConfig() error {
 	}
 
 	a.authConfig.disableAuth = cfg.DisableAuth
+	a.authConfig.localToken = cfg.LocalToken
 	a.authConfig.plugins = updatedPlugins
 	a.authConfig.allowedPluginIDs = updatedAllowedPluginIDs
 	a.authConfig.allowedOrigins = updatedAllowedOrigins
@@ -154,20 +153,23 @@ func (a *Auth) RefreshConfig() error {
 // authentication data from incoming requests.
 func (a *Auth) Handler(next http.Handler) http.Handler {
 	return a.cors.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		ctx := context.WithValue(r.Context(), originCtxKey, origin)
+		r = r.WithContext(ctx)
+
 		authString, err := request.AuthorizationHeaderExtractor.ExtractToken(r)
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), authCtxKey, authString)
+		ctx = context.WithValue(r.Context(), authCtxKey, authString)
 		r = r.WithContext(ctx)
+
 		next.ServeHTTP(w, r)
 	}))
 }
 
-// AllowOriginFunc returns true only if the origin is referenced by any URL
-// of the registered plugins.
-func (a *Auth) AllowOriginFunc(origin string) bool {
+func isLocalOrigin(origin string) bool {
 	if strings.Contains(origin, "file://") {
 		return true
 	}
@@ -175,6 +177,16 @@ func (a *Auth) AllowOriginFunc(origin string) bool {
 		return true
 	}
 	if strings.Contains(origin, "http://localhost") {
+		return true
+	}
+
+	return false
+}
+
+// AllowOriginFunc returns true only if the origin is referenced by any URL
+// of the registered plugins.
+func (a *Auth) AllowOriginFunc(origin string) bool {
+	if isLocalOrigin(origin) {
 		return true
 	}
 
@@ -233,6 +245,10 @@ func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
 		return nil
 	}
 
+	if a.isValidLocalTokenAuth(ctx) {
+		return nil
+	}
+
 	claims, err := a.extractClaimsFromCtx(ctx)
 	if err != nil {
 		return err
@@ -246,6 +262,29 @@ func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
 		return ErrAuth
 	}
 	return nil
+}
+
+func (a *Auth) isValidLocalTokenAuth(ctx context.Context) bool {
+	localToken := a.authConfig.localToken
+	if localToken == "" {
+		return false
+	}
+
+	origin, found := ctx.Value(originCtxKey).(string)
+	if !found {
+		return false
+	}
+
+	authString, found := ctx.Value(authCtxKey).(string)
+	if !found {
+		return false
+	}
+
+	if !isLocalOrigin(origin) {
+		return false
+	}
+
+	return (authString == localToken)
 }
 
 // GetRegisteredPlugins returns a copy of the map containing all the plugins
@@ -263,11 +302,13 @@ func (a *Auth) GetRegisteredPlugins() map[string]PluginInfo {
 	return plugins
 }
 
+func (a *Auth) WebsocketInitFunc(ctx context.Context, payload transport.InitPayload) (context.Context, error) {
+	ctx = context.WithValue(ctx, authCtxKey, payload.Authorization())
+	return ctx, nil
+}
+
 func (a *Auth) extractClaimsFromCtx(ctx context.Context) (jwt.MapClaims, error) {
-	authString, found := ctx.Value(authCtxKey).(string)
-	if !found && a.initPayloadGetter != nil {
-		authString = a.initPayloadGetter(ctx).Authorization()
-	}
+	authString, _ := ctx.Value(authCtxKey).(string)
 	return a.extractClaimsFromToken(authString)
 }
 

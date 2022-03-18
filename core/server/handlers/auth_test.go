@@ -54,7 +54,7 @@ var _ = Describe("Auth", func() {
 		cfg := config.Config{}
 		cp = config.NewProvider(configFile, cfg, logger)
 
-		auth, err = handlers.NewAuth(cp, nil, logger)
+		auth, err = handlers.NewAuth(cp, logger)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -189,7 +189,10 @@ var _ = Describe("Auth", func() {
 	Describe("AuthorizePluginToken", func() {
 		Context("when auth is disabled", func() {
 			BeforeEach(func() {
-				Expect(cp.SetDisableAuth(true)).To(Succeed())
+				Expect(cp.MutateConfig(func(cfg config.Config) (config.Config, error) {
+					cfg.DisableAuth = true
+					return cfg, nil
+				})).To(Succeed())
 				Expect(auth.RefreshConfig()).To(Succeed())
 			})
 
@@ -199,18 +202,6 @@ var _ = Describe("Auth", func() {
 		})
 
 		Context("when the authorization token is sent via websockets", func() {
-			type authTestKeyType string
-			const authTestKey authTestKeyType = "authTest-apiToken"
-
-			BeforeEach(func() {
-				var err error
-				auth, err = handlers.NewAuth(cp, func(ctx context.Context) transport.InitPayload {
-					apiToken := ctx.Value(authTestKey).(string)
-					return transport.InitPayload{"Authorization": apiToken}
-				}, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-			})
-
 			It("successfully validates the token", func() {
 				Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
 				Expect(auth.RefreshConfig()).To(Succeed())
@@ -218,16 +209,19 @@ var _ = Describe("Auth", func() {
 				plugins := auth.GetRegisteredPlugins()
 				pluginInfo := plugins["Foo Plugin"]
 
-				apiToken := pluginInfo.APIToken
+				initPayload := transport.InitPayload{"Authorization": pluginInfo.APIToken}
+				background := context.Background()
+				ctx, err := auth.WebsocketInitFunc(background, initPayload)
+				Expect(err).ToNot(HaveOccurred())
 
-				ctx := context.Background()
-				ctx = context.WithValue(ctx, authTestKey, apiToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			})
 
 			It("rejects invalid tokens", func() {
-				ctx := context.Background()
-				ctx = context.WithValue(ctx, authTestKey, "invalid-token")
+				initPayload := transport.InitPayload{"Authorization": "invalid-token"}
+				background := context.Background()
+				ctx, err := auth.WebsocketInitFunc(background, initPayload)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			})
 		})
@@ -247,7 +241,7 @@ var _ = Describe("Auth", func() {
 				cfg := config.Config{}
 				altCP := config.NewProvider(altConfigFile, cfg, zap.NewNop())
 
-				altAuth, err := handlers.NewAuth(altCP, nil, zap.NewNop())
+				altAuth, err := handlers.NewAuth(altCP, zap.NewNop())
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(altCP.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
@@ -354,6 +348,127 @@ var _ = Describe("Auth", func() {
 				Expect(rw.Header().Get("Access-Control-Allow-Methods")).To(Equal("POST"))
 				Expect(rw.Header().Get("Access-Control-Allow-Headers")).To(Equal("Authorization, Content-Type, X-Apollo-Tracing"))
 				Expect(rw.Header().Get("Access-Control-Allow-Credentials")).To(Equal("true"))
+			})
+		})
+
+		Context("when a local plugin provides a correct local token", func() {
+			BeforeEach(func() {
+				Expect(cp.MutateConfig(func(cfg config.Config) (config.Config, error) {
+					cfg.LocalToken = "some-local-token"
+					return cfg, nil
+				})).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
+			})
+
+			It("allows local plugins to use the local token to authenticate", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+				req.Header.Set("Authorization", "Bearer some-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
+			})
+
+			It("does not allow non-local plugins to use the local token to authenticate", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Authorization", "Bearer some-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+			})
+
+			It("does not allow local plugins to authenticate without the local token", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+			})
+
+			It("does not allow local plugins to authenticate with an incorrect token", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+				req.Header.Set("Authorization", "Bearer incorrect-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+
+			})
+
+			Context("when a local plugin is registered", func() {
+				BeforeEach(func() {
+					Expect(cp.AddPlugin("Foo Plugin", "https://localhost:12345/foo/plugin")).To(Succeed())
+					Expect(auth.RefreshConfig()).To(Succeed())
+				})
+
+				It("allows local plugins to use its assigned API token instead", func() {
+					req, err := http.NewRequest("POST", "/foo", nil)
+					Expect(err).ToNot(HaveOccurred())
+
+					req.Header.Set("Origin", "https://localhost")
+
+					plugins := auth.GetRegisteredPlugins()
+					pluginInfo := plugins["Foo Plugin"]
+					apiToken := pluginInfo.APIToken
+
+					req.Header.Set("Authorization", "Bearer "+apiToken)
+
+					var receivedCtx context.Context
+					authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						receivedCtx = r.Context()
+					}))
+
+					rw := httptest.NewRecorder()
+					authHandler.ServeHTTP(rw, req)
+
+					Expect(receivedCtx).ToNot(BeNil())
+
+					Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
+				})
 			})
 		})
 	})

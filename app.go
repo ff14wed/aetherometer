@@ -96,7 +96,7 @@ func (b *App) startup(ctx context.Context) {
 
 	var err error
 
-	b.authHandler, err = handlers.NewAuth(b.cfgProvider, transport.GetInitPayload, b.logger)
+	b.authHandler, err = handlers.NewAuth(b.cfgProvider, b.logger)
 	if err != nil {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
@@ -155,6 +155,7 @@ func (b *App) startup(ctx context.Context) {
 
 	gqlServer.AddTransport(transport.Websocket{
 		Upgrader:              upgrader,
+		InitFunc:              b.authHandler.WebsocketInitFunc,
 		KeepAlivePingInterval: 10 * time.Second,
 	})
 	gqlServer.AddTransport(transport.Options{})

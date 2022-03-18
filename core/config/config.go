@@ -16,6 +16,10 @@ type Config struct {
 	// CORS validation is still enforced.
 	DisableAuth bool `toml:"disable_auth,omitempty"`
 
+	// LocalToken allows local plugins to authenticate with the API with this
+	// token. If empty, it does not allow authentication with an empty string.
+	LocalToken string `toml:"local_token,omitempty"`
+
 	// Sources contains configuration for data sources.
 	Sources Sources `toml:"sources"`
 
