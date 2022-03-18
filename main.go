@@ -23,9 +23,6 @@ import (
 //go:embed frontend/dist
 var assets embed.FS
 
-//go:embed build/appicon.png
-var icon []byte
-
 var Version = "development"
 
 func getCurrentDirectory() (string, error) {

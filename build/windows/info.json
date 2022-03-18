@@ -5,10 +5,11 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "1.0.0",
-			"CompanyName": "aetherometer",
-			"FileDescription": "aetherometer",
+			"CompanyName": "Flawed",
+			"FileDescription": "Aetherometer",
 			"LegalCopyright": "Copyright Flawed 2022",
-			"ProductName": "aetherometer"
+			"ProductName": "Aetherometer",
+			"Comments": "https://github.com/ff14wed/aetherometer"
 		}
 	}
 }

@@ -5,14 +5,17 @@
   "frontend:dev": "",
   "wailsjsdir": "./frontend",
   "version": "2",
-  "Path": "",
-  "BuildDir": "",
   "outputfilename": "aetherometer.exe",
-  "OutputType": "",
-  "Platform": "",
   "Author": {
     "name": "Flawed",
     "email": ""
+  },
+  "info": {
+    "companyName": "Flawed",
+    "productName": "Aetherometer",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright Flawed 2022",
+    "comments": "https://github.com/ff14wed/aetherometer"
   },
   "debounceMS": 100,
   "devserverurl": "http://localhost:34115",
