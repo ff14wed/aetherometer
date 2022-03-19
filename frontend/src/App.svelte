@@ -9,8 +9,6 @@
 
 	import { onMount } from "svelte";
 
-	import type { runtime } from "../wailsjs/runtime";
-	import go from "../wailsjs/go/bindings";
 	import type { StreamInfo } from "../wailsjs/go/models";
 
 	interface PluginInfo {
@@ -57,23 +55,23 @@
 	let apiURL = "";
 
 	onMount(async () => {
-		await window.go.main.App.WaitForStartup();
+		await window.go.app.App.WaitForStartup();
 
 		// Load initial streams (though normally there aren't any)
-		activeStreams = (await window.go.main.App.GetStreams()) || [];
-		registeredPlugins = (await window.go.main.App.GetPlugins()) || {};
-		apiURL = (await window.go.main.App.GetAPIURL()) || "";
+		activeStreams = (await window.go.app.App.GetStreams()) || [];
+		registeredPlugins = (await window.go.app.App.GetPlugins()) || {};
+		apiURL = (await window.go.app.App.GetAPIURL()) || "";
 
 		console.log("Active streams", activeStreams);
 		console.log("Registered Plugins", registeredPlugins);
 
 		window.runtime.EventsOn("StreamChange", async () => {
-			activeStreams = (await window.go.main.App.GetStreams()) || [];
+			activeStreams = (await window.go.app.App.GetStreams()) || [];
 			console.log("Updating active streams", activeStreams);
 		});
 
 		window.runtime.EventsOn("ConfigChange", async () => {
-			registeredPlugins = (await window.go.main.App.GetPlugins()) || {};
+			registeredPlugins = (await window.go.app.App.GetPlugins()) || {};
 			console.log("Updating registered Plugins", registeredPlugins);
 		});
 	});

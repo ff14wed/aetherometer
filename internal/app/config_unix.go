@@ -1,7 +1,7 @@
 //go:build !windows
 // +build !windows
 
-package main
+package app
 
 import (
 	"os"
@@ -10,17 +10,11 @@ import (
 	"github.com/ff14wed/aetherometer/core/config"
 )
 
-func defaultConfig() (config.Config, error) {
-	execPath, err := os.Executable()
+func DefaultConfig() (config.Config, error) {
+	dirPath, err := GetCurrentDirectory()
 	if err != nil {
 		return config.Config{}, err
 	}
-
-	cleanPath, err := filepath.EvalSymlinks(execPath)
-	if err != nil {
-		return config.Config{}, err
-	}
-	dirPath := filepath.Dir(cleanPath)
 
 	return config.Config{
 		APIPort: 0,

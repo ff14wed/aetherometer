@@ -1,4 +1,7 @@
-package main
+//go:build windows
+// +build windows
+
+package app
 
 import (
 	"path/filepath"
@@ -6,8 +9,8 @@ import (
 	"github.com/ff14wed/aetherometer/core/config"
 )
 
-func defaultConfig() (config.Config, error) {
-	dirPath, err := getCurrentDirectory()
+func DefaultConfig() (config.Config, error) {
+	dirPath, err := GetCurrentDirectory()
 	if err != nil {
 		return config.Config{}, err
 	}

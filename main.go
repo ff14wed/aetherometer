@@ -13,6 +13,7 @@ import (
 
 	"github.com/apenwarr/fixconsole"
 	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/ff14wed/aetherometer/internal/app"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -25,19 +26,6 @@ var assets embed.FS
 
 var Version = "development"
 
-func getCurrentDirectory() (string, error) {
-	execPath, err := os.Executable()
-	if err != nil {
-		return "", err
-	}
-
-	cleanPath, err := filepath.EvalSymlinks(execPath)
-	if err != nil {
-		return "", err
-	}
-	return filepath.Dir(cleanPath), nil
-}
-
 func main() {
 	flag.Usage = func() {
 		fixconsole.FixConsoleIfNeeded()
@@ -45,7 +33,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	dirPath, err := getCurrentDirectory()
+	dirPath, err := app.GetCurrentDirectory()
 	if err != nil {
 		panic(err)
 	}
@@ -95,17 +83,17 @@ func main() {
 		zapLogger.Fatal("Config path cannot be empty")
 	}
 
-	defaultCfg, err := defaultConfig()
+	defaultCfg, err := app.DefaultConfig()
 	if err != nil {
 		zapLogger.Fatal("Error setting up default config", zap.Error(err))
 	}
 	cfgProvider := config.NewProvider(*cfgPath, defaultCfg, zapLogger)
 
-	app := NewApp(cfgProvider, Version, zapLogger)
+	app := app.NewApp(cfgProvider, Version, zapLogger)
 
 	// Do not start the GUI in headless mode.
 	if *headless {
-		app.startup(context.Background())
+		app.Startup(context.Background())
 
 		signals := make(chan os.Signal, 32)
 		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
@@ -113,7 +101,7 @@ func main() {
 		sig := <-signals
 		zapLogger.Info("Received signal, shutting down...", zap.Stringer("signal", sig))
 
-		app.shutdown(context.Background())
+		app.Shutdown(context.Background())
 		return
 	}
 
@@ -132,9 +120,9 @@ func main() {
 		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Assets:            assets,
 		LogLevel:          logger.DEBUG,
-		OnStartup:         app.startup,
-		OnDomReady:        app.domReady,
-		OnShutdown:        app.shutdown,
+		OnStartup:         app.Startup,
+		OnDomReady:        app.DomReady,
+		OnShutdown:        app.Shutdown,
 		Bind: []interface{}{
 			app,
 		},

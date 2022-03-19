@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -15,7 +15,6 @@ import (
 	"github.com/ff14wed/aetherometer/core/adapter"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/datasheet"
-	"github.com/ff14wed/aetherometer/core/hub"
 	"github.com/ff14wed/aetherometer/core/models"
 	"github.com/ff14wed/aetherometer/core/server"
 	"github.com/ff14wed/aetherometer/core/server/handlers"
@@ -25,7 +24,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/thejerf/suture"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
 )
 
@@ -65,11 +63,10 @@ func NewApp(cfgProvider *config.Provider, version string, logger *zap.Logger) *A
 	}
 }
 
-// startup is called at application startup
-func (b *App) startup(ctx context.Context) {
+// Startup is called at application startup
+func (b *App) Startup(ctx context.Context) {
 	b.logger.Info("====================================")
 	b.logger.Info("Starting Aetherometer...")
-
 	b.ctx = ctx
 
 	b.appSupervisor = suture.New("main", suture.Spec{
@@ -101,7 +98,7 @@ func (b *App) startup(ctx context.Context) {
 		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
 	}
 
-	appEventWatcher := NewAppEventWatcher(
+	appEventWatcher := NewEventWatcher(
 		b.storeProvider.StreamEventSource(),
 		b.cfgProvider.NotifyHub,
 		b.authHandler,
@@ -183,13 +180,13 @@ func (b *App) startup(ctx context.Context) {
 	close(b.ready)
 }
 
-// domReady is called after the front-end dom has been loaded
-func (b *App) domReady(ctx context.Context) {
+// DomReady is called after the front-end dom has been loaded
+func (b *App) DomReady(ctx context.Context) {
 	// Add your action here
 }
 
-// shutdown is called at application termination
-func (b *App) shutdown(ctx context.Context) {
+// Shutdown is called at application termination
+func (b *App) Shutdown(ctx context.Context) {
 	// Perform your teardown here
 
 	b.appSupervisor.Stop()
@@ -199,7 +196,7 @@ func (b *App) WaitForStartup() {
 	<-b.ready
 }
 
-// ReloadDatasheets reloads datasheets from the filepath
+// reloadDatasheets reloads datasheets from the filepath
 func (b *App) reloadDatasheets(collection *datasheet.Collection) {
 	cfg := b.cfgProvider.Config()
 	err := collection.Populate(cfg.Sources.DataPath)
@@ -228,7 +225,7 @@ func (b *App) GetAPIURL() string {
 }
 
 func (b *App) GetAppDirectory() string {
-	dirPath, _ := getCurrentDirectory()
+	dirPath, _ := GetCurrentDirectory()
 	return dirPath
 }
 
@@ -280,71 +277,4 @@ func (b *App) AddPlugin(name string, url string) error {
 
 func (b *App) RemovePlugin(name string) error {
 	return b.cfgProvider.RemovePlugin(name)
-}
-
-// AppEventWatcher emits app events whenever events are triggered
-type AppEventWatcher struct {
-	ses         models.StreamEventSource
-	cfgNotify   *hub.NotifyHub
-	authHandler *handlers.Auth
-
-	ctx    context.Context
-	logger *zap.Logger
-
-	stop     chan struct{}
-	stopDone chan struct{}
-}
-
-// NewAppEventWatcher returns a new AppEventWatcher
-func NewAppEventWatcher(
-	streamEventSource models.StreamEventSource,
-	cfgNotify *hub.NotifyHub,
-	authHandler *handlers.Auth,
-	ctx context.Context,
-	logger *zap.Logger,
-) *AppEventWatcher {
-	return &AppEventWatcher{
-		ses:         streamEventSource,
-		cfgNotify:   cfgNotify,
-		authHandler: authHandler,
-		ctx:         ctx,
-		logger:      logger.Named("app-event-watcher"),
-
-		stop:     make(chan struct{}),
-		stopDone: make(chan struct{}),
-	}
-}
-
-// Serve runs the service for the app event watcher
-func (s *AppEventWatcher) Serve() {
-	defer close(s.stopDone)
-	streamCh, streamChID := s.ses.Subscribe()
-	cfgNotifyCh, cfgNotifyChID := s.cfgNotify.Subscribe()
-	s.logger.Info("Running")
-
-	for {
-		select {
-		case event := <-streamCh:
-			_, isAddStream := event.Type.(models.AddStream)
-			_, isRemoveStream := event.Type.(models.RemoveStream)
-			_, isUpdateIDs := event.Type.(models.UpdateIDs)
-			if isAddStream || isRemoveStream || isUpdateIDs {
-				runtime.EventsEmit(s.ctx, "StreamChange")
-			}
-		case <-cfgNotifyCh:
-			s.authHandler.RefreshConfig()
-			runtime.EventsEmit(s.ctx, "ConfigChange")
-		case <-s.stop:
-			s.logger.Info("Stopping...")
-			s.ses.Unsubscribe(streamChID)
-			s.cfgNotify.Unsubscribe(cfgNotifyChID)
-			return
-		}
-	}
-}
-
-// Stop will shutdown this service and wait on it to stop before returning.
-func (s *AppEventWatcher) Stop() {
-	close(s.stop)
-	<-s.stopDone
 }
