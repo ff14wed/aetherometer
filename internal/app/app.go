@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"runtime/debug"
@@ -22,7 +21,6 @@ import (
 	"github.com/ff14wed/aetherometer/core/store/update"
 	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/gorilla/websocket"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
 )
@@ -192,10 +190,6 @@ func (b *App) Shutdown(ctx context.Context) {
 	b.appSupervisor.Stop()
 }
 
-func (b *App) WaitForStartup() {
-	<-b.ready
-}
-
 // reloadDatasheets reloads datasheets from the filepath
 func (b *App) reloadDatasheets(collection *datasheet.Collection) {
 	cfg := b.cfgProvider.Config()
@@ -206,75 +200,4 @@ func (b *App) reloadDatasheets(collection *datasheet.Collection) {
 
 	// Since loading datasheets takes up a lot of memory for some reason
 	debug.FreeOSMemory()
-}
-
-func (b *App) GetVersion() string {
-	return b.version
-}
-
-func (b *App) GetAPIVersion() string {
-	return models.AetherometerAPIVersion
-}
-
-func (b *App) GetAPIURL() string {
-	addr := b.srv.Address()
-	if addr == nil {
-		return ""
-	}
-	return fmt.Sprintf("http://localhost:%d/query", addr.Port)
-}
-
-func (b *App) GetAppDirectory() string {
-	dirPath, _ := GetCurrentDirectory()
-	return dirPath
-}
-
-func (b *App) OpenAppDirectory() {
-	dirPath := b.GetAppDirectory()
-	if dirPath != "" {
-		open.Start(dirPath)
-	}
-}
-
-type StreamInfo struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-func (b *App) GetStreams() []StreamInfo {
-	streams, err := b.storeProvider.Streams()
-	if err != nil {
-		return nil
-	}
-	var infos []StreamInfo
-	for _, s := range streams {
-		if char, ok := s.EntitiesMap[s.CharacterID]; ok {
-			infos = append(infos, StreamInfo{
-				ID:   s.ID,
-				Name: char.Name,
-			})
-		} else {
-			infos = append(infos, StreamInfo{
-				ID:   s.ID,
-				Name: fmt.Sprintf("Stream %d", s.ID),
-			})
-		}
-	}
-	return infos
-}
-
-func (b *App) GetPlugins() map[string]handlers.PluginInfo {
-	return b.authHandler.GetRegisteredPlugins()
-}
-
-func (b *App) GetConfig() config.Config {
-	return b.cfgProvider.Config()
-}
-
-func (b *App) AddPlugin(name string, url string) error {
-	return b.cfgProvider.AddPlugin(name, url)
-}
-
-func (b *App) RemovePlugin(name string) error {
-	return b.cfgProvider.RemovePlugin(name)
 }

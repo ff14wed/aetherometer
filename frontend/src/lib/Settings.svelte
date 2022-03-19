@@ -31,20 +31,20 @@
 	let appDirectory = "";
 
 	onMount(async () => {
-		await window.go.app.App.WaitForStartup();
+		await window.go.app.Bindings.WaitForStartup();
 
-		config = (await window.go.app.App.GetConfig()) || config;
+		config = (await window.go.app.Bindings.GetConfig()) || config;
 		if (!config.Plugins) {
 			config.Plugins = {};
 		}
 
-		appVersion = (await window.go.app.App.GetVersion()) || "";
-		apiVersion = (await window.go.app.App.GetAPIVersion()) || "";
-		apiURL = (await window.go.app.App.GetAPIURL()) || "";
-		appDirectory = (await window.go.app.App.GetAppDirectory()) || "";
+		appVersion = (await window.go.app.Bindings.GetVersion()) || "";
+		apiVersion = (await window.go.app.Bindings.GetAPIVersion()) || "";
+		apiURL = (await window.go.app.Bindings.GetAPIURL()) || "";
+		appDirectory = (await window.go.app.Bindings.GetAppDirectory()) || "";
 
 		window.runtime.EventsOn("ConfigChange", async () => {
-			config = (await window.go.app.App.GetConfig()) || config;
+			config = (await window.go.app.Bindings.GetConfig()) || config;
 			if (!config.Plugins) {
 				config.Plugins = {};
 			}
@@ -53,16 +53,16 @@
 	});
 
 	async function addPlugin() {
-		await window.go.app.App.AddPlugin(newPluginName, newPluginURL);
+		await window.go.app.Bindings.AddPlugin(newPluginName, newPluginURL);
 		newPluginName = "";
 		newPluginURL = "";
 	}
 	async function deletePlugin(name: string) {
-		await window.go.app.App.RemovePlugin(name);
+		await window.go.app.Bindings.RemovePlugin(name);
 	}
 
 	async function openAppDirectory() {
-		await window.go.app.App.OpenAppDirectory();
+		await window.go.app.Bindings.OpenAppDirectory();
 	}
 
 	let newPluginName;

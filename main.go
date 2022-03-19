@@ -89,11 +89,11 @@ func main() {
 	}
 	cfgProvider := config.NewProvider(*cfgPath, defaultCfg, zapLogger)
 
-	app := app.NewApp(cfgProvider, Version, zapLogger)
+	a := app.NewApp(cfgProvider, Version, zapLogger)
 
 	// Do not start the GUI in headless mode.
 	if *headless {
-		app.Startup(context.Background())
+		a.Startup(context.Background())
 
 		signals := make(chan os.Signal, 32)
 		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
@@ -101,7 +101,7 @@ func main() {
 		sig := <-signals
 		zapLogger.Info("Received signal, shutting down...", zap.Stringer("signal", sig))
 
-		app.Shutdown(context.Background())
+		a.Shutdown(context.Background())
 		return
 	}
 
@@ -120,11 +120,11 @@ func main() {
 		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Assets:            assets,
 		LogLevel:          logger.DEBUG,
-		OnStartup:         app.Startup,
-		OnDomReady:        app.DomReady,
-		OnShutdown:        app.Shutdown,
+		OnStartup:         a.Startup,
+		OnDomReady:        a.DomReady,
+		OnShutdown:        a.Shutdown,
 		Bind: []interface{}{
-			app,
+			app.GetBindings(a),
 		},
 		// Windows platform specific options
 		Windows: &windows.Options{

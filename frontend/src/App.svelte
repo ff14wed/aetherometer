@@ -55,23 +55,23 @@
 	let apiURL = "";
 
 	onMount(async () => {
-		await window.go.app.App.WaitForStartup();
+		await window.go.app.Bindings.WaitForStartup();
 
 		// Load initial streams (though normally there aren't any)
-		activeStreams = (await window.go.app.App.GetStreams()) || [];
-		registeredPlugins = (await window.go.app.App.GetPlugins()) || {};
-		apiURL = (await window.go.app.App.GetAPIURL()) || "";
+		activeStreams = (await window.go.app.Bindings.GetStreams()) || [];
+		registeredPlugins = (await window.go.app.Bindings.GetPlugins()) || {};
+		apiURL = (await window.go.app.Bindings.GetAPIURL()) || "";
 
 		console.log("Active streams", activeStreams);
 		console.log("Registered Plugins", registeredPlugins);
 
 		window.runtime.EventsOn("StreamChange", async () => {
-			activeStreams = (await window.go.app.App.GetStreams()) || [];
+			activeStreams = (await window.go.app.Bindings.GetStreams()) || [];
 			console.log("Updating active streams", activeStreams);
 		});
 
 		window.runtime.EventsOn("ConfigChange", async () => {
-			registeredPlugins = (await window.go.app.App.GetPlugins()) || {};
+			registeredPlugins = (await window.go.app.Bindings.GetPlugins()) || {};
 			console.log("Updating registered Plugins", registeredPlugins);
 		});
 	});
