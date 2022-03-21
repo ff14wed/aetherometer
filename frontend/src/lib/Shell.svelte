@@ -3,6 +3,7 @@
 
 	import { Header, HeaderUtilities } from "carbon-components-svelte";
 
+	import Renew20 from "carbon-icons-svelte/lib/Renew20";
 	import SettingsAdjust20 from "carbon-icons-svelte/lib/SettingsAdjust20";
 	import Subtract24 from "carbon-icons-svelte/lib/Subtract24";
 	import Stop20 from "carbon-icons-svelte/lib/Stop20";
@@ -10,6 +11,8 @@
 	import Close24 from "carbon-icons-svelte/lib/Close24";
 	import HeaderButton from "./HeaderButton.svelte";
 	import Settings from "./Settings.svelte";
+
+	export let refreshCurrentTab;
 
 	function minimize() {
 		window.runtime.WindowMinimise();
@@ -32,6 +35,11 @@
 	<slot />
 
 	<HeaderUtilities>
+		<HeaderButton
+			aria-label="Refresh"
+			icon={Renew20}
+			on:click={refreshCurrentTab}
+		/>
 		<HeaderButton
 			aria-label="Settings"
 			icon={SettingsAdjust20}

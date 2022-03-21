@@ -76,10 +76,21 @@
 		});
 	});
 
+	let iframes = [];
+	$: iframes = iframes.filter((el) => el);
+
+	function refreshCurrentTab() {
+		for (let iframe of iframes) {
+			if (iframe.id === $selectedTabID) {
+				iframe.src = iframe.src;
+			}
+		}
+	}
+
 	$: plugins = generatePluginList(activeStreams, registeredPlugins);
 </script>
 
-<Shell company="XIV" platformName="Aetherometer">
+<Shell company="XIV" platformName="Aetherometer" {refreshCurrentTab}>
 	<Tabs autoWidth bind:selectedTabID={$selectedTabID}>
 		{#each plugins as plugin, idx (plugin.id)}
 			<Tab label={plugin.name} id={plugin.id} tabindex={idx} />
@@ -110,10 +121,12 @@
 				/>
 			</div>
 		{:else}
-			{#each plugins as plugin (plugin.id)}
+			{#each plugins as plugin, i (plugin.id)}
 				<TabContent id={plugin.id} label={plugin.name}>
 					<iframe
 						sandbox="allow-same-origin allow-scripts allow-downloads"
+						bind:this={iframes[i]}
+						id={plugin.id}
 						class:iframe={true}
 						title={plugin.name}
 						src={iframeURL(plugin.url, apiURL, plugin.streamID, plugin.token)}
