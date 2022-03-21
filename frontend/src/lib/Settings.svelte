@@ -1,23 +1,9 @@
 <script lang="ts">
-	import {
-		Button,
-		Form,
-		FormGroup,
-		Modal,
-		TextInput,
-	} from "carbon-components-svelte";
-	import {
-		StructuredList,
-		StructuredListHead,
-		StructuredListRow,
-		StructuredListCell,
-		StructuredListBody,
-	} from "carbon-components-svelte";
+	import { Button, Modal } from "carbon-components-svelte";
 
-	import Add16 from "carbon-icons-svelte/lib/Add16";
-	import Delete16 from "carbon-icons-svelte/lib/Delete16";
 	import FolderOpen16 from "carbon-icons-svelte/lib/FolderOpen16";
 	import { onMount } from "svelte";
+	import PluginList from "./PluginList.svelte";
 
 	export let open = false;
 
@@ -52,11 +38,10 @@
 		});
 	});
 
-	async function addPlugin() {
-		await window.go.app.Bindings.AddPlugin(newPluginName, newPluginURL);
-		newPluginName = "";
-		newPluginURL = "";
+	async function addPlugin(name: string, url: string) {
+		await window.go.app.Bindings.AddPlugin(name, url);
 	}
+
 	async function deletePlugin(name: string) {
 		await window.go.app.Bindings.RemovePlugin(name);
 	}
@@ -64,9 +49,6 @@
 	async function openAppDirectory() {
 		await window.go.app.Bindings.OpenAppDirectory();
 	}
-
-	let newPluginName;
-	let newPluginURL;
 
 	$: infoTable = {
 		"App version": appVersion,
@@ -106,68 +88,7 @@
 
 	<h4>Loaded Plugins</h4>
 	<br />
-	<StructuredList condensed>
-		<StructuredListHead>
-			<StructuredListRow head>
-				<StructuredListCell head>
-					<div class:plugin={true}>Name</div>
-				</StructuredListCell>
-				<StructuredListCell head>
-					<div class:plugin={true}>URL</div>
-				</StructuredListCell>
-				<StructuredListCell head />
-			</StructuredListRow>
-		</StructuredListHead>
-		<StructuredListBody>
-			{#each Object.entries(config.Plugins) as [name, url]}
-				<StructuredListRow>
-					<StructuredListCell>
-						<div class:plugin={true}>{name}</div>
-					</StructuredListCell>
-					<StructuredListCell>
-						<div class:plugin={true}>{url}</div>
-					</StructuredListCell>
-					<StructuredListCell>
-						<Button
-							iconDescription="Delete Plugin"
-							icon={Delete16}
-							size="small"
-							kind="danger"
-							on:click={() => deletePlugin(name)}
-						/>
-					</StructuredListCell>
-				</StructuredListRow>
-			{/each}
-			<StructuredListRow>
-				<StructuredListCell>
-					<TextInput
-						hideLabel
-						labelText="Plugin Name"
-						placeholder="Enter plugin name..."
-						size="sm"
-						bind:value={newPluginName}
-					/>
-				</StructuredListCell>
-				<StructuredListCell>
-					<TextInput
-						hideLabel
-						labelText="Plugin URL"
-						placeholder="eg. https://plugins.com/foo/"
-						size="sm"
-						bind:value={newPluginURL}
-					/>
-				</StructuredListCell>
-				<StructuredListCell>
-					<Button
-						iconDescription="Add Plugin"
-						icon={Add16}
-						size="small"
-						on:click={addPlugin}
-					/>
-				</StructuredListCell>
-			</StructuredListRow>
-		</StructuredListBody>
-	</StructuredList>
+	<PluginList plugins={config.Plugins} {addPlugin} {deletePlugin} />
 	<p>Settings are automatically saved.</p>
 </Modal>
 
@@ -185,17 +106,5 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
-	}
-
-	.plugin {
-		padding: 0 1rem;
-	}
-
-	:global(.bx--structured-list) {
-		margin-bottom: 2rem;
-	}
-
-	:global(.bx--structured-list-td) {
-		vertical-align: middle;
 	}
 </style>
