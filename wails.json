@@ -2,7 +2,7 @@
   "name": "aetherometer",
   "frontend:build": "npm run build",
   "frontend:install": "npm install",
-  "frontend:dev": "",
+  "frontend:dev:watcher": "npm run dev",
   "wailsjsdir": "./frontend",
   "version": "2",
   "outputfilename": "aetherometer.exe",
