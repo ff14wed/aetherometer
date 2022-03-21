@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script>
+	import { TooltipIcon } from "carbon-components-svelte";
+
 	/** Set to `true` to use the variant with the red hover */
 	export let isClose = false;
 
@@ -23,6 +25,12 @@ limitations under the License.
 	 * @type {typeof import("svelte").SvelteComponent}
 	 */
 	export let icon = undefined;
+
+	/**
+	 * Specify the ARIA label for the button icon
+	 * @type {string}
+	 */
+	export let iconDescription = undefined;
 
 	/** Obtain a reference to the HTML button element */
 	export let ref = null;
@@ -37,7 +45,7 @@ limitations under the License.
 	on:click
 >
 	<slot>
-		<svelte:component this={icon} />
+		<TooltipIcon {icon} tooltipText={iconDescription} />
 	</slot>
 </button>
 

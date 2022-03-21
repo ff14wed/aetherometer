@@ -36,32 +36,41 @@
 
 	<HeaderUtilities>
 		<HeaderButton
-			aria-label="Refresh"
+			iconDescription="Refresh"
 			icon={Renew20}
 			on:click={refreshCurrentTab}
 		/>
 		<HeaderButton
-			aria-label="Settings"
+			iconDescription="Settings"
 			icon={SettingsAdjust20}
 			on:click={() => (openSettings = true)}
 		/>
-		<HeaderButton aria-label="Minimize" icon={Subtract24} on:click={minimize} />
+		<HeaderButton
+			iconDescription="Minimize"
+			icon={Subtract24}
+			on:click={minimize}
+		/>
 		{#if isMaximized}
 			<div class:cx--flip-horizontal={true}>
 				<HeaderButton
-					aria-label="Unmaximize"
+					iconDescription="Unmaximize"
 					icon={Copy16}
 					on:click={toggleMaximize}
 				/>
 			</div>
 		{:else}
 			<HeaderButton
-				aria-label="Maximize"
+				iconDescription="Maximize"
 				icon={Stop20}
 				on:click={toggleMaximize}
 			/>
 		{/if}
-		<HeaderButton aria-label="Close" icon={Close24} isClose on:click={quit} />
+		<HeaderButton
+			iconDescription="Close"
+			icon={Close24}
+			isClose
+			on:click={quit}
+		/>
 	</HeaderUtilities>
 </Header>
 
