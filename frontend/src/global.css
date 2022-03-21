@@ -13,3 +13,7 @@ body {
 	height: 100%;
 	overscroll-behavior: none;
 }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #3a3a3a; }
+::-webkit-scrollbar-thumb { background: #9d9d9d; }
