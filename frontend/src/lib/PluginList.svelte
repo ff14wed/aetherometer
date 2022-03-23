@@ -32,6 +32,7 @@
     },
   ];
 
+  let comboBox;
   let selectedPresetID;
 
   function updatePresetURL(id: string) {
@@ -84,6 +85,7 @@
         <ComboBox
           placeholder="Enter plugin name..."
           direction="top"
+          bind:this={comboBox}
           bind:value={newPluginName}
           bind:selectedId={selectedPresetID}
           items={presets}
@@ -114,7 +116,7 @@
             addPlugin(newPluginName, newPluginURL);
             newPluginName = "";
             newPluginURL = "";
-            selectedPresetID = "";
+            comboBox.clear({ focus: false });
           }}
         />
       </StructuredListCell>

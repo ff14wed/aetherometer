@@ -17,7 +17,7 @@ limitations under the License.
 <script>
   /**
    * @typedef {any} ComboBoxItemId
-   * @typedef {{ id: ComboBoxItemId; text: string; }} ComboBoxItem
+   * @typedef {{ id: ComboBoxItemId; text: string; url: string; }} ComboBoxItem
    * @event {{ selectedId: ComboBoxItemId; selectedItem: ComboBoxItem }} select
    * @slot {{ item: ComboBoxItem; index: number }}
    */
