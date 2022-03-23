@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, TextInput } from "carbon-components-svelte";
-  import ComboBox from "./ComboBox.svelte";
+  import ComboBox from "./carbon/ComboBox.svelte";
   import {
     StructuredList,
     StructuredListHead,

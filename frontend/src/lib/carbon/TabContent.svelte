@@ -1,5 +1,5 @@
 <script>
-	import { selectedTabID } from "./stores/stores";
+	import { selectedTabID } from "../stores/stores";
 
 	/** Set an id for the top-level element */
 	export let id = "ccs-" + Math.random().toString(36);

@@ -9,7 +9,9 @@
 	import Stop20 from "carbon-icons-svelte/lib/Stop20";
 	import Copy16 from "carbon-icons-svelte/lib/Copy16";
 	import Close24 from "carbon-icons-svelte/lib/Close24";
-	import HeaderButton from "./HeaderButton.svelte";
+
+	import HeaderButton from "./carbon/HeaderButton.svelte";
+
 	import Settings from "./Settings.svelte";
 
 	export let refreshCurrentTab;

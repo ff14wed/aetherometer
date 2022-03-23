@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Shell from "./lib/Shell.svelte";
-	import Tabs from "./lib/Tabs.svelte";
-	import Tab from "./lib/Tab.svelte";
-	import TabContent from "./lib/TabContent.svelte";
+
+	import Tabs from "./lib/carbon/Tabs.svelte";
+	import Tab from "./lib/carbon/Tab.svelte";
+	import TabContent from "./lib/carbon/TabContent.svelte";
+
 	import { selectedTabID } from "./lib/stores/stores";
 
 	import { InlineNotification } from "carbon-components-svelte";
