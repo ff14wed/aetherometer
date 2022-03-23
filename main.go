@@ -109,9 +109,9 @@ func main() {
 	err = wails.Run(&options.App{
 		Title:             "aetherometer",
 		Width:             1280,
-		Height:            720,
-		MinWidth:          880,
-		MinHeight:         680,
+		Height:            800,
+		MinWidth:          1024,
+		MinHeight:         768,
 		DisableResize:     false,
 		Fullscreen:        false,
 		Frameless:         true,

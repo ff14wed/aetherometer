@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Button, TextInput } from "carbon-components-svelte";
+  import ComboBox from "./ComboBox.svelte";
   import {
     StructuredList,
     StructuredListHead,
@@ -17,6 +18,33 @@
   export let plugins;
   export let addPlugin;
   export let deletePlugin;
+
+  let presets = [
+    {
+      id: "preset-inspector",
+      text: "Inspector",
+      url: "https://ff14wed.github.io/inspector-plugin/",
+    },
+    {
+      id: "preset-craftlog",
+      text: "Craftlog",
+      url: "https://ff14wed.github.io/craftlog-plugin/",
+    },
+  ];
+
+  let selectedPresetID;
+
+  function updatePresetURL(id: string) {
+    for (let preset of presets) {
+      if (preset.id === id) {
+        newPluginURL = preset.url;
+        return;
+      }
+    }
+    newPluginURL = "";
+  }
+
+  $: updatePresetURL(selectedPresetID);
 </script>
 
 <StructuredList condensed>
@@ -53,20 +81,27 @@
     {/each}
     <StructuredListRow>
       <StructuredListCell>
-        <TextInput
-          hideLabel
-          labelText="Plugin Name"
+        <ComboBox
           placeholder="Enter plugin name..."
-          size="sm"
+          direction="top"
           bind:value={newPluginName}
-        />
+          bind:selectedId={selectedPresetID}
+          items={presets}
+          let:item
+        >
+          <div>
+            <strong>{item.text}</strong>
+          </div>
+          <div>
+            url: {item.url}
+          </div>
+        </ComboBox>
       </StructuredListCell>
       <StructuredListCell>
         <TextInput
           hideLabel
           labelText="Plugin URL"
           placeholder="eg. https://plugins.com/foo/"
-          size="sm"
           bind:value={newPluginURL}
         />
       </StructuredListCell>
@@ -79,6 +114,7 @@
             addPlugin(newPluginName, newPluginURL);
             newPluginName = "";
             newPluginURL = "";
+            selectedPresetID = "";
           }}
         />
       </StructuredListCell>
@@ -97,5 +133,13 @@
 
   :global(.bx--structured-list-td) {
     vertical-align: middle;
+  }
+
+  :global(.bx--list-box__menu-item) {
+    height: auto;
+  }
+
+  :global(.bx--list-box__menu-item__option) {
+    height: auto;
   }
 </style>
