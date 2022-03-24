@@ -8,11 +8,6 @@ jobs:
   build:
     runs-on: windows-2019
     steps:
-    - name: Get version
-      id: version
-      run: |
-        $tag = $env:GITHUB_REF -replace "refs/tags/", ""
-        echo "::set-output name=tag::$(echo $tag)"
     - name: Install Go
       uses: actions/setup-go@v2
       with:
@@ -31,7 +26,7 @@ jobs:
 
     - name: Build
       run: |
-        wails build -f -ldflags "-X main.Version=${{ steps.version.outputs.tag }}"
+        wails build -f -ldflags "-X main.Version=${{ github.ref }}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -43,18 +38,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - name: Get version
-      id: version
-      run: echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
-
     - name: Download build artifacts
       uses: actions/download-artifact@v3
 
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.version.outputs.tag }}
-        name: Aetherometer ${{ steps.version.outputs.tag }}
-        body: '# What's changed'
+        name: Aetherometer ${{ github.ref }}
+        body: "# What's changed"
         draft: true
         files: aetherometer-windows/aetherometer.exe
