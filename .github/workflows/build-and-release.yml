@@ -18,14 +18,20 @@ jobs:
       with:
         node-version: 17.x
 
-    - uses: actions/checkout@v3
-
     - name: Install Wails
       run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+    - uses: actions/checkout@v3
+
+    - name: Get version
+      id: version
+      run: |
+        $tag = $env:GITHUB_REF -replace "refs/tags/", ""
+        echo "::set-output name=tag::$(echo $tag)"
+
     - name: Build
       run: |
-        wails build -f -ldflags "-X main.Version=${{ github.ref }}"
+        wails build -f -ldflags "-X main.Version=${{ steps.version.output.tag }}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -40,10 +46,14 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v3
 
+    - name: Get version
+      id: version
+      run: echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
+
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        name: Aetherometer ${{ github.ref }}
+        name: Aetherometer ${{ steps.version.outputs.tag }}
         body: "# What's changed"
         draft: true
         files: aetherometer-windows/aetherometer.exe
