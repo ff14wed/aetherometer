@@ -2,9 +2,11 @@ package handlers_test
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"sync"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -21,8 +23,10 @@ import (
 
 var _ = Describe("Auth", func() {
 	var (
-		auth     *handlers.Auth
-		adminOTP string
+		cp         *config.Provider
+		configFile string
+
+		auth *handlers.Auth
 
 		logBuf *testhelpers.LogBuffer
 		once   sync.Once
@@ -43,229 +47,124 @@ var _ = Describe("Auth", func() {
 		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
-		adminOTP = "one-time-password"
-		cfg := config.Config{
-			AdminOTP: adminOTP,
-		}
-		auth, err = handlers.NewAuth(cfg, nil, logger)
+		f, err := ioutil.TempFile("", "authtest")
+		Expect(err).ToNot(HaveOccurred())
+		configFile = f.Name()
+
+		cfg := config.Config{}
+		cp = config.NewProvider(configFile, cfg, logger)
+
+		auth, err = handlers.NewAuth(cp, logger)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Describe("CreateAdminToken", func() {
-		It("successfully creates a token that passes admin validation", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			token, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
-		})
-
-		It("does not allow a token to be created twice", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			_, err = auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError("No more admin tokens can be created."))
-		})
-
-		It("does not create a token if the OTP is incorrect", func() {
-			ctx := handlers.ContextWithToken("incorrect")
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError(handlers.AuthError))
-		})
-
-		It("allows creation of a token after a failed attempt", func() {
-			ctx := handlers.ContextWithToken("incorrect")
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).To(MatchError(handlers.AuthError))
-
-			ctx = handlers.ContextWithToken(adminOTP)
-			token, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
-		})
+	AfterEach(func() {
+		_ = os.Remove(configFile)
 	})
 
-	Describe("AuthorizeAdminToken", func() {
-		It("rejects valid tokens that contain the incorrect admin ID", func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			oldToken, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			auth.ResetOTPUsed()
-			_, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(oldToken)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
-		It("rejects the token if it was signed with the wrong key", func() {
-			altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-			Expect(err).ToNot(HaveOccurred())
-			ctx := handlers.ContextWithToken("altotp")
-			token, err := altAuth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
-		Context("when the authorization token is sent via websockets", func() {
-			var adminToken string
-
-			BeforeEach(func() {
-				cfg := config.Config{
-					AdminOTP: adminOTP,
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
-					return transport.InitPayload{"Authorization": adminToken}
-				}, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("successfully validates the token", func() {
-				ctx := handlers.ContextWithToken(adminOTP)
-				var err error
-				adminToken, err = auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(auth.AuthorizeAdminToken(context.Background())).To(Succeed())
-			})
-
-			It("rejects invalid tokens", func() {
-				adminToken = "invalid-token"
-				Expect(auth.AuthorizeAdminToken(context.Background())).To(MatchError(handlers.AuthError))
-			})
-		})
-	})
-
-	Describe("AddPlugin", func() {
-		var adminToken string
-
-		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
+	Describe("adding a plugin", func() {
 		It("authorizes the plugin to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-			Expect(err).ToNot(HaveOccurred())
+			oldPlugins := auth.GetRegisteredPlugins()
 
-			ctx = handlers.ContextWithToken(apiToken)
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).ToNot(Equal(oldPlugins))
+			pluginInfo := plugins["Foo Plugin"]
+
+			ctx := handlers.ContextWithToken(pluginInfo.APIToken)
 			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 
 			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
 			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
-			Eventually(logBuf).Should(gbytes.Say("Added Plugin"))
+			Eventually(logBuf).Should(gbytes.Say("Generated new plugin auth"))
 			Eventually(logBuf).Should(gbytes.Say("https://example.com.*id"))
 		})
 
 		It("returns an error if the plugin URL is invalid", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, ":bad-url.com")
-			Expect(err).To(BeAssignableToTypeOf(new(url.Error)))
-			Expect(apiToken).To(BeEmpty())
+			Expect(cp.AddPlugin("Bad Plugin", ":bad-url.com")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(BeAssignableToTypeOf(new(url.Error)))
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(BeEmpty())
 		})
 
 		It("returns an error if the plugin URL is missing the scheme", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			apiToken, err := auth.AddPlugin(ctx, "example.com/foo/plugin")
-			Expect(err).To(MatchError("Could not parse plugin URL."))
-			Expect(apiToken).To(BeEmpty())
+			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
+
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(BeEmpty())
 		})
 
-		Context("when the incorrect admin token has been provided", func() {
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				adminToken, err = altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-			})
+		It("does not change the registered plugins list if a bad plugin URL is added", func() {
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+			plugins := auth.GetRegisteredPlugins()
+			Expect(plugins).To(HaveKey("Foo Plugin"))
 
-			It("does not authorize the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				apiToken, err := auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-				Expect(err).To(MatchError(handlers.AuthError))
-				Expect(apiToken).To(BeEmpty())
+			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
 
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-			})
+			plugins = auth.GetRegisteredPlugins()
+			Expect(plugins).To(HaveKey("Foo Plugin"))
+			Expect(plugins).ToNot(HaveKey("Bad Plugin"))
+
+			pluginInfo := plugins["Foo Plugin"]
+			ctx := handlers.ContextWithToken(pluginInfo.APIToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
+			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 		})
 	})
 
-	Describe("RemovePlugin", func() {
-		var adminToken, apiToken string
+	Describe("removing a plugin", func() {
+		const pluginName = "Foo Plugin"
+		var apiToken string
 
 		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
+			Expect(cp.AddPlugin(pluginName, "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
 
-			ctx = handlers.ContextWithToken(adminToken)
-			apiToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-			Expect(err).ToNot(HaveOccurred())
+			plugins := auth.GetRegisteredPlugins()
+			pluginInfo := plugins[pluginName]
+
+			apiToken = pluginInfo.APIToken
+			ctx := handlers.ContextWithToken(apiToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
+			Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 		})
 
 		It("revokes authorization for the plugin to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			removed, err := auth.RemovePlugin(ctx, apiToken)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(removed).To(BeTrue())
+			Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
 
-			ctx = handlers.ContextWithToken(apiToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
-			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-
-			Eventually(logBuf).Should(gbytes.Say("DEBUG"))
-			Eventually(logBuf).Should(gbytes.Say("auth-handler"))
-			Eventually(logBuf).Should(gbytes.Say("Deleted Plugin.*id"))
-		})
-
-		It("removes the token if even if it doesn't exist or no longer exists", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			for i := 0; i < 3; i++ {
-				removed, err := auth.RemovePlugin(ctx, apiToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
-			}
-
-			ctx = handlers.ContextWithToken(apiToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+			ctx := handlers.ContextWithToken(apiToken)
+			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
 		})
 
 		Context("when adding a second plugin with the same origin", func() {
+			const altPluginName string = "Bar Plugin"
 			var altAPIToken string
 
 			BeforeEach(func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				var err error
-				altAPIToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.AddPlugin(altPluginName, "https://example.com/bar/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
+
+				plugins := auth.GetRegisteredPlugins()
+				pluginInfo := plugins[altPluginName]
+
+				altAPIToken = pluginInfo.APIToken
 			})
 
 			It("continues to allow the origin when removing a single plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				for i := 0; i < 3; i++ {
-					removed, err := auth.RemovePlugin(ctx, apiToken)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(removed).To(BeTrue())
-				}
+				Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				ctx := handlers.ContextWithToken(apiToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 
 				ctx = handlers.ContextWithToken(altAPIToken)
 				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
@@ -273,108 +172,28 @@ var _ = Describe("Auth", func() {
 			})
 
 			It("no longer allows the origin when removing both plugins", func() {
-				ctx := handlers.ContextWithToken(adminToken)
+				Expect(cp.RemovePlugin(pluginName)).To(Succeed())
+				Expect(cp.RemovePlugin(altPluginName)).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 
-				removed, err := auth.RemovePlugin(ctx, apiToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
-
-				removed, err = auth.RemovePlugin(ctx, altAPIToken)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(removed).To(BeTrue())
-
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				ctx := handlers.ContextWithToken(apiToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 
 				ctx = handlers.ContextWithToken(altAPIToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 				Expect(auth.AllowOriginFunc("https://example.com")).To(BeFalse())
-			})
-		})
-
-		Context("when the incorrect admin token has been provided", func() {
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				adminToken, err = altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("does not revoke authorization for the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				removed, err := auth.RemovePlugin(ctx, apiToken)
-				Expect(err).To(MatchError(handlers.AuthError))
-				Expect(removed).To(BeFalse())
-
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
-			})
-		})
-
-		Context("when the provided api token is invalid", func() {
-			var altAPIToken string
-
-			BeforeEach(func() {
-				altAuth, err := handlers.NewAuth(config.Config{AdminOTP: "altotp"}, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-				ctx := handlers.ContextWithToken("altotp")
-				altAdminToken, err := altAuth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				ctx = handlers.ContextWithToken(altAdminToken)
-				altAPIToken, err = altAuth.AddPlugin(ctx, "https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("does not revoke authorization for the plugin", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				removed, err := auth.RemovePlugin(ctx, altAPIToken)
-				Expect(err).To(MatchError(handlers.AuthError))
-				Expect(removed).To(BeFalse())
-
-				ctx = handlers.ContextWithToken(apiToken)
-				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-				Expect(auth.AllowOriginFunc("https://example.com")).To(BeTrue())
 			})
 		})
 	})
 
 	Describe("AuthorizePluginToken", func() {
-		var adminToken string
-
-		BeforeEach(func() {
-			ctx := handlers.ContextWithToken(adminOTP)
-			var err error
-			adminToken, err = auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("authorizes requests with the admin token to access the API", func() {
-			ctx := handlers.ContextWithToken(adminToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
-		})
-
-		It("rejects valid tokens that contain the incorrect admin ID", func() {
-			auth.ResetOTPUsed()
-			ctx := handlers.ContextWithToken(adminOTP)
-			_, err := auth.CreateAdminToken(ctx)
-			Expect(err).ToNot(HaveOccurred())
-
-			ctx = handlers.ContextWithToken(adminToken)
-			Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.AuthError))
-		})
-
 		Context("when auth is disabled", func() {
 			BeforeEach(func() {
-				cfg := config.Config{
-					AdminOTP:    adminOTP,
-					DisableAuth: true,
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.MutateConfig(func(cfg config.Config) (config.Config, error) {
+					cfg.DisableAuth = true
+					return cfg, nil
+				})).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 			})
 
 			It("authorizes requests with no token to access the API", func() {
@@ -383,35 +202,63 @@ var _ = Describe("Auth", func() {
 		})
 
 		Context("when the authorization token is sent via websockets", func() {
-			var apiToken string
-
-			BeforeEach(func() {
-				cfg := config.Config{
-					AdminOTP: adminOTP,
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, func(context.Context) transport.InitPayload {
-					return transport.InitPayload{"Authorization": apiToken}
-				}, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-
-				ctx := handlers.ContextWithToken(adminOTP)
-				adminToken, err = auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
 			It("successfully validates the token", func() {
-				ctx := handlers.ContextWithToken(adminToken)
-				var err error
-				apiToken, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
+				Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
+
+				plugins := auth.GetRegisteredPlugins()
+				pluginInfo := plugins["Foo Plugin"]
+
+				initPayload := transport.InitPayload{"Authorization": pluginInfo.APIToken}
+				background := context.Background()
+				ctx, err := auth.WebsocketInitFunc(background, initPayload)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(auth.AuthorizePluginToken(context.Background())).To(Succeed())
+				Expect(auth.AuthorizePluginToken(ctx)).To(Succeed())
 			})
 
 			It("rejects invalid tokens", func() {
-				apiToken = "invalid-token"
-				Expect(auth.AuthorizePluginToken(context.Background())).To(MatchError(handlers.AuthError))
+				initPayload := transport.InitPayload{"Authorization": "invalid-token"}
+				background := context.Background()
+				ctx, err := auth.WebsocketInitFunc(background, initPayload)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
+			})
+		})
+
+		Context("when the provided api token is no longer valid", func() {
+			var (
+				altAPIToken   string
+				altConfigFile string
+			)
+
+			BeforeEach(func() {
+
+				f, err := ioutil.TempFile("", "authtest")
+				Expect(err).ToNot(HaveOccurred())
+				altConfigFile = f.Name()
+
+				cfg := config.Config{}
+				altCP := config.NewProvider(altConfigFile, cfg, zap.NewNop())
+
+				altAuth, err := handlers.NewAuth(altCP, zap.NewNop())
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(altCP.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(altAuth.RefreshConfig()).To(Succeed())
+
+				plugins := altAuth.GetRegisteredPlugins()
+				pluginInfo := plugins["Foo Plugin"]
+				altAPIToken = pluginInfo.APIToken
+			})
+
+			AfterEach(func() {
+				_ = os.Remove(altConfigFile)
+			})
+
+			It("rejects the api token", func() {
+				ctx := handlers.ContextWithToken(altAPIToken)
+				Expect(auth.AuthorizePluginToken(ctx)).To(MatchError(handlers.ErrAuth))
 			})
 		})
 	})
@@ -420,37 +267,43 @@ var _ = Describe("Auth", func() {
 		It("adds the auth token to the request context", func() {
 			req, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).ToNot(HaveOccurred())
-			req.Header.Set("Authorization", "Bearer "+adminOTP)
 
-			var token string
+			Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+			Expect(auth.RefreshConfig()).To(Succeed())
+
+			plugins := auth.GetRegisteredPlugins()
+			pluginInfo := plugins["Foo Plugin"]
+			apiToken := pluginInfo.APIToken
+
+			req.Header.Set("Authorization", "Bearer "+apiToken)
+
+			var receivedCtx context.Context
 			authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				token, err = auth.CreateAdminToken(r.Context())
-				Expect(err).ToNot(HaveOccurred())
+				receivedCtx = r.Context()
 			}))
 
 			rw := httptest.NewRecorder()
 			authHandler.ServeHTTP(rw, req)
 
-			Expect(token).ToNot(BeEmpty())
+			Expect(receivedCtx).ToNot(BeNil())
 
-			ctx := handlers.ContextWithToken(token)
-			Expect(auth.AuthorizeAdminToken(ctx)).To(Succeed())
+			Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
 		})
 
 		It("calls the provided next handler even if there is no Authorization header", func() {
 			req, err := http.NewRequest("POST", "/foo", nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			var token string
+			var receivedCtx context.Context
 			authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				token, err = auth.CreateAdminToken(r.Context())
+				receivedCtx = r.Context()
 			}))
 
 			rw := httptest.NewRecorder()
 			authHandler.ServeHTTP(rw, req)
 
-			Expect(token).To(BeEmpty())
-			Expect(err).To(MatchError(handlers.AuthError))
+			Expect(receivedCtx).ToNot(BeNil())
+			Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
 		})
 
 		It("does not allow unknown origins in the preflight request", func() {
@@ -474,14 +327,8 @@ var _ = Describe("Auth", func() {
 
 		Context("when the preflight request is for a plugin that has been authorized", func() {
 			BeforeEach(func() {
-				ctx := handlers.ContextWithToken(adminOTP)
-				var err error
-				adminToken, err := auth.CreateAdminToken(ctx)
-				Expect(err).ToNot(HaveOccurred())
-
-				ctx = handlers.ContextWithToken(adminToken)
-				_, err = auth.AddPlugin(ctx, "https://example.com/foo/plugin")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(cp.AddPlugin("Foo Plugin", "https://example.com/foo/plugin")).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
 			})
 
 			It("allows the origin in the preflight request", func() {
@@ -503,6 +350,127 @@ var _ = Describe("Auth", func() {
 				Expect(rw.Header().Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 			})
 		})
+
+		Context("when a local plugin provides a correct local token", func() {
+			BeforeEach(func() {
+				Expect(cp.MutateConfig(func(cfg config.Config) (config.Config, error) {
+					cfg.LocalToken = "some-local-token"
+					return cfg, nil
+				})).To(Succeed())
+				Expect(auth.RefreshConfig()).To(Succeed())
+			})
+
+			It("allows local plugins to use the local token to authenticate", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+				req.Header.Set("Authorization", "Bearer some-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
+			})
+
+			It("does not allow non-local plugins to use the local token to authenticate", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Authorization", "Bearer some-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+			})
+
+			It("does not allow local plugins to authenticate without the local token", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+			})
+
+			It("does not allow local plugins to authenticate with an incorrect token", func() {
+				req, err := http.NewRequest("POST", "/foo", nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				req.Header.Set("Origin", "app://bar")
+				req.Header.Set("Authorization", "Bearer incorrect-local-token")
+
+				var receivedCtx context.Context
+				authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					receivedCtx = r.Context()
+				}))
+
+				rw := httptest.NewRecorder()
+				authHandler.ServeHTTP(rw, req)
+
+				Expect(receivedCtx).ToNot(BeNil())
+
+				Expect(auth.AuthorizePluginToken(receivedCtx)).To(MatchError(handlers.ErrAuth))
+
+			})
+
+			Context("when a local plugin is registered", func() {
+				BeforeEach(func() {
+					Expect(cp.AddPlugin("Foo Plugin", "https://localhost:12345/foo/plugin")).To(Succeed())
+					Expect(auth.RefreshConfig()).To(Succeed())
+				})
+
+				It("allows local plugins to use its assigned API token instead", func() {
+					req, err := http.NewRequest("POST", "/foo", nil)
+					Expect(err).ToNot(HaveOccurred())
+
+					req.Header.Set("Origin", "https://localhost")
+
+					plugins := auth.GetRegisteredPlugins()
+					pluginInfo := plugins["Foo Plugin"]
+					apiToken := pluginInfo.APIToken
+
+					req.Header.Set("Authorization", "Bearer "+apiToken)
+
+					var receivedCtx context.Context
+					authHandler := auth.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						receivedCtx = r.Context()
+					}))
+
+					rw := httptest.NewRecorder()
+					authHandler.ServeHTTP(rw, req)
+
+					Expect(receivedCtx).ToNot(BeNil())
+
+					Expect(auth.AuthorizePluginToken(receivedCtx)).To(Succeed())
+				})
+			})
+		})
 	})
 
 	Describe("AllowOriginFunc", func() {
@@ -516,25 +484,6 @@ var _ = Describe("Auth", func() {
 
 		It("always allows cross-origin requests from localhost", func() {
 			Expect(auth.AllowOriginFunc("http://localhost:9001")).To(BeTrue())
-		})
-
-		Context("when allowed origins are provided in the config", func() {
-			BeforeEach(func() {
-				Expect(auth.AllowOriginFunc("http://foo.com")).To(BeFalse())
-				Expect(auth.AllowOriginFunc("http://bar.com")).To(BeFalse())
-				cfg := config.Config{
-					AdminOTP:     adminOTP,
-					AllowOrigins: []string{"http://foo.com", "http://bar.com"},
-				}
-				var err error
-				auth, err = handlers.NewAuth(cfg, nil, zap.NewNop())
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("allows the provided origins", func() {
-				Expect(auth.AllowOriginFunc("http://foo.com")).To(BeTrue())
-				Expect(auth.AllowOriginFunc("http://bar.com")).To(BeTrue())
-			})
 		})
 	})
 })

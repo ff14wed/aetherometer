@@ -6,19 +6,17 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"math"
+	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
-	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/rs/cors"
-	"github.com/rs/xid"
 	"go.uber.org/zap"
 )
 
@@ -27,9 +25,10 @@ type ctxKey struct {
 }
 
 var authCtxKey = &ctxKey{name: "auth"}
+var originCtxKey = &ctxKey{name: "origin"}
 
-var AuthError = errors.New(
-	"Unauthorized: The request lacks valid authentication credentials for the target resource.",
+var ErrAuth = errors.New(
+	"unauthorized error: the request lacks valid authentication credentials for the target resource",
 )
 
 // InitPayloadGetter provides an alternate method of retrieving credentials
@@ -37,26 +36,36 @@ var AuthError = errors.New(
 // websockets)
 type InitPayloadGetter func(context.Context) transport.InitPayload
 
+type PluginInfo struct {
+	PluginID  string
+	PluginURL string
+	APIToken  string
+}
+type authConfig struct {
+	disableAuth bool
+	localToken  string
+
+	// plugins maps -> plugin name -> (pluginID, apiToken)
+	plugins map[string]PluginInfo
+	// allowedPluginIDs caches the set of allowed pluginIDs
+	allowedPluginIDs map[string]struct{}
+	// allowedOrigins caches the set of allowed origins
+	allowedOrigins map[string]struct{}
+}
+
 // Auth provides a middleware handler that handles cross-origin
 // requests and pulling of authentication from incoming requests.
 // It also handles the registration and deregistration of plugins
 // and updates its authorizer methods accordingly.
 type Auth struct {
-	otpUsed  int32
-	adminOTP string
-	adminID  atomic.Value
+	cp *config.Provider
 
-	disableAuth bool
-
-	allowedPlugins map[string]string
-	allowedOrigins map[string]int
-	allowedLock    sync.RWMutex
+	authConfig     authConfig
+	authConfigLock sync.RWMutex
 
 	cors *cors.Cors
 
 	privKey *rsa.PrivateKey
-
-	initPayloadGetter InitPayloadGetter
 
 	logger *zap.Logger
 }
@@ -64,7 +73,7 @@ type Auth struct {
 // NewAuth creates a new instance of Auth. InitPayloadGetter provides a
 // way to grab credentials from the context when the connection is made
 // via Websockets.
-func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger) (*Auth, error) {
+func NewAuth(cp *config.Provider, l *zap.Logger) (*Auth, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
@@ -73,25 +82,20 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 	a := &Auth{
 		privKey: key,
 
-		adminOTP:    c.AdminOTP,
-		disableAuth: c.DisableAuth,
+		cp: cp,
 
-		allowedPlugins: make(map[string]string),
-		allowedOrigins: make(map[string]int),
+		authConfig: authConfig{
+			disableAuth: false,
 
-		initPayloadGetter: initPayloadGetter,
+			plugins:          make(map[string]PluginInfo),
+			allowedPluginIDs: make(map[string]struct{}),
+			allowedOrigins:   make(map[string]struct{}),
+		},
 
 		logger: l.Named("auth-handler"),
 	}
 
-	if len(c.AllowOrigins) > 0 {
-		for _, origin := range c.AllowOrigins {
-			a.allowedOrigins[origin] = math.MaxInt32
-		}
-	}
-
-	invalidID := xid.New().String()
-	a.adminID.Store(invalidID)
+	a.RefreshConfig()
 
 	a.cors = cors.New(cors.Options{
 		AllowOriginFunc:  a.AllowOriginFunc,
@@ -102,24 +106,70 @@ func NewAuth(c config.Config, initPayloadGetter InitPayloadGetter, l *zap.Logger
 	return a, nil
 }
 
+// RefreshConfig will read the configuration from the config provider and
+// add and remove plugins as necessary. Any preexisting plugins will retain
+// the same ID and apiToken
+func (a *Auth) RefreshConfig() error {
+	a.authConfigLock.Lock()
+	defer a.authConfigLock.Unlock()
+
+	cfg := a.cp.Config()
+
+	updatedPlugins := make(map[string]PluginInfo)
+	updatedAllowedPluginIDs := make(map[string]struct{})
+	updatedAllowedOrigins := make(map[string]struct{})
+
+	for pluginName, pluginURL := range cfg.Plugins {
+		origin, err := parseOrigin(pluginURL)
+		if err != nil {
+			return err
+		}
+
+		if info, ok := a.authConfig.plugins[pluginName]; ok {
+			updatedPlugins[pluginName] = info
+			updatedAllowedPluginIDs[info.PluginID] = struct{}{}
+		} else {
+			newInfo, err := a.generatePluginInfo(pluginURL)
+			if err != nil {
+				return err
+			}
+			updatedPlugins[pluginName] = newInfo
+			updatedAllowedPluginIDs[newInfo.PluginID] = struct{}{}
+		}
+
+		updatedAllowedOrigins[origin] = struct{}{}
+	}
+
+	a.authConfig.disableAuth = cfg.DisableAuth
+	a.authConfig.localToken = cfg.LocalToken
+	a.authConfig.plugins = updatedPlugins
+	a.authConfig.allowedPluginIDs = updatedAllowedPluginIDs
+	a.authConfig.allowedOrigins = updatedAllowedOrigins
+
+	return nil
+}
+
 // Handler returns a handler that serves cross-origin requests and pulls
 // authentication data from incoming requests.
 func (a *Auth) Handler(next http.Handler) http.Handler {
 	return a.cors.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		ctx := context.WithValue(r.Context(), originCtxKey, origin)
+		r = r.WithContext(ctx)
+
 		authString, err := request.AuthorizationHeaderExtractor.ExtractToken(r)
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), authCtxKey, authString)
+		ctx = context.WithValue(r.Context(), authCtxKey, authString)
 		r = r.WithContext(ctx)
+
 		next.ServeHTTP(w, r)
 	}))
 }
 
-// AllowOriginFunc returns true only if the origin is referenced by any URL
-// of the registered plugins.
-func (a *Auth) AllowOriginFunc(origin string) bool {
+func isLocalOrigin(origin string) bool {
 	if strings.Contains(origin, "file://") {
 		return true
 	}
@@ -130,131 +180,72 @@ func (a *Auth) AllowOriginFunc(origin string) bool {
 		return true
 	}
 
-	a.allowedLock.RLock()
-	count := a.allowedOrigins[origin]
-	a.allowedLock.RUnlock()
-	return count > 0
+	return false
 }
 
-// CreateAdminToken returns a persistent token that is authorized to not only
-// the same requests that plugins can make, but also register or unregister
-// plugins.
-func (a *Auth) CreateAdminToken(ctx context.Context) (string, error) {
-	authString, _ := ctx.Value(authCtxKey).(string)
-	if authString != a.adminOTP {
-		return "", AuthError
+// AllowOriginFunc returns true only if the origin is referenced by any URL
+// of the registered plugins.
+func (a *Auth) AllowOriginFunc(origin string) bool {
+	if isLocalOrigin(origin) {
+		return true
 	}
 
-	swapped := atomic.CompareAndSwapInt32(&a.otpUsed, 0, 1)
-	if !swapped {
-		return "", errors.New("No more admin tokens can be created.")
-	}
-
-	adminID := xid.New().String()
-	a.adminID.Store(adminID)
-
-	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"adminID": adminID,
-	})
-
-	adminToken, err := t.SignedString(a.privKey)
-	if err != nil {
-		return "", err
-	}
-
-	return adminToken, nil
+	a.authConfigLock.RLock()
+	defer a.authConfigLock.RUnlock()
+	_, ok := a.authConfig.allowedOrigins[origin]
+	return ok
 }
 
-// AddPlugin registers the provided plugin URL in the system and returns the
-// token that the plugin can use to make requests. If the plugin URL cannot be
-// parsed, it fails to create a token and returns an error.
-func (a *Auth) AddPlugin(ctx context.Context, pluginURL string) (string, error) {
-	if err := a.AuthorizeAdminToken(ctx); err != nil {
-		return "", err
-	}
-
+func parseOrigin(pluginURL string) (string, error) {
 	parsedURL, err := url.Parse(pluginURL)
 	if err != nil {
 		return "", err
 	}
 	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return "", errors.New("Could not parse plugin URL.")
+		return "", errors.New("could not parse plugin URL")
 	}
 
-	origin := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+	return fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host), nil
+}
 
-	guid := xid.New().String()
-
-	a.allowedLock.Lock()
-	a.allowedPlugins[guid] = origin
-	a.allowedOrigins[origin] += 1
-	a.allowedLock.Unlock()
+// generatePluginInfo registers the provided plugin URL in the system and
+// returns the token that the plugin can use to make requests. If the plugin URL
+// cannot be parsed, it fails to create a token and returns an error.
+func (a *Auth) generatePluginInfo(pluginURL string) (PluginInfo, error) {
+	pluginID, err := generateRandomString(32)
+	if err != nil {
+		return PluginInfo{}, errors.New("system error: could not generate plugin ID")
+	}
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"url": pluginURL,
-		"id":  guid,
+		"id":  pluginID,
 	})
-
 	apiToken, err := t.SignedString(a.privKey)
 	if err != nil {
-		return "", err
+		return PluginInfo{}, err
 	}
 
-	a.logger.Debug("Added Plugin", zap.String("url", pluginURL), zap.String("id", guid))
-	return apiToken, nil
-}
+	a.logger.Debug("Generated new plugin auth", zap.String("url", pluginURL), zap.String("id", pluginID))
 
-// RemovePlugin unregisters the plugin corresponding to this specific apiToken.
-// It will return success even if the apiToken is no longer registered,
-// provided that this token is still a valid token.
-// If all plugins corresponding to a particular origin are removed, this origin
-// will no longer be allowed in the CORS mechanism.
-func (a *Auth) RemovePlugin(ctx context.Context, apiToken string) (bool, error) {
-	if err := a.AuthorizeAdminToken(ctx); err != nil {
-		return false, err
-	}
-
-	claims, err := a.extractClaimsFromToken(apiToken)
-	if err != nil {
-		return false, err
-	}
-
-	if pluginID, found := claims["id"]; found {
-		id := pluginID.(string)
-		a.allowedLock.Lock()
-		if origin, found := a.allowedPlugins[id]; found {
-			a.allowedOrigins[origin] -= 1
-		}
-		delete(a.allowedPlugins, id)
-		a.allowedLock.Unlock()
-		a.logger.Debug("Deleted Plugin", zap.String("id", id))
-		return true, nil
-	}
-
-	return false, AuthError
-}
-
-// AuthorizeAdminToken checks to make sure that the provided admin token
-// is valid and is authorized to make admin-level requests.
-func (a *Auth) AuthorizeAdminToken(ctx context.Context) error {
-	claims, err := a.extractClaimsFromCtx(ctx)
-	if err != nil {
-		return err
-	}
-	if adminID, found := claims["adminID"]; found {
-		correctID := a.adminID.Load().(string)
-		if adminID.(string) != correctID {
-			return AuthError
-		}
-		return nil
-	}
-	return AuthError
+	return PluginInfo{
+		PluginID:  pluginID,
+		PluginURL: pluginURL,
+		APIToken:  apiToken,
+	}, nil
 }
 
 // AuthorizePluginToken checks to make sure that the provided plugin token
 // is valid and is authorized to make plugin-level requests.
 func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
-	if a.disableAuth {
+	a.authConfigLock.RLock()
+	defer a.authConfigLock.RUnlock()
+
+	if a.authConfig.disableAuth {
+		return nil
+	}
+
+	if a.isValidLocalTokenAuth(ctx) {
 		return nil
 	}
 
@@ -263,43 +254,87 @@ func (a *Auth) AuthorizePluginToken(ctx context.Context) error {
 		return err
 	}
 
-	if adminID, found := claims["adminID"]; found {
-		correctID := a.adminID.Load().(string)
-		if adminID.(string) != correctID {
-			return AuthError
-		}
-		return nil
+	pluginID, found := claims["id"]
+	if !found {
+		return ErrAuth
+	}
+	if _, allowed := a.authConfig.allowedPluginIDs[pluginID.(string)]; !allowed {
+		return ErrAuth
+	}
+	return nil
+}
+
+func (a *Auth) isValidLocalTokenAuth(ctx context.Context) bool {
+	localToken := a.authConfig.localToken
+	if localToken == "" {
+		return false
 	}
 
-	if pluginID, found := claims["id"]; found {
-		a.allowedLock.RLock()
-		defer a.allowedLock.RUnlock()
-		if _, allowed := a.allowedPlugins[pluginID.(string)]; !allowed {
-			return AuthError
-		}
-		return nil
+	origin, found := ctx.Value(originCtxKey).(string)
+	if !found {
+		return false
 	}
-	return AuthError
+
+	authString, found := ctx.Value(authCtxKey).(string)
+	if !found {
+		return false
+	}
+
+	if !isLocalOrigin(origin) {
+		return false
+	}
+
+	return (authString == localToken)
+}
+
+// GetRegisteredPlugins returns a copy of the map containing all the plugins
+// and their API tokens.
+func (a *Auth) GetRegisteredPlugins() map[string]PluginInfo {
+	a.authConfigLock.RLock()
+	defer a.authConfigLock.RUnlock()
+
+	plugins := make(map[string]PluginInfo)
+
+	for name, info := range a.authConfig.plugins {
+		plugins[name] = info
+	}
+
+	return plugins
+}
+
+func (a *Auth) WebsocketInitFunc(ctx context.Context, payload transport.InitPayload) (context.Context, error) {
+	ctx = context.WithValue(ctx, authCtxKey, payload.Authorization())
+	return ctx, nil
 }
 
 func (a *Auth) extractClaimsFromCtx(ctx context.Context) (jwt.MapClaims, error) {
-	authString, found := ctx.Value(authCtxKey).(string)
-	if !found && a.initPayloadGetter != nil {
-		authString = a.initPayloadGetter(ctx).Authorization()
-	}
+	authString, _ := ctx.Value(authCtxKey).(string)
 	return a.extractClaimsFromToken(authString)
 }
 
 func (a *Auth) extractClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
 	if len(tokenString) == 0 {
-		return nil, AuthError
+		return nil, ErrAuth
 	}
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		return &a.privKey.PublicKey, nil
 	})
 	if err != nil || !token.Valid {
-		return nil, AuthError
+		return nil, ErrAuth
 	}
 	return claims, nil
+}
+
+func generateRandomString(length int) (string, error) {
+	const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	s := make([]byte, length)
+	for i := 0; i < length; i++ {
+		c, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		if err != nil {
+			return "", err
+		}
+		s[i] = chars[c.Int64()]
+	}
+	return string(s), nil
 }

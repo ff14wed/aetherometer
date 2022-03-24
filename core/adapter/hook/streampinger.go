@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:generate counterfeiter . HookDataSender
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . HookDataSender
 
 // HookDataSender defines the interface that allows the sending of data
 // to the hook connection from the adapter.

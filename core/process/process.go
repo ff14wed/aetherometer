@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//go:generate counterfeiter . Enumerator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Enumerator
 
 // Enumerator defines the interface for enumerating processes on the
 // system

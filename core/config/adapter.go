@@ -14,9 +14,9 @@ type HookConfig struct {
 	// DialRetryInterval controls how long to wait before retrying
 	// failures to make a connection with the hook DLL.
 	// Defaults to 500 milliseconds.
-	DialRetryInterval Duration `toml:"dial_retry_interval"`
+	DialRetryInterval Duration `toml:"dial_retry_interval,omitzero"`
 
 	// PingInterval controls the interval between liveness checks to
 	// hook. Defaults to 1 second.
-	PingInterval Duration `toml:"ping_interval"`
+	PingInterval Duration `toml:"ping_interval,omitzero"`
 }

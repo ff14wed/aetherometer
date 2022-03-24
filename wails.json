@@ -1,0 +1,23 @@
+{
+  "name": "aetherometer",
+  "frontend:build": "npm run build",
+  "frontend:install": "npm install",
+  "frontend:dev:watcher": "npm run dev",
+  "wailsjsdir": "./frontend",
+  "version": "2",
+  "outputfilename": "aetherometer.exe",
+  "Author": {
+    "name": "Flawed",
+    "email": ""
+  },
+  "info": {
+    "companyName": "Flawed",
+    "productName": "Aetherometer",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright Flawed 2022",
+    "comments": "https://github.com/ff14wed/aetherometer"
+  },
+  "debounceMS": 100,
+  "devserverurl": "http://localhost:34115",
+  "appargs": ""
+}

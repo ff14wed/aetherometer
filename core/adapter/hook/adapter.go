@@ -29,7 +29,7 @@ type AdapterConfig struct {
 	ProcessEnumerator     process.Enumerator
 }
 
-//go:generate counterfeiter . RemoteProcessProvider
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoteProcessProvider
 
 // RemoteProcessProvider defines the interface that exposes methods for interacting
 // with other processes on the system

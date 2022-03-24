@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:generate counterfeiter . Provider
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Provider
 
 // Provider defines the public facing interface for a provider of a parsed data
 // stream. It must provide methods for ingesting data and allow some way of
@@ -49,7 +49,7 @@ type Adapter interface {
 	suture.Service
 }
 
-//go:generate counterfeiter . AdapterBuilder
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AdapterBuilder
 
 // AdapterBuilder represents a set of methods that instantiates the adapter.
 type AdapterBuilder interface {

@@ -321,55 +321,8 @@ var _ = Describe("Models", func() {
 							Data:     "hello",
 						})
 					Expect(resp).To(BeEmpty())
-					Expect(err).To(MatchError("Request handler is missing"))
+					Expect(err).To(MatchError("request handler is missing"))
 				})
-			})
-		})
-
-		Describe("CreateAdminToken", func() {
-			It("calls the auth provider", func() {
-				ctx := context.Background()
-				fakeAuthProvider.CreateAdminTokenReturns("some-token", nil)
-
-				Expect(resolver.Mutation().CreateAdminToken(ctx)).To(Equal(
-					"some-token",
-				))
-
-				Expect(fakeAuthProvider.CreateAdminTokenCallCount()).To(Equal(1))
-				ctxArg := fakeAuthProvider.CreateAdminTokenArgsForCall(0)
-				Expect(ctxArg).To(Equal(ctx))
-			})
-		})
-
-		Describe("AddPlugin", func() {
-			It("calls the auth provider", func() {
-				ctx := context.Background()
-				pluginURL := "some-plugin-url"
-				fakeAuthProvider.AddPluginReturns("some-token", nil)
-
-				Expect(resolver.Mutation().AddPlugin(ctx, pluginURL)).To(Equal(
-					"some-token",
-				))
-
-				Expect(fakeAuthProvider.AddPluginCallCount()).To(Equal(1))
-				ctxArg, pluginURLArg := fakeAuthProvider.AddPluginArgsForCall(0)
-				Expect(ctxArg).To(Equal(ctx))
-				Expect(pluginURLArg).To(Equal(pluginURL))
-			})
-		})
-
-		Describe("RemovePlugin", func() {
-			It("calls the auth provider", func() {
-				ctx := context.Background()
-				authToken := "some-auto-token"
-				fakeAuthProvider.RemovePluginReturns(true, nil)
-
-				Expect(resolver.Mutation().RemovePlugin(ctx, authToken)).To(BeTrue())
-
-				Expect(fakeAuthProvider.RemovePluginCallCount()).To(Equal(1))
-				ctxArg, authTokenArg := fakeAuthProvider.RemovePluginArgsForCall(0)
-				Expect(ctxArg).To(Equal(ctx))
-				Expect(authTokenArg).To(Equal(authToken))
 			})
 		})
 	})

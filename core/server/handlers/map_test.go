@@ -55,9 +55,11 @@ var _ = Describe("MapHandler", func() {
 		mapHandler = handlers.NewMapHandler(
 			"/prefix/",
 			config.Config{
-				Maps: config.MapConfig{
-					Cache:   cachePath,
-					APIPath: "http://" + apiServer.Addr(),
+				Sources: config.Sources{
+					Maps: config.MapConfig{
+						Cache:   cachePath,
+						APIPath: "http://" + apiServer.Addr(),
+					},
 				},
 			},
 			logger,

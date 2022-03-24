@@ -336,10 +336,6 @@ scalar Uint
 
 type Mutation {
   sendStreamRequest(request: StreamRequest!): String!
-
-  createAdminToken: String!
-  addPlugin(pluginURL: String!): String!
-  removePlugin(apiToken: String!): Boolean!
 }
 
 input StreamRequest {

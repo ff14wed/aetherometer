@@ -39,7 +39,7 @@ type MapHandler struct {
 //
 // prefix is the path to this handler.
 func NewMapHandler(prefix string, c config.Config, l *zap.Logger) *MapHandler {
-	mapConfig := c.Maps
+	mapConfig := c.Sources.Maps
 	if mapConfig.APIPath == "" {
 		mapConfig.APIPath = "https://xivapi.com"
 	}

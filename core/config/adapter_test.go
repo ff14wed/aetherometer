@@ -31,11 +31,12 @@ var _ = Describe("HookConfig", func() {
 
 		It("is successful on a correct config", func() {
 			c = &config.Config{
-				APIPort:  9000,
-				DataPath: dummyPath,
-				AdminOTP: "dummy-otp",
-				Maps: config.MapConfig{
-					Cache: dummyPath,
+				APIPort: 9000,
+				Sources: config.Sources{
+					DataPath: dummyPath,
+					Maps: config.MapConfig{
+						Cache: dummyPath,
+					},
 				},
 				Adapters: config.Adapters{
 					Hook: config.HookConfig{
@@ -53,11 +54,12 @@ var _ = Describe("HookConfig", func() {
 
 			JustBeforeEach(func() {
 				c = &config.Config{
-					APIPort:  9000,
-					DataPath: dummyPath,
-					AdminOTP: "dummy-otp",
-					Maps: config.MapConfig{
-						Cache: dummyPath,
+					APIPort: 9000,
+					Sources: config.Sources{
+						DataPath: dummyPath,
+						Maps: config.MapConfig{
+							Cache: dummyPath,
+						},
 					},
 					Adapters: config.Adapters{
 						Hook: config.HookConfig{
@@ -99,11 +101,12 @@ var _ = Describe("HookConfig", func() {
 		Describe("ffxiv_process", func() {
 			BeforeEach(func() {
 				c = &config.Config{
-					APIPort:  9000,
-					DataPath: dummyPath,
-					AdminOTP: "dummy-otp",
-					Maps: config.MapConfig{
-						Cache: dummyPath,
+					APIPort: 9000,
+					Sources: config.Sources{
+						DataPath: dummyPath,
+						Maps: config.MapConfig{
+							Cache: dummyPath,
+						},
 					},
 					Adapters: config.Adapters{
 						Hook: config.HookConfig{
@@ -128,8 +131,8 @@ var _ = Describe("HookConfig", func() {
 		BeforeEach(func() {
 			lines := []string{
 				`api_port = 9000`,
+				`[sources]`,
 				`data_path = "dummy-path"`,
-				`admin_otp = "dummy-otp"`,
 				`[adapters.hook]`,
 				`enabled = true`,
 				`dll_path = "some-path"`,
@@ -140,9 +143,10 @@ var _ = Describe("HookConfig", func() {
 			input = strings.Join(lines, "\n")
 
 			c = &config.Config{
-				APIPort:  9000,
-				DataPath: "dummy-path",
-				AdminOTP: "dummy-otp",
+				APIPort: 9000,
+				Sources: config.Sources{
+					DataPath: "dummy-path",
+				},
 				Adapters: config.Adapters{
 					Hook: config.HookConfig{
 						Enabled:           true,

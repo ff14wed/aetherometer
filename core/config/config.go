@@ -10,41 +10,27 @@ import (
 // Config stores configuration values for the Aetherometer core
 type Config struct {
 	// APIPort provides the port on which the core API is served.
-	APIPort uint16 `toml:"api_port" validate:"nonempty"`
+	APIPort uint16 `toml:"api_port"`
 
-	// DataPath provides the path to the folder with raw EXD files (in CSV format)
-	// containing game data.
-	DataPath string `toml:"data_path" validate:"directory"`
+	// DisableAuth allows plugins to query the API server without an auth token.
+	// CORS validation is still enforced.
+	DisableAuth bool `toml:"disable_auth,omitempty"`
 
-	// AdminOTP provides a one time password that the admin can use to create an
-	// admin token for the API.
-	AdminOTP string `toml:"admin_otp" validate:"nonempty"`
+	// LocalToken allows local plugins to authenticate with the API with this
+	// token. If empty, it does not allow authentication with an empty string.
+	LocalToken string `toml:"local_token,omitempty"`
 
-	// DisableAuth allows starting the API server without requiring an auth
-	// token for queries. CORS validation will still be enforced.
-	DisableAuth bool `toml:"disable_auth"`
-
-	// AllowOrigins allows the listed sites to bypass CORS validation without
-	// having to register them. Note that scheme and subdomain must be provided.
-	// Example: allow_sites = ["https://plugins.foo.com"]
-	AllowOrigins []string `toml:"allow_origins"`
-
-	// Maps provides the configuration for the Map endpoint of the API.
-	Maps MapConfig `toml:"maps"`
+	// Sources contains configuration for data sources.
+	Sources Sources `toml:"sources"`
 
 	// Adapters contains the configuration for all the adapters enabled for
 	// the core API.
 	Adapters Adapters `toml:"adapters"`
-}
 
-// Maps sets the configuration for the Map endpoint of the API.
-type MapConfig struct {
-	// Cache provides the path of the maps on the local disk.
-	Cache string `toml:"cache" validate:"directory"`
-
-	// APIPath provides the URL of an xivapi environment serving the maps if the
-	// map could not be found on the local disk. Defaults to https://xivapi.com.
-	APIPath string `toml:"api_path"`
+	// Plugins is a name -> URL dictionary that allows the listed plugins to
+	// access the API and pass CORS validation.  Note that the plugin scheme
+	// must be provided.
+	Plugins map[string]string `toml:"plugins" json:"Plugins"`
 }
 
 // Adapters stores configuration structs for adapters
@@ -52,8 +38,8 @@ type Adapters struct {
 	// Hook provides the configuration for the Hook adapter.
 	Hook HookConfig `toml:"hook"`
 
-	// Test is for testing purposes only. Do not use.
-	Test struct{}
+	//lint:ignore U1000 test is for testing purposes only. Do not use.
+	test struct{}
 }
 
 // IsEnabled returns whether or not the provided adapter name is enabled
@@ -69,10 +55,25 @@ func (a Adapters) IsEnabled(adapterName string) bool {
 	return true
 }
 
-// SourceDirs is a table of directories that provide data used to interpret
+// Sources stores configuration for sources that provide data used to interpret
 // indexes sent over the network
-type SourceDirs struct {
-	MapsDir string `toml:"maps_dir" validate:"directory"`
+type Sources struct {
+	// DataPath provides the path to the folder with raw EXD files (in CSV format)
+	// containing game data.
+	DataPath string `toml:"data_path" validate:"directory"`
+
+	// Maps provides the configuration for the Map endpoint of the API.
+	Maps MapConfig `toml:"maps"`
+}
+
+// Maps sets the configuration for the Map endpoint of the API.
+type MapConfig struct {
+	// Cache provides the path of the maps on the local disk.
+	Cache string `toml:"cache" validate:"directory"`
+
+	// APIPath provides the URL of an xivapi environment serving the maps if the
+	// map could not be found on the local disk. Defaults to https://xivapi.com.
+	APIPath string `toml:"api_path"`
 }
 
 func buildError(ctx []string, msg string) error {

@@ -1,0 +1,19 @@
+
+html {
+	color: white;
+	background-color: rgba(33, 37, 43, 0.2);
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	color: white;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	overscroll-behavior: none;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #3a3a3a; }
+::-webkit-scrollbar-thumb { background: #9d9d9d; }

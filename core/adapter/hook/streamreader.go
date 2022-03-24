@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//go:generate counterfeiter io.ReadCloser
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . io.ReadCloser
 
 // StreamReader reads data from the hook connection and decodes it into
 // envelopes
