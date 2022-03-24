@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/ff14wed/aetherometer/core/hub"
@@ -114,13 +115,15 @@ func (p *Provider) Serve() {
 	}
 }
 
-func consumeNextWriteEvent(fsEvents chan fsnotify.Event) (ok bool) {
+func consumeNextWriteEvent(fsEventsChan chan fsnotify.Event) (ok bool) {
+	// Consume events for the next 10 milliseconds in order to batch write events
 	for {
-		event, ok := <-fsEvents
-		if !ok {
-			return false
-		}
-		if event.Op&fsnotify.Write == fsnotify.Write {
+		select {
+		case _, ok := <-fsEventsChan:
+			if !ok {
+				return false
+			}
+		case <-time.After(10 * time.Millisecond):
 			return true
 		}
 	}
