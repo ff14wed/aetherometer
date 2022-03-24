@@ -6,9 +6,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/apenwarr/fixconsole"
@@ -25,6 +27,30 @@ import (
 var assets embed.FS
 
 var Version = "development"
+
+// Workaround for Windows support for zap from
+// https://github.com/uber-go/zap/issues/621
+func newWinFileSink(u *url.URL) (zap.Sink, error) {
+	// Remove leading slash left by url.Parse()
+	return os.OpenFile(u.Path[1:], os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+}
+func NewLogger(outputLogPath string, useStdout bool) (*zap.Logger, error) {
+	if useStdout {
+		outputLogPath = "stdout"
+	} else if runtime.GOOS == "windows" {
+		err := zap.RegisterSink("winfile", newWinFileSink)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't register winfile log sink: %s", err)
+		}
+		outputLogPath = "winfile:///" + filepath.ToSlash(outputLogPath)
+	}
+	zapCfg := zap.NewDevelopmentConfig()
+	zapCfg.DisableStacktrace = true
+	zapCfg.DisableCaller = true
+	zapCfg.OutputPaths = []string{outputLogPath}
+	zapCfg.ErrorOutputPaths = []string{outputLogPath}
+	return zapCfg.Build()
+}
 
 func main() {
 	flag.Usage = func() {
@@ -59,18 +85,12 @@ func main() {
 		return
 	}
 
-	var outputLogPath string = "aetherometer.log"
+	outputLogPath := filepath.Join(dirPath, "aetherometer.log")
 	if *headless {
-		outputLogPath = "stdout"
 		fixconsole.FixConsoleIfNeeded()
 	}
 
-	zapCfg := zap.NewDevelopmentConfig()
-	zapCfg.DisableStacktrace = true
-	zapCfg.DisableCaller = true
-	zapCfg.OutputPaths = []string{outputLogPath}
-	zapCfg.ErrorOutputPaths = []string{outputLogPath}
-	zapLogger, err := zapCfg.Build()
+	zapLogger, err := NewLogger(outputLogPath, *headless)
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v\n", err)
 	}

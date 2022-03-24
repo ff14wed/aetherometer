@@ -116,7 +116,7 @@ func (p *Provider) Serve() {
 }
 
 func consumeNextWriteEvent(fsEventsChan chan fsnotify.Event) (ok bool) {
-	// Consume events for the next 10 milliseconds in order to batch write events
+	// Consume events for the next several milliseconds in order to batch write events
 	for {
 		select {
 		case _, ok := <-fsEventsChan:
