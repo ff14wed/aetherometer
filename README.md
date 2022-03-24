@@ -79,9 +79,8 @@ to build the project.
 Once you have Wails installed, run `wails doctor` to ensure you have all
 dependencies. Namely, Go 1.17+, Node 14+, and the WebView2 runtime.
 
-To run in live development mode, run `wails dev` in the project directory. The
-frontend dev server will run on http://localhost:34115. Open this in your
-browser to connect to your application.
+To run in live development mode, be sure to have run `wails build` beforehand.
+Then run `wails dev` to start the live development mode.
 
 ### Building
 

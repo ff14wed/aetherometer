@@ -1,3 +1,4 @@
+//go:build tools
 // +build tools
 
 package scripts
@@ -8,4 +9,5 @@ import (
 	_ "github.com/99designs/gqlgen/cmd"
 	_ "github.com/99designs/gqlgen/codegen"
 	_ "github.com/maxbrunsfeld/counterfeiter/v6"
+	_ "github.com/onsi/ginkgo/ginkgo"
 )

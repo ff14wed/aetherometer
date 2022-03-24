@@ -34,6 +34,7 @@ require (
 	github.com/fasthttp/websocket v1.4.6 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/gofiber/fiber/v2 v2.26.0 // indirect
 	github.com/gofiber/websocket/v2 v2.0.15 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
