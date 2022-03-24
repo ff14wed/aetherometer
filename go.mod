@@ -7,9 +7,9 @@ require (
 	github.com/BurntSushi/toml v1.0.0
 	github.com/Microsoft/go-winio v0.5.1
 	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ff14wed/xivnet/v3 v3.31.0
 	github.com/fsnotify/fsnotify v1.4.9
+	github.com/golang-jwt/jwt/v4 v4.4.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.5.0
@@ -41,7 +41,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
-	github.com/klauspost/compress v1.14.2 // indirect
+	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.2.0 // indirect
 	github.com/leaanthony/go-common-file-dialog v1.0.3 // indirect
@@ -61,7 +61,7 @@ require (
 	github.com/tkrajina/go-reflector v0.5.5 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.33.0 // indirect
+	github.com/valyala/fasthttp v1.34.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect

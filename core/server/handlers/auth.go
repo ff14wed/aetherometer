@@ -13,9 +13,9 @@ import (
 	"sync"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dgrijalva/jwt-go/request"
 	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v4/request"
 	"github.com/rs/cors"
 	"go.uber.org/zap"
 )
