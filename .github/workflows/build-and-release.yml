@@ -23,15 +23,9 @@ jobs:
 
     - uses: actions/checkout@v3
 
-    - name: Get version
-      id: version
-      run: |
-        $tag = $env:GITHUB_REF -replace "refs/tags/", ""
-        echo "::set-output name=tag::$(echo $tag)"
-
     - name: Build
       run: |
-        wails build -f -ldflags "-X main.Version=${{ steps.version.output.tag }}"
+        wails build -f -ldflags "-X main.Version=${{ github.ref_name }}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -46,14 +40,10 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v3
 
-    - name: Get version
-      id: version
-      run: echo "::set-output name=tag::${GITHUB_REF/refs\/tags\//}"
-
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        name: Aetherometer ${{ steps.version.outputs.tag }}
+        name: Aetherometer ${{ github.ref_name }}
         body: "# What's changed"
         draft: true
         files: aetherometer-windows/aetherometer.exe
