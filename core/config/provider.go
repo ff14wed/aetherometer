@@ -123,7 +123,7 @@ func consumeNextWriteEvent(fsEventsChan chan fsnotify.Event) (ok bool) {
 			if !ok {
 				return false
 			}
-		case <-time.After(10 * time.Millisecond):
+		case <-time.After(20 * time.Millisecond):
 			return true
 		}
 	}
