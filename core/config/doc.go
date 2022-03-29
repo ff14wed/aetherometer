@@ -8,6 +8,7 @@ The following shows an example TOML config file for Aetherometer.
 
 	api_port = 0
 	disable_auth = false
+	local_token = "foobar-token"
 
 	[sources]
 		data_path = "C:\\path\\to\\aetherometer\\resources\\datasheets"
@@ -37,7 +38,7 @@ Also note that any comments written in the configuration file will be LOST if
 you change any configuration in the UI, so it is wise to backup the config file
 if you really need to.
 
-api_port
+Field api_port
 
 Configures the port on which the GraphQL API server will listen. For example,
 if this value is set to 8080, the server will be queryable on
@@ -45,64 +46,69 @@ http://localhost:8080/query
 
 Requires a restart of Aetherometer for any changes to this field to take effect.
 
-disable_auth
+Field disable_auth
 
 Disabling the auth allows plugins to query the API server without an auth
 token. CORS validation is still enforced, so web-based plugins are still
 rejected unless they originate from localhost. Intended for development
 purposes only.  DISABLE AT YOUR OWN RISK.
 
-[sources]
+Field local_token
+
+This field allows local plugins to specify this token in the Authorization
+header for the API in order to gain access. This token may not be used from
+a remote origin.
+
+Table [sources]
 
 This table is primarily concerned with the configuration of data and map image
 sources.
 
-sources.data_path
+Field sources.data_path
 
 Configures the location of the CSV files containing FFXIV data.  This directory
 must exist if the TOML config file is provided.
 
-sources.map.cache
+Field sources.map.cache
 Configures the location of the map cache.  This directory must exist if
 the TOML config file is provided.
 
-sources.map.api_path
+Field sources.map.api_path
 Configures where to pull map images from if they do not exist locally.
 Defaults to "https://xivapi.com"
 
-[adapters]
+Table [adapters]
 
 This table lists configuration of the various ingress adapters that Aetherometer
 supports. Currently, only the "hook" adapter for Windows is supported.
 
-[adapters.hook]
+Table [adapters.hook]
 
 Configuration for the "hook" adapter for Windows. This adapter will
 automatically inject a hook into each FFXIV process and read networked data to
 your Aetherometer instance.
 
-adapters.hook.enabled
+Field adapters.hook.enabled
 
 Enables the hook adapter.
 
-adapters.hook.dll_path
+Field adapters.hook.dll_path
 
 The hook DLL to inject into FFXIV processes.
 
-adapters.hook.ffxiv_process
+Field adapters.hook.ffxiv_process
 
 The name of the FFXIV process into which to inject the hook. Generally it
 should be set to "ffxiv_dx11.exe", but change it "ffxiv.exe" if you are using
 DirectX 9.
 
-[plugins]
+Table [plugins]
 
 A table of plugins, where the key is the display name of the plugin and
 the value is the URL of the plugin.
 
 If the plugin is a webpage-based plugin, it must be provided in this list in
 order to be authorized to access the Aetherometer API.
-
 
 	"My Plugin" = "https://foo.com/my/plugin"
 	"Other Plugin" = "https://bar.com/other/plugin"
