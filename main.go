@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"os/signal"
@@ -13,9 +13,11 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/apenwarr/fixconsole"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/internal/app"
+
+	"github.com/apenwarr/fixconsole"
+	"github.com/sqweek/dialog"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -52,7 +54,7 @@ func NewLogger(outputLogPath string, useStdout bool) (*zap.Logger, error) {
 	return zapCfg.Build()
 }
 
-func main() {
+func startup() error {
 	flag.Usage = func() {
 		fixconsole.FixConsoleIfNeeded()
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
@@ -61,7 +63,7 @@ func main() {
 
 	dirPath, err := app.GetCurrentDirectory()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	cfgPath := flag.String("c", filepath.Join(dirPath, "config.toml"), "optional path to TOML config file")
@@ -76,13 +78,13 @@ func main() {
 
 	if *helpFlag {
 		flag.Usage()
-		return
+		return nil
 	}
 
 	if *versionFlag {
 		fixconsole.FixConsoleIfNeeded()
 		fmt.Println("Aetherometer version:", Version)
-		return
+		return nil
 	}
 
 	outputLogPath := filepath.Join(dirPath, "aetherometer.log")
@@ -92,7 +94,7 @@ func main() {
 
 	zapLogger, err := NewLogger(outputLogPath, *headless)
 	if err != nil {
-		log.Fatalf("can't initialize zap logger: %v\n", err)
+		return fmt.Errorf("can't initialize zap logger: %v", err)
 	}
 	defer func() {
 		_ = zapLogger.Sync()
@@ -100,13 +102,14 @@ func main() {
 	zap.ReplaceGlobals(zapLogger)
 
 	if len(*cfgPath) == 0 {
-		zapLogger.Fatal("Config path cannot be empty")
+		return errors.New("config path cannot be empty")
 	}
 
 	defaultCfg, err := app.DefaultConfig()
 	if err != nil {
-		zapLogger.Fatal("Error setting up default config", zap.Error(err))
+		return fmt.Errorf("could not setup default config: %v", err)
 	}
+
 	cfgProvider := config.NewProvider(*cfgPath, defaultCfg, zapLogger)
 
 	a := app.NewApp(cfgProvider, Version, zapLogger)
@@ -122,7 +125,7 @@ func main() {
 		zapLogger.Info("Received signal, shutting down...", zap.Stringer("signal", sig))
 
 		a.Shutdown(context.Background())
-		return
+		return nil
 	}
 
 	// Start run wails app if not headless mode
@@ -154,7 +157,13 @@ func main() {
 		},
 	})
 
+	return err
+}
+
+func main() {
+	err := startup()
 	if err != nil {
-		log.Fatal(err)
+		msgBuilder := dialog.Message("Fatal error starting Aetherometer: %s", err)
+		msgBuilder.Error()
 	}
 }

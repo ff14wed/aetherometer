@@ -18,6 +18,7 @@ require (
 	github.com/onsi/gomega v1.18.1
 	github.com/rs/cors v1.8.2
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
+	github.com/sqweek/dialog v0.0.0-20220227145630-7a1c9e333fcf
 	github.com/thejerf/suture v4.0.1+incompatible
 	github.com/vektah/gqlparser/v2 v2.3.1
 	github.com/wailsapp/wails/v2 v2.0.0-beta.33
@@ -27,6 +28,7 @@ require (
 )
 
 require (
+	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/apenwarr/w32 v0.0.0-20190407065021-aa00fece76ab // indirect
