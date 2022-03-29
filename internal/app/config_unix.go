@@ -4,14 +4,13 @@
 package app
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/ff14wed/aetherometer/core/config"
 )
 
 func defaultConfig() (config.Config, error) {
-	dirPath, err := GetCurrentDirectory()
+	dirPath, err := GetAppDirectory()
 	if err != nil {
 		return config.Config{}, err
 	}
