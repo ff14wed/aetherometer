@@ -10,7 +10,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/config"
 )
 
-func DefaultConfig() (config.Config, error) {
+func defaultConfig() (config.Config, error) {
 	dirPath, err := GetCurrentDirectory()
 	if err != nil {
 		return config.Config{}, err

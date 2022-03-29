@@ -61,7 +61,7 @@ func startup() error {
 		flag.PrintDefaults()
 	}
 
-	dirPath, err := app.GetCurrentDirectory()
+	dirPath, err := app.GetAppDirectory()
 	if err != nil {
 		return err
 	}

@@ -69,7 +69,7 @@ func NewApp(cfgPath string, version string, logger *zap.Logger) *App {
 
 // Initialize is called before the application is started
 func (b *App) Initialize() error {
-	defaultCfg, err := DefaultConfig()
+	defaultCfg, err := defaultConfig()
 	if err != nil {
 		return fmt.Errorf("could not setup default config: %v", err)
 	}

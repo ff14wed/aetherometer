@@ -38,7 +38,7 @@ func (b *Bindings) GetAPIURL() string {
 }
 
 func (b *Bindings) GetAppDirectory() string {
-	dirPath, _ := GetCurrentDirectory()
+	dirPath, _ := GetAppDirectory()
 	return dirPath
 }
 

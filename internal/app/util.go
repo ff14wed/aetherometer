@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func GetCurrentDirectory() (string, error) {
+func GetAppDirectory() (string, error) {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return "", err
