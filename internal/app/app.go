@@ -2,15 +2,12 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"runtime/debug"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/ff14wed/aetherometer/core/adapter"
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/datasheet"
@@ -20,6 +17,11 @@ import (
 	"github.com/ff14wed/aetherometer/core/store"
 	"github.com/ff14wed/aetherometer/core/store/update"
 	"github.com/ff14wed/aetherometer/core/stream"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/gorilla/websocket"
 	"github.com/thejerf/suture"
 	"go.uber.org/zap"
@@ -35,37 +37,49 @@ func addDebugHandlers(srv *server.Server) {
 
 // App application struct
 type App struct {
+	cfgPath string
+	version string
+	logger  *zap.Logger
+
 	ctx         context.Context
 	cfgProvider *config.Provider
-	logger      *zap.Logger
 
-	version string
+	appSupervisor    *suture.Supervisor
+	streamSupervisor *suture.Supervisor
 
-	appSupervisor *suture.Supervisor
-
-	collection    *datasheet.Collection
-	srv           *server.Server
-	storeProvider *store.Provider
-	authHandler   *handlers.Auth
+	collection     *datasheet.Collection
+	srv            *server.Server
+	storeProvider  *store.Provider
+	authHandler    *handlers.Auth
+	streamManager  *stream.Manager
+	streamAdapters map[string]stream.Adapter
 
 	ready chan struct{}
 }
 
 // NewApp creates a new App application struct
-func NewApp(cfgProvider *config.Provider, version string, logger *zap.Logger) *App {
+func NewApp(cfgPath string, version string, logger *zap.Logger) *App {
 	return &App{
-		cfgProvider: cfgProvider,
-		version:     version,
-		logger:      logger,
-		ready:       make(chan struct{}),
+		cfgPath: cfgPath,
+		version: version,
+		logger:  logger,
+		ready:   make(chan struct{}),
 	}
 }
 
-// Startup is called at application startup
-func (b *App) Startup(ctx context.Context) {
-	b.logger.Info("====================================")
-	b.logger.Info("Starting Aetherometer...")
-	b.ctx = ctx
+// Initialize is called before the application is started
+func (b *App) Initialize() error {
+	defaultCfg, err := DefaultConfig()
+	if err != nil {
+		return fmt.Errorf("could not setup default config: %v", err)
+	}
+
+	b.cfgProvider = config.NewProvider(b.cfgPath, defaultCfg, b.logger)
+
+	err = b.cfgProvider.EnsureConfigFile()
+	if err != nil {
+		return fmt.Errorf("config error: %s", err)
+	}
 
 	b.appSupervisor = suture.New("main", suture.Spec{
 		Log: func(line string) {
@@ -73,28 +87,66 @@ func (b *App) Startup(ctx context.Context) {
 		},
 	})
 
-	b.appSupervisor.ServeBackground()
-	b.appSupervisor.Add(b.cfgProvider)
-	b.cfgProvider.WaitUntilReady()
-
-	cfg := b.cfgProvider.Config()
-
-	b.srv = server.New(cfg, b.logger)
-
 	b.collection = new(datasheet.Collection)
-	b.reloadDatasheets(b.collection)
+	err = b.reloadDatasheets(b.collection)
+	if err != nil {
+		return fmt.Errorf("could not populate data from datasheets: %s", err)
+	}
 
 	generator := update.NewGenerator(b.collection)
 
 	b.storeProvider = store.NewProvider(b.logger)
-	b.appSupervisor.Add(b.storeProvider)
-
-	var err error
 
 	b.authHandler, err = handlers.NewAuth(b.cfgProvider, b.logger)
 	if err != nil {
-		b.logger.Fatal("Error initializing Auth handler", zap.Error(err))
+		return fmt.Errorf("could not initialize Auth handler: %s", err)
 	}
+
+	err = b.authHandler.RefreshConfig()
+	if err != nil {
+		return fmt.Errorf("config error: %s", err)
+	}
+
+	b.streamSupervisor = suture.New("stream-supervisor", suture.Spec{
+		Log: func(line string) {
+			b.logger.Named("stream-supervisor").Info(line)
+		},
+	})
+
+	b.streamManager = stream.NewManager(
+		generator,
+		b.storeProvider.UpdatesChan(),
+		b.streamSupervisor,
+		stream.NewHandler,
+		b.logger,
+	)
+
+	cfg := b.cfgProvider.Config()
+	b.streamAdapters, err = stream.BuildAdapterInventory(
+		adapter.Inventory(),
+		cfg,
+		b.streamManager.StreamUp(),
+		b.streamManager.StreamDown(),
+		b.logger,
+	)
+	if err != nil {
+		return fmt.Errorf("could not initialize adapters: %s", err)
+	}
+
+	b.srv = b.initializeServer()
+
+	return nil
+}
+
+// Startup is called at application startup
+func (b *App) Startup(ctx context.Context) {
+	b.ctx = ctx
+
+	b.appSupervisor.ServeBackground()
+	b.appSupervisor.Add(b.cfgProvider)
+	b.cfgProvider.WaitUntilReady()
+
+	b.appSupervisor.Add(b.storeProvider)
 
 	appEventWatcher := NewEventWatcher(
 		b.storeProvider.StreamEventSource(),
@@ -105,34 +157,51 @@ func (b *App) Startup(ctx context.Context) {
 	)
 	b.appSupervisor.Add(appEventWatcher)
 
-	streamSupervisor := suture.New("stream-supervisor", suture.Spec{
-		Log: func(line string) {
-			b.logger.Named("stream-supervisor").Info(line)
-		},
-	})
-	b.appSupervisor.Add(streamSupervisor)
+	b.appSupervisor.Add(b.streamSupervisor)
 
-	sm := stream.NewManager(
-		generator,
-		b.storeProvider.UpdatesChan(),
-		streamSupervisor,
-		stream.NewHandler,
-		b.logger,
-	)
+	b.appSupervisor.Add(b.streamManager)
+
+	for _, adapter := range b.streamAdapters {
+		b.appSupervisor.Add(adapter)
+	}
+	b.appSupervisor.Add(b.srv)
+
+	close(b.ready)
+}
+
+// DomReady is called after the front-end dom has been loaded
+func (b *App) DomReady(ctx context.Context) {
+	// Add your action here
+}
+
+// Shutdown is called at application termination
+func (b *App) Shutdown(ctx context.Context) {
+	// Perform your teardown here
+
+	b.appSupervisor.Stop()
+}
+
+// reloadDatasheets reloads datasheets from the filepath
+func (b *App) reloadDatasheets(collection *datasheet.Collection) error {
+	defer func() {
+		// Since loading datasheets takes up a lot of memory for some reason
+		debug.FreeOSMemory()
+	}()
+	cfg := b.cfgProvider.Config()
+	err := collection.Populate(cfg.Sources.DataPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *App) initializeServer() *server.Server {
+	cfg := b.cfgProvider.Config()
+	srv := server.New(cfg, b.logger)
 
 	streamRequestHandler := func(streamID int, request []byte) (string, error) {
-		b, err := sm.SendRequest(streamID, request)
+		b, err := b.streamManager.SendRequest(streamID, request)
 		return string(b), err
-	}
-
-	b.appSupervisor.Add(sm)
-
-	adapters, err := stream.BuildAdapterInventory(adapter.Inventory(), cfg, sm.StreamUp(), sm.StreamDown(), b.logger)
-	if err != nil {
-		b.logger.Fatal("Error creating adapter", zap.Error(err))
-	}
-	for _, adapter := range adapters {
-		b.appSupervisor.Add(adapter)
 	}
 
 	queryResolver := models.NewResolver(b.storeProvider, b.authHandler, streamRequestHandler)
@@ -167,37 +236,11 @@ func (b *App) Startup(ctx context.Context) {
 	queryHandler := b.authHandler.Handler(gqlServer)
 	mapHandler := b.authHandler.Handler(handlers.NewMapHandler("/map/", cfg, b.logger))
 
-	addDebugHandlers(b.srv)
+	addDebugHandlers(srv)
 
-	b.srv.AddHandler("/playground", handlers.Playground("GraphQL playground", "/query"))
-	b.srv.AddHandler("/query", queryHandler)
-	b.srv.AddHandler("/map/", mapHandler)
+	srv.AddHandler("/playground", handlers.Playground("GraphQL playground", "/query"))
+	srv.AddHandler("/query", queryHandler)
+	srv.AddHandler("/map/", mapHandler)
 
-	b.appSupervisor.Add(b.srv)
-
-	close(b.ready)
-}
-
-// DomReady is called after the front-end dom has been loaded
-func (b *App) DomReady(ctx context.Context) {
-	// Add your action here
-}
-
-// Shutdown is called at application termination
-func (b *App) Shutdown(ctx context.Context) {
-	// Perform your teardown here
-
-	b.appSupervisor.Stop()
-}
-
-// reloadDatasheets reloads datasheets from the filepath
-func (b *App) reloadDatasheets(collection *datasheet.Collection) {
-	cfg := b.cfgProvider.Config()
-	err := collection.Populate(cfg.Sources.DataPath)
-	if err != nil {
-		b.logger.Fatal("Error populating data", zap.Error(err))
-	}
-
-	// Since loading datasheets takes up a lot of memory for some reason
-	debug.FreeOSMemory()
+	return srv
 }

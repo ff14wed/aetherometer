@@ -59,10 +59,32 @@ func NewProvider(
 	}
 }
 
+// EnsureConfigFile ensure the config file exists and validates the initial
+// configuration passed to the provider
+func (p *Provider) EnsureConfigFile() error {
+	if _, err := os.Stat(p.configFile); errors.Is(err, os.ErrNotExist) {
+		// Config file doesn't exist, so write the config to disk first
+		p.logger.Info("Writing default config")
+		writeErr := p.writeConfig()
+		if writeErr != nil {
+			return fmt.Errorf("unable to write config file: %s", err)
+		}
+	} else if err != nil {
+		return fmt.Errorf("unable to check for config file: %s", err)
+	} else {
+		readErr := p.readConfig()
+		if readErr != nil {
+			return fmt.Errorf("unable to read config file: %s", readErr)
+		}
+	}
+	return nil
+}
+
 // Serve runs the main loop for the provider. It updates the saved
 // configuration in response to file changes.
 func (p *Provider) Serve() {
-	if ok := p.ensureConfigFile(); !ok {
+	if err := p.EnsureConfigFile(); err != nil {
+		p.logger.Error("Error ensuring config file", zap.Error(err))
 		return
 	}
 	watcher, err := fsnotify.NewWatcher()
@@ -138,28 +160,6 @@ func (p *Provider) WaitUntilReady() {
 func (p *Provider) Stop() {
 	close(p.stop)
 	<-p.stopDone
-}
-
-func (p *Provider) ensureConfigFile() (ok bool) {
-	if _, err := os.Stat(p.configFile); errors.Is(err, os.ErrNotExist) {
-		// Config file doesn't exist, so write the config to disk first
-		p.logger.Info("Writing default config")
-		writeErr := p.writeConfig()
-		if writeErr != nil {
-			p.logger.Error("Unable to write config file", zap.Error(err))
-			return false
-		}
-	} else if err != nil {
-		p.logger.Error("Unable to check for config file", zap.Error(err))
-		return false
-	} else {
-		readErr := p.readConfig()
-		if readErr != nil {
-			p.logger.Error("Unable to read config file", zap.Error(readErr))
-			return false
-		}
-	}
-	return true
 }
 
 // Config returns a the stored configuration from the provider.

@@ -6,14 +6,16 @@ import (
 )
 
 func GetCurrentDirectory() (string, error) {
-	execPath, err := os.Executable()
+	configDir, err := os.UserConfigDir()
 	if err != nil {
+		return "", err
+	}
+	appPath := filepath.Join(configDir, "aetherometer.exe")
+
+	err = os.Mkdir(appPath, 0755)
+	if err != nil && !os.IsExist(err) {
 		return "", err
 	}
 
-	cleanPath, err := filepath.EvalSymlinks(execPath)
-	if err != nil {
-		return "", err
-	}
-	return filepath.Dir(cleanPath), nil
+	return filepath.Clean(appPath), nil
 }

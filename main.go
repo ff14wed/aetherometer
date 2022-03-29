@@ -13,11 +13,10 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/internal/app"
+	"github.com/ff14wed/aetherometer/internal/reporter"
 
 	"github.com/apenwarr/fixconsole"
-	"github.com/sqweek/dialog"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -36,6 +35,7 @@ func newWinFileSink(u *url.URL) (zap.Sink, error) {
 	// Remove leading slash left by url.Parse()
 	return os.OpenFile(u.Path[1:], os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 }
+
 func NewLogger(outputLogPath string, useStdout bool) (*zap.Logger, error) {
 	if useStdout {
 		outputLogPath = "stdout"
@@ -105,14 +105,16 @@ func startup() error {
 		return errors.New("config path cannot be empty")
 	}
 
-	defaultCfg, err := app.DefaultConfig()
+	a := app.NewApp(*cfgPath, Version, zapLogger)
+
+	zapLogger.Info("====================================")
+	zapLogger.Info("Starting Aetherometer...")
+
+	err = a.Initialize()
 	if err != nil {
-		return fmt.Errorf("could not setup default config: %v", err)
+		zapLogger.Error("Could not initialize Aetherometer", zap.Error(err))
+		return err
 	}
-
-	cfgProvider := config.NewProvider(*cfgPath, defaultCfg, zapLogger)
-
-	a := app.NewApp(cfgProvider, Version, zapLogger)
 
 	// Do not start the GUI in headless mode.
 	if *headless {
@@ -163,7 +165,6 @@ func startup() error {
 func main() {
 	err := startup()
 	if err != nil {
-		msgBuilder := dialog.Message("Fatal error starting Aetherometer: %s", err)
-		msgBuilder.Error()
+		reporter.FatalError(err)
 	}
 }

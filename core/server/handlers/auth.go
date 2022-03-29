@@ -95,8 +95,6 @@ func NewAuth(cp *config.Provider, l *zap.Logger) (*Auth, error) {
 		logger: l.Named("auth-handler"),
 	}
 
-	a.RefreshConfig()
-
 	a.cors = cors.New(cors.Options{
 		AllowOriginFunc:  a.AllowOriginFunc,
 		AllowCredentials: true,
@@ -202,7 +200,7 @@ func parseOrigin(pluginURL string) (string, error) {
 		return "", err
 	}
 	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return "", errors.New("could not parse plugin URL")
+		return "", fmt.Errorf("could not parse plugin URL. Check that the URL is correctly formatted and has a scheme (e.g. https://): %s", pluginURL)
 	}
 
 	return fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host), nil

@@ -93,7 +93,7 @@ var _ = Describe("Auth", func() {
 
 		It("returns an error if the plugin URL is missing the scheme", func() {
 			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
-			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
+			Expect(auth.RefreshConfig()).To(MatchError(HavePrefix("could not parse plugin URL")))
 
 			plugins := auth.GetRegisteredPlugins()
 			Expect(plugins).To(BeEmpty())
@@ -106,7 +106,7 @@ var _ = Describe("Auth", func() {
 			Expect(plugins).To(HaveKey("Foo Plugin"))
 
 			Expect(cp.AddPlugin("Bad Plugin", "example.com/foo/plugin")).To(Succeed())
-			Expect(auth.RefreshConfig()).To(MatchError("could not parse plugin URL"))
+			Expect(auth.RefreshConfig()).To(MatchError(HavePrefix("could not parse plugin URL")))
 
 			plugins = auth.GetRegisteredPlugins()
 			Expect(plugins).To(HaveKey("Foo Plugin"))
