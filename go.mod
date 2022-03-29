@@ -9,7 +9,7 @@ require (
 	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
 	github.com/ff14wed/xivnet/v3 v3.31.0
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/golang-jwt/jwt/v4 v4.4.0
+	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.5.0
