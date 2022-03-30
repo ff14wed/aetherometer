@@ -5,6 +5,8 @@
 	import { onMount } from "svelte";
 	import PluginList from "./PluginList.svelte";
 
+	import { errors } from "./stores/stores";
+
 	export let open = false;
 
 	let config = {
@@ -39,11 +41,19 @@
 	});
 
 	async function addPlugin(name: string, url: string) {
-		await window.go.app.Bindings.AddPlugin(name, url);
+		try {
+			await window.go.app.Bindings.AddPlugin(name, url);
+		} catch (e) {
+			$errors = [...$errors, e];
+		}
 	}
 
 	async function deletePlugin(name: string) {
-		await window.go.app.Bindings.RemovePlugin(name);
+		try {
+			await window.go.app.Bindings.RemovePlugin(name);
+		} catch (e) {
+			$errors = [...$errors, e];
+		}
 	}
 
 	async function openAppDirectory() {

@@ -5,13 +5,18 @@
 	import Tab from "./lib/carbon/Tab.svelte";
 	import TabContent from "./lib/carbon/TabContent.svelte";
 
-	import { selectedTabID } from "./lib/stores/stores";
+	import { selectedTabID, errors } from "./lib/stores/stores";
 
-	import { InlineNotification } from "carbon-components-svelte";
+	import {
+		InlineNotification,
+		ToastNotification,
+	} from "carbon-components-svelte";
 
 	import { onMount } from "svelte";
 
 	import type { StreamInfo } from "../wailsjs/go/models";
+	import go from "../wailsjs/go/bindings";
+	import type { runtime } from "../wailsjs/runtime/runtime";
 
 	interface PluginInfo {
 		PluginID: string;
@@ -139,6 +144,16 @@
 	</div>
 </section>
 
+<div class:notifications={true}>
+	{#each $errors as error}
+		<ToastNotification
+			title="Error"
+			subtitle={error}
+			caption={new Date().toLocaleString()}
+		/>
+	{/each}
+</div>
+
 <style>
 	section {
 		display: flex;
@@ -166,5 +181,12 @@
 	.iframe {
 		height: 100%;
 		width: 100%;
+	}
+
+	.notifications {
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		z-index: 10000;
 	}
 </style>
