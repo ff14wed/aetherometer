@@ -38,74 +38,72 @@ Also note that any comments written in the configuration file will be LOST if
 you change any configuration in the UI, so it is wise to backup the config file
 if you really need to.
 
-Field api_port
+API Port
 
-Configures the port on which the GraphQL API server will listen. For example,
-if this value is set to 8080, the server will be queryable on
-http://localhost:8080/query
+The field `api_port` configures the port on which the GraphQL API server will
+listen. For example, if this value is set to 8080, the server will be queryable
+on http://localhost:8080/query
 
 Requires a restart of Aetherometer for any changes to this field to take effect.
 
-Field disable_auth
+Disable Auth
 
-Disabling the auth allows plugins to query the API server without an auth
-token. CORS validation is still enforced, so web-based plugins are still
-rejected unless they originate from localhost. Intended for development
-purposes only.  DISABLE AT YOUR OWN RISK.
+Setting `disable_auth` to `true` allows plugins to query the API server without
+an auth token. CORS validation is still enforced, so web-based plugins are still
+rejected unless they originate from localhost. Intended for development purposes
+only.  DISABLE AT YOUR OWN RISK.
 
-Field local_token
+Token for local plugins
 
-This field allows local plugins to specify this token in the Authorization
-header for the API in order to gain access. This token may not be used from
-a remote origin.
+The `local_token` field allows local plugins to specify this token in the
+Authorization header for the API in order to gain access. This token may not be
+used from a remote origin.
 
-Table [sources]
+Sources Table
 
 This table is primarily concerned with the configuration of data and map image
 sources.
 
-Field sources.data_path
+Data Path
 
-Configures the location of the CSV files containing FFXIV data.  This directory
-must exist if the TOML config file is provided.
+The field `sources.data_path` configures the location of the CSV files
+containing FFXIV data.  This directory must exist if the TOML config file is
+provided.
 
-Field sources.map.cache
-Configures the location of the map cache.  This directory must exist if
-the TOML config file is provided.
+Map Cache
 
-Field sources.map.api_path
-Configures where to pull map images from if they do not exist locally.
-Defaults to "https://xivapi.com"
+The field `sources.map.cache` configures the location of the map cache.  This
+directory must exist if the TOML config file is provided.
 
-Table [adapters]
+Map API Path
+
+The field `sources.map.api_path` configures where to pull map images from if
+they do not exist locally.  Defaults to "https://xivapi.com"
+
+Adapters Table
 
 This table lists configuration of the various ingress adapters that Aetherometer
 supports. Currently, only the "hook" adapter for Windows is supported.
 
-Table [adapters.hook]
+Hook Adapter
 
-Configuration for the "hook" adapter for Windows. This adapter will
-automatically inject a hook into each FFXIV process and read networked data to
-your Aetherometer instance.
+The table `[adapters.hook]` contains configuration for the "hook" adapter
+(Windows only).  This adapter will automatically inject a hook into each FFXIV
+process and read networked data to your Aetherometer instance.
 
-Field adapters.hook.enabled
+Setting the field `adapters.hook.enabled` to `true` enables the adapter.
 
-Enables the hook adapter.
+The field `adapters.hook.dll_path` specifies the hook DLL to inject into
+FFXIV processes.
 
-Field adapters.hook.dll_path
+The field `adapters.hook.ffxiv_process` should be set to the name of the FFXIV
+process into which to inject the hook. Generally it should be set to
+"ffxiv_dx11.exe", but change it "ffxiv.exe" if you are using DirectX 9.
 
-The hook DLL to inject into FFXIV processes.
+Plugins Table
 
-Field adapters.hook.ffxiv_process
-
-The name of the FFXIV process into which to inject the hook. Generally it
-should be set to "ffxiv_dx11.exe", but change it "ffxiv.exe" if you are using
-DirectX 9.
-
-Table [plugins]
-
-A table of plugins, where the key is the display name of the plugin and
-the value is the URL of the plugin.
+This table contains a map of plugins, where the key is the display name of
+the plugin and the value is the URL of the plugin.
 
 If the plugin is a webpage-based plugin, it must be provided in this list in
 order to be authorized to access the Aetherometer API.
