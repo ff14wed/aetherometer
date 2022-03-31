@@ -134,6 +134,34 @@ var _ = Describe("Provider", func() {
 		})
 	})
 
+	Context("if the config file was modified but does not pass validation", func() {
+		JustBeforeEach(func() {
+			Eventually(logBuf).Should(gbytes.Say("config-provider.*Writing default config"))
+			cp.WaitUntilReady()
+
+			lines := []string{
+				`api_port = 9000`,
+				`[sources]`,
+				`data_path = "/nonexistent"`,
+				`maps.cache = "/tmp"`,
+				`maps.api_path = "www.maps.com"`,
+				`[adapters.hook]`,
+				`enabled = false`,
+				`[plugins]`,
+				`"My Plugin" = "https://foo.com/my/plugin"`,
+			}
+			configString := strings.Join(lines, "\n")
+			Expect(ioutil.WriteFile(configFile, []byte(configString), 0644)).To(Succeed())
+		})
+
+		It("logs an the error reading the file and does not overwrite the existing config", func() {
+			Eventually(logBuf).Should(gbytes.Say("config-provider.*Detected config file change"))
+			Eventually(logBuf).Should(gbytes.Say("config-provider.*Unable to read config file"))
+			cfg := cp.Config()
+			Expect(cfg.Sources.DataPath).To(Equal("/tmp"))
+		})
+	})
+
 	It("updates the saved config upon config file change", func() {
 		cp.WaitUntilReady()
 		originalCfg := cp.Config()
