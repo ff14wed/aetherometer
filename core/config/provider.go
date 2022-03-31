@@ -19,7 +19,7 @@ import (
 // It returns a current snapshot of the config whenever it is polled for a
 // config file.
 type Provider struct {
-	NotifyHub *hub.NotifyHub
+	NotifyHub *hub.NotifyHub[struct{}]
 
 	logger *zap.Logger
 
@@ -42,7 +42,7 @@ func NewProvider(
 	logger *zap.Logger,
 ) *Provider {
 	return &Provider{
-		NotifyHub: hub.NewNotifyHub(10),
+		NotifyHub: hub.NewNotifyHub[struct{}](10),
 
 		logger: logger.Named("config-provider"),
 
@@ -173,7 +173,7 @@ func (p *Provider) Config() Config {
 // It is expected to be used inside a critical section
 func (p *Provider) updateConfig(cfg Config) {
 	p.savedConfig = cfg
-	p.NotifyHub.Broadcast()
+	p.NotifyHub.Broadcast(struct{}{})
 }
 
 // readConfig reads the saved config file from disk

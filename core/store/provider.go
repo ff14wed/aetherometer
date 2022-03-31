@@ -19,8 +19,8 @@ type Provider struct {
 	logger       *zap.Logger
 
 	streams   Streams
-	streamHub *hub.StreamHub
-	entityHub *hub.EntityHub
+	streamHub *hub.NotifyHub[*models.StreamEvent]
+	entityHub *hub.NotifyHub[*models.EntityEvent]
 
 	updatesChan         chan Update
 	internalRequestChan chan internalRequest
@@ -58,8 +58,8 @@ func NewProvider(
 		logger:       logger.Named("store-provider"),
 
 		streams:   Streams{Map: make(map[int]*models.Stream)},
-		streamHub: hub.NewStreamHub(cfg.eventBufferSize),
-		entityHub: hub.NewEntityHub(cfg.eventBufferSize),
+		streamHub: hub.NewNotifyHub[*models.StreamEvent](cfg.eventBufferSize),
+		entityHub: hub.NewNotifyHub[*models.EntityEvent](cfg.eventBufferSize),
 
 		updatesChan:         make(chan Update, cfg.updateBufferSize),
 		internalRequestChan: make(chan internalRequest, cfg.requestBufferSize),
@@ -118,10 +118,12 @@ func (p *Provider) handleUpdate(u Update) {
 		)
 	}
 	for _, streamEvent := range streamEvents {
-		p.streamHub.Broadcast(streamEvent)
+		eventCopy := streamEvent
+		p.streamHub.Broadcast(&eventCopy)
 	}
 	for _, entityEvent := range entityEvents {
-		p.entityHub.Broadcast(entityEvent)
+		eventCopy := entityEvent
+		p.entityHub.Broadcast(&eventCopy)
 	}
 }
 

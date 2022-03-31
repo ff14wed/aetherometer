@@ -13,7 +13,7 @@ import (
 // EventWatcher emits app events whenever events are triggered
 type EventWatcher struct {
 	ses         models.StreamEventSource
-	cfgNotify   *hub.NotifyHub
+	cfgNotify   *hub.NotifyHub[struct{}]
 	authHandler *handlers.Auth
 
 	ctx    context.Context
@@ -26,7 +26,7 @@ type EventWatcher struct {
 // NewEventWatcher returns a new EventWatcher
 func NewEventWatcher(
 	streamEventSource models.StreamEventSource,
-	cfgNotify *hub.NotifyHub,
+	cfgNotify *hub.NotifyHub[struct{}],
 	authHandler *handlers.Auth,
 	ctx context.Context,
 	logger *zap.Logger,
