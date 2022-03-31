@@ -150,7 +150,7 @@ func (b *App) Startup(ctx context.Context) {
 
 	appEventWatcher := NewEventWatcher(
 		b.storeProvider.StreamEventSource(),
-		b.cfgProvider.NotifyHub,
+		b.cfgProvider.UpdateEvents,
 		b.authHandler,
 		ctx,
 		b.logger,

@@ -166,7 +166,7 @@ var _ = Describe("Provider", func() {
 		cp.WaitUntilReady()
 		originalCfg := cp.Config()
 
-		sub, _ := cp.NotifyHub.Subscribe()
+		sub, _ := cp.UpdateEvents.Subscribe()
 
 		Expect(appendToFile(configFile, "[plugins]\n"+`"Some Plugin" = "https://bar.com/some/plugin"`+"\n")).To(Succeed())
 
@@ -184,7 +184,7 @@ var _ = Describe("Provider", func() {
 		It("adds the plugin and syncs changes to the config to disk", func() {
 			cp.WaitUntilReady()
 
-			sub, _ := cp.NotifyHub.Subscribe()
+			sub, _ := cp.UpdateEvents.Subscribe()
 
 			Expect(cp.AddPlugin("Other Plugin", "https://foo.com/bar/plugin")).To(Succeed())
 
@@ -242,7 +242,7 @@ var _ = Describe("Provider", func() {
 		It("removes the plugin and syncs changes to the config to disk", func() {
 			cp.WaitUntilReady()
 
-			sub, _ := cp.NotifyHub.Subscribe()
+			sub, _ := cp.UpdateEvents.Subscribe()
 
 			lines := []string{
 				`api_port = 9000`,
@@ -330,7 +330,7 @@ var _ = Describe("Provider", func() {
 		It("sets some field and syncs changes to the config to disk", func() {
 			cp.WaitUntilReady()
 
-			sub, _ := cp.NotifyHub.Subscribe()
+			sub, _ := cp.UpdateEvents.Subscribe()
 
 			Expect(cp.MutateConfig(func(cfg config.Config) (config.Config, error) {
 				cfg.DisableAuth = true
@@ -372,7 +372,7 @@ var _ = Describe("Provider", func() {
 	})
 
 	It("doesn't watch files anymore after shutdown", func() {
-		sub, _ := cp.NotifyHub.Subscribe()
+		sub, _ := cp.UpdateEvents.Subscribe()
 
 		supervisor.Stop()
 		Eventually(logBuf).Should(gbytes.Say("config-provider.*Stopping..."))

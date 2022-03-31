@@ -13,7 +13,7 @@ import (
 // EventWatcher emits app events whenever events are triggered
 type EventWatcher struct {
 	ses         models.StreamEventSource
-	cfgNotify   *hub.NotifyHub[struct{}]
+	cfgUpdates  *hub.NotifyHub[struct{}]
 	authHandler *handlers.Auth
 
 	ctx    context.Context
@@ -26,14 +26,14 @@ type EventWatcher struct {
 // NewEventWatcher returns a new EventWatcher
 func NewEventWatcher(
 	streamEventSource models.StreamEventSource,
-	cfgNotify *hub.NotifyHub[struct{}],
+	cfgUpdates *hub.NotifyHub[struct{}],
 	authHandler *handlers.Auth,
 	ctx context.Context,
 	logger *zap.Logger,
 ) *EventWatcher {
 	return &EventWatcher{
 		ses:         streamEventSource,
-		cfgNotify:   cfgNotify,
+		cfgUpdates:  cfgUpdates,
 		authHandler: authHandler,
 		ctx:         ctx,
 		logger:      logger.Named("app-event-watcher"),
@@ -47,7 +47,7 @@ func NewEventWatcher(
 func (s *EventWatcher) Serve() {
 	defer close(s.stopDone)
 	streamCh, streamChID := s.ses.Subscribe()
-	cfgNotifyCh, cfgNotifyChID := s.cfgNotify.Subscribe()
+	cfgUpdatesCh, cfgUpdatesChID := s.cfgUpdates.Subscribe()
 	s.logger.Info("Running")
 
 	for {
@@ -59,13 +59,13 @@ func (s *EventWatcher) Serve() {
 			if isAddStream || isRemoveStream || isUpdateIDs {
 				runtime.EventsEmit(s.ctx, "StreamChange")
 			}
-		case <-cfgNotifyCh:
+		case <-cfgUpdatesCh:
 			s.authHandler.RefreshConfig()
 			runtime.EventsEmit(s.ctx, "ConfigChange")
 		case <-s.stop:
 			s.logger.Info("Stopping...")
 			s.ses.Unsubscribe(streamChID)
-			s.cfgNotify.Unsubscribe(cfgNotifyChID)
+			s.cfgUpdates.Unsubscribe(cfgUpdatesChID)
 			return
 		}
 	}
