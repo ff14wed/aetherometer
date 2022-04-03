@@ -135,6 +135,18 @@ var _ = Describe("Provider", func() {
 	})
 
 	Context("if the config file was modified but does not pass validation", func() {
+		var (
+			errEvents chan string
+			subID     uint64
+		)
+		BeforeEach(func() {
+			errEvents, subID = cp.ErrorEvents.Subscribe()
+		})
+
+		AfterEach(func() {
+			cp.ErrorEvents.Unsubscribe(subID)
+		})
+
 		JustBeforeEach(func() {
 			Eventually(logBuf).Should(gbytes.Say("config-provider.*Writing default config"))
 			cp.WaitUntilReady()
@@ -159,6 +171,10 @@ var _ = Describe("Provider", func() {
 			Eventually(logBuf).Should(gbytes.Say("config-provider.*Unable to read config file"))
 			cfg := cp.Config()
 			Expect(cfg.Sources.DataPath).To(Equal("/tmp"))
+		})
+
+		It("emits an the error on the ErrorEvents notify hub", func() {
+			Eventually(errEvents).Should(Receive(ContainSubstring("Unable to read config file")))
 		})
 	})
 

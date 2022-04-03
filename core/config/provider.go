@@ -20,6 +20,7 @@ import (
 // config file.
 type Provider struct {
 	UpdateEvents *hub.NotifyHub[struct{}]
+	ErrorEvents  *hub.NotifyHub[string]
 
 	logger *zap.Logger
 
@@ -43,6 +44,7 @@ func NewProvider(
 ) *Provider {
 	return &Provider{
 		UpdateEvents: hub.NewNotifyHub[struct{}](10),
+		ErrorEvents:  hub.NewNotifyHub[string](10),
 
 		logger: logger.Named("config-provider"),
 
@@ -80,23 +82,29 @@ func (p *Provider) EnsureConfigFile() error {
 	return nil
 }
 
+// broadcastError emits a message to the log and all notifyhub subscribers
+func (p *Provider) broadcastError(message string, err error) {
+	p.logger.Error(message, zap.Error(err))
+	p.ErrorEvents.Broadcast(fmt.Sprintf("%s: %s", message, err))
+}
+
 // Serve runs the main loop for the provider. It updates the saved
 // configuration in response to file changes.
 func (p *Provider) Serve() {
 	if err := p.EnsureConfigFile(); err != nil {
-		p.logger.Error("Error ensuring config file", zap.Error(err))
+		p.broadcastError("Error loading config file", err)
 		return
 	}
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		p.logger.Error("Unable to setup FS watcher", zap.Error(err))
+		p.broadcastError("Unable to setup FS watcher", err)
 		return
 	}
 	defer watcher.Close()
 
 	err = watcher.Add(p.configFile)
 	if err != nil {
-		p.logger.Error("Unable to setup FS watcher", zap.Error(err))
+		p.broadcastError("Unable to setup FS watcher", err)
 		return
 	}
 	defer close(p.stopDone)
@@ -114,7 +122,7 @@ func (p *Provider) Serve() {
 				p.logger.Info("Detected config file change")
 				err = p.readConfig()
 				if err != nil {
-					p.logger.Error("Unable to read config file", zap.Error(err))
+					p.broadcastError("Unable to read config file", err)
 					break
 				}
 				p.logger.Info("Successfully applied config change")
@@ -123,7 +131,7 @@ func (p *Provider) Serve() {
 			if !ok {
 				return
 			}
-			p.logger.Error("FS watcher error", zap.Error(err))
+			p.broadcastError("FS watcher error", err)
 		case <-p.internalWriteEvent:
 			// If we are writing to disk, consume the next watcher event
 			ok := consumeNextWriteEvent(watcher.Events)

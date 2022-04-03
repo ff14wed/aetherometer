@@ -81,6 +81,11 @@
 			registeredPlugins = (await window.go.app.Bindings.GetPlugins()) || {};
 			console.log("Updating registered Plugins", registeredPlugins);
 		});
+
+		window.runtime.EventsOn("ErrorEvent", async (e) => {
+			$errors = [...$errors, e];
+			console.error("Received error from backend", e);
+		});
 	});
 
 	let iframes = [];
