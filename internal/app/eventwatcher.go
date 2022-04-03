@@ -43,6 +43,12 @@ func NewEventWatcher(
 	}
 }
 
+func EventsEmit(ctx context.Context, eventName string, optionalData ...interface{}) {
+	if !IsHeadless(ctx) {
+		runtime.EventsEmit(ctx, eventName, optionalData...)
+	}
+}
+
 // Serve runs the service for the app event watcher
 func (s *EventWatcher) Serve() {
 	defer close(s.stopDone)
@@ -58,13 +64,13 @@ func (s *EventWatcher) Serve() {
 			_, isRemoveStream := event.Type.(models.RemoveStream)
 			_, isUpdateIDs := event.Type.(models.UpdateIDs)
 			if isAddStream || isRemoveStream || isUpdateIDs {
-				runtime.EventsEmit(s.ctx, "StreamChange")
+				EventsEmit(s.ctx, "StreamChange")
 			}
 		case <-cfgUpdatesCh:
 			s.authHandler.RefreshConfig()
-			runtime.EventsEmit(s.ctx, "ConfigChange")
+			EventsEmit(s.ctx, "ConfigChange")
 		case msg := <-cfgErrorsCh:
-			runtime.EventsEmit(s.ctx, "ErrorEvent", msg)
+			EventsEmit(s.ctx, "ErrorEvent", msg)
 		case <-s.stop:
 			s.logger.Info("Stopping...")
 			s.ses.Unsubscribe(streamChID)
