@@ -1,9 +1,14 @@
 package app
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 )
+
+type headlessCtxType string
+
+const headlessCtx headlessCtxType = "headless"
 
 func GetAppDirectory() (string, error) {
 	configDir, err := os.UserConfigDir()
@@ -18,4 +23,13 @@ func GetAppDirectory() (string, error) {
 	}
 
 	return filepath.Clean(appPath), nil
+}
+
+func HeadlessContext() context.Context {
+	ctx := context.Background()
+	return context.WithValue(ctx, headlessCtx, true)
+}
+
+func IsHeadless(ctx context.Context) bool {
+	return ctx.Value(headlessCtx) == true
 }

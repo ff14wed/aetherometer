@@ -148,14 +148,16 @@ func (b *App) Startup(ctx context.Context) {
 
 	b.appSupervisor.Add(b.storeProvider)
 
-	appEventWatcher := NewEventWatcher(
-		b.storeProvider.StreamEventSource(),
-		b.cfgProvider.UpdateEvents,
-		b.authHandler,
-		ctx,
-		b.logger,
-	)
-	b.appSupervisor.Add(appEventWatcher)
+	if !IsHeadless(ctx) {
+		appEventWatcher := NewEventWatcher(
+			b.storeProvider.StreamEventSource(),
+			b.cfgProvider,
+			b.authHandler,
+			ctx,
+			b.logger,
+		)
+		b.appSupervisor.Add(appEventWatcher)
+	}
 
 	b.appSupervisor.Add(b.streamSupervisor)
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"embed"
 	"errors"
 	"flag"
@@ -118,7 +117,8 @@ func startup() error {
 
 	// Do not start the GUI in headless mode.
 	if *headless {
-		a.Startup(context.Background())
+		ctx := app.HeadlessContext()
+		a.Startup(ctx)
 
 		signals := make(chan os.Signal, 32)
 		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
@@ -126,7 +126,7 @@ func startup() error {
 		sig := <-signals
 		zapLogger.Info("Received signal, shutting down...", zap.Stringer("signal", sig))
 
-		a.Shutdown(context.Background())
+		a.Shutdown(ctx)
 		return nil
 	}
 
