@@ -41,20 +41,15 @@ func NewNotifyHub[T interface{}](chanSize int) *NotifyHub[T] {
 
 // Broadcast sends the message to all subscribers of this hub
 func (h *NotifyHub[T]) Broadcast(payload T) {
-	subsList := []chan T{}
 	h.subLock.Lock()
 	for _, sub := range h.subscribers {
-		subsList = append(subsList, sub)
-	}
-	h.subLock.Unlock()
-
-	for _, sub := range subsList {
 		select {
 		case sub <- payload:
 		default:
 			fmt.Println("Channel is blocked. Dropping message:", payload)
 		}
 	}
+	h.subLock.Unlock()
 }
 
 // Subscribe adds a new hub subscriber
