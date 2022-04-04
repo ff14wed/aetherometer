@@ -1,7 +1,9 @@
 package app
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/models"
@@ -85,6 +87,15 @@ func (b *Bindings) GetConfig() config.Config {
 }
 
 func (b *Bindings) AddPlugin(name string, url string) error {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return errors.New("plugin name must not be empty")
+	}
+
+	url = strings.TrimSpace(url)
+	if url == "" {
+		return errors.New("plugin URL must not be empty")
+	}
 	return b.app.cfgProvider.AddPlugin(name, url)
 }
 

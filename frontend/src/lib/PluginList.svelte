@@ -33,6 +33,7 @@
   ];
 
   let comboBox;
+  let nameInvalid = false;
   let urlInvalid = false;
   let selectedPresetID;
 
@@ -44,6 +45,14 @@
       }
     }
     newPluginURL = "";
+  }
+
+  function validate_name(name: string): boolean {
+    name = name.trim();
+    if (name === "") {
+      return false;
+    }
+    return true;
   }
 
   function validate_url(urlString: string): boolean {
@@ -59,6 +68,12 @@
   }
 
   async function tryAddPlugin(name: string, url: string) {
+    if (!validate_name(name)) {
+      nameInvalid = true;
+      return;
+    }
+    nameInvalid = false;
+
     if (!validate_url(url)) {
       urlInvalid = true;
       return;
@@ -108,7 +123,9 @@
         <ComboBox
           placeholder="Enter plugin name..."
           direction="top"
+          invalidText="Plugin name must not be empty."
           bind:this={comboBox}
+          bind:invalid={nameInvalid}
           bind:value={newPluginName}
           bind:selectedId={selectedPresetID}
           items={presets}
@@ -127,7 +144,7 @@
           hideLabel
           labelText="Plugin URL"
           placeholder="eg. https://plugins.com/foo/"
-          invalidText={'Invalid URL. Note that the URL must begin with a scheme (e.g. "https://")'}
+          invalidText={'Invalid URL. Note that the URL must begin with a scheme (e.g. "https://").'}
           bind:invalid={urlInvalid}
           bind:value={newPluginURL}
         />
