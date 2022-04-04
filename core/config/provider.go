@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -29,7 +30,8 @@ type Provider struct {
 	savedConfig Config
 	configLock  sync.RWMutex
 
-	internalWriteEvent chan struct{}
+	eventBatcher       *hub.EventBatcher
+	internalWriteEvent int32
 
 	ready    chan struct{}
 	stop     chan struct{}
@@ -53,7 +55,7 @@ func NewProvider(
 		savedConfig: defaultConfig,
 		configLock:  sync.RWMutex{},
 
-		internalWriteEvent: make(chan struct{}, 10),
+		eventBatcher: hub.NewEventBatcher(20 * time.Millisecond),
 
 		ready:    make(chan struct{}),
 		stop:     make(chan struct{}),
@@ -119,42 +121,29 @@ func (p *Provider) Serve() {
 				return
 			}
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				p.logger.Info("Detected config file change")
-				err = p.readConfig()
-				if err != nil {
-					p.broadcastError("Unable to read config file", err)
-					break
-				}
-				p.logger.Info("Successfully applied config change")
+				p.eventBatcher.Notify()
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
 				return
 			}
 			p.broadcastError("FS watcher error", err)
-		case <-p.internalWriteEvent:
-			// If we are writing to disk, consume the next watcher event
-			ok := consumeNextWriteEvent(watcher.Events)
-			if !ok {
-				return
+		case <-p.eventBatcher.BatchedEvents():
+			// Ignore write event if it was an internal write
+			swapped := atomic.CompareAndSwapInt32(&p.internalWriteEvent, 1, 0)
+			if swapped {
+				break
 			}
+			p.logger.Info("Detected config file change")
+			err = p.readConfig()
+			if err != nil {
+				p.broadcastError("Unable to read config file", err)
+				break
+			}
+			p.logger.Info("Successfully applied config change")
 		case <-p.stop:
 			p.logger.Info("Stopping...")
 			return
-		}
-	}
-}
-
-func consumeNextWriteEvent(fsEventsChan chan fsnotify.Event) (ok bool) {
-	// Consume events for the next several milliseconds in order to batch write events
-	for {
-		select {
-		case _, ok := <-fsEventsChan:
-			if !ok {
-				return false
-			}
-		case <-time.After(20 * time.Millisecond):
-			return true
 		}
 	}
 }
@@ -215,14 +204,6 @@ func (p *Provider) writeConfig() error {
 	return os.WriteFile(p.configFile, configBytes.Bytes(), 0644)
 }
 
-func (p *Provider) sendInternalWriteEvent() {
-	// Don't worry if the channel is blocked
-	select {
-	case p.internalWriteEvent <- struct{}{}:
-	default:
-	}
-}
-
 // AddPlugin adds the given plugin to the configuration
 // It errors if the plugin name already exists.
 func (p *Provider) AddPlugin(name string, pluginURL string) error {
@@ -277,7 +258,7 @@ func (p *Provider) MutateConfig(mutate func(Config) (Config, error)) error {
 		return err
 	}
 
-	p.sendInternalWriteEvent()
+	atomic.StoreInt32(&p.internalWriteEvent, 1)
 	return p.writeConfig()
 
 }
