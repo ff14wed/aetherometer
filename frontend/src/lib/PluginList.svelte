@@ -33,6 +33,7 @@
   ];
 
   let comboBox;
+  let urlInvalid = false;
   let selectedPresetID;
 
   function updatePresetURL(id: string) {
@@ -43,6 +44,28 @@
       }
     }
     newPluginURL = "";
+  }
+
+  function validate_url(urlString: string): boolean {
+    let url;
+
+    try {
+      url = new URL(urlString);
+    } catch (_) {
+      return false;
+    }
+
+    return url.protocol === "http:" || url.protocol === "https:";
+  }
+
+  async function tryAddPlugin(name: string, url: string) {
+    if (!validate_url(url)) {
+      urlInvalid = true;
+      return;
+    }
+    urlInvalid = false;
+
+    await addPlugin(name, url);
   }
 
   $: updatePresetURL(selectedPresetID);
@@ -104,6 +127,8 @@
           hideLabel
           labelText="Plugin URL"
           placeholder="eg. https://plugins.com/foo/"
+          invalidText={'Invalid URL. Note that the URL must begin with a scheme (e.g. "https://")'}
+          bind:invalid={urlInvalid}
           bind:value={newPluginURL}
         />
       </StructuredListCell>
@@ -113,7 +138,7 @@
           icon={Add16}
           size="small"
           on:click={() => {
-            addPlugin(newPluginName, newPluginURL);
+            tryAddPlugin(newPluginName, newPluginURL);
             newPluginName = "";
             newPluginURL = "";
             comboBox.clear({ focus: false });

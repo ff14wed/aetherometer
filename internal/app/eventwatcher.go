@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/models"
@@ -67,8 +68,11 @@ func (s *EventWatcher) Serve() {
 				EventsEmit(s.ctx, "StreamChange")
 			}
 		case <-cfgUpdatesCh:
-			s.authHandler.RefreshConfig()
 			EventsEmit(s.ctx, "ConfigChange")
+			if err := s.authHandler.RefreshConfig(); err != nil {
+				s.logger.Error("AuthHandler RefreshConfig", zap.Error(err))
+				EventsEmit(s.ctx, "ErrorEvent", fmt.Sprintf("Error refreshing config for Auth: %s", err))
+			}
 		case msg := <-cfgErrorsCh:
 			EventsEmit(s.ctx, "ErrorEvent", msg)
 		case <-s.stop:
