@@ -59,6 +59,11 @@ The `local_token` field allows local plugins to specify this token in the
 Authorization header for the API in order to gain access. This token may not be
 used from a remote origin.
 
+Auto Update
+
+Setting `auto_update` to `true` allows Aetherometer to download required
+resources if they are outdated or if they do not exist.
+
 Sources Table
 
 This table is primarily concerned with the configuration of data and map image

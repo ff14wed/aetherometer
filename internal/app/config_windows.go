@@ -16,7 +16,8 @@ func defaultConfig() (config.Config, error) {
 	}
 
 	return config.Config{
-		APIPort: 0,
+		APIPort:    0,
+		AutoUpdate: true,
 		Sources: config.Sources{
 			DataPath: filepath.Join(dirPath, "resources", "datasheets"),
 			Maps: config.MapConfig{

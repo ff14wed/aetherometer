@@ -202,6 +202,7 @@ var _ = Describe("Config", func() {
 				`api_port = 9000`,
 				`disable_auth = false`,
 				`local_token = "some-token"`,
+				`auto_update = true`,
 				`[sources]`,
 				`data_path = "dummy-path"`,
 				`maps.cache = "some-map-dir"`,
@@ -218,6 +219,7 @@ var _ = Describe("Config", func() {
 				APIPort:     9000,
 				DisableAuth: false,
 				LocalToken:  "some-token",
+				AutoUpdate:  true,
 				Sources: config.Sources{
 					DataPath: "dummy-path",
 					Maps: config.MapConfig{

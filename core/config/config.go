@@ -20,6 +20,10 @@ type Config struct {
 	// token. If empty, it does not allow authentication with an empty string.
 	LocalToken string `toml:"local_token,omitempty"`
 
+	// AutoUpdate allows Aetherometer the ability to downloaded required resources
+	// if they are outdated or do not exist.
+	AutoUpdate bool `toml:"auto_update,omitempty"`
+
 	// Sources contains configuration for data sources.
 	Sources Sources `toml:"sources"`
 
