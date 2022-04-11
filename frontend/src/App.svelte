@@ -15,7 +15,7 @@
 	import { onMount } from "svelte";
 
 	import type { StreamInfo } from "../wailsjs/go/models";
-	import go from "../wailsjs/go/bindings";
+	import type { go } from "../wailsjs/go/bindings";
 	import type { runtime } from "../wailsjs/runtime/runtime";
 
 	interface PluginInfo {
