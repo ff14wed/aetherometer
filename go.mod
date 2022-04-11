@@ -21,7 +21,7 @@ require (
 	github.com/sqweek/dialog v0.0.0-20220227145630-7a1c9e333fcf
 	github.com/thejerf/suture v4.0.1+incompatible
 	github.com/vektah/gqlparser/v2 v2.3.1
-	github.com/wailsapp/wails/v2 v2.0.0-beta.33
+	github.com/wailsapp/wails/v2 v2.0.0-beta.34
 	go.uber.org/zap v1.20.0
 	golang.org/x/sys v0.0.0-20220315194320-039c03cc5b86
 	gopkg.in/dealancer/validate.v2 v2.1.0
@@ -47,7 +47,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.2.0 // indirect
 	github.com/leaanthony/go-common-file-dialog v1.0.3 // indirect
-	github.com/leaanthony/go-webview2 v1.0.3-0.20220125181555-00f20a61c17d // indirect
+	github.com/leaanthony/go-webview2 v1.0.3-0.20220314105146-f44268990abe // indirect
 	github.com/leaanthony/gosod v1.0.3 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect
 	github.com/leaanthony/typescriptify-golang-structs v0.1.7 // indirect
