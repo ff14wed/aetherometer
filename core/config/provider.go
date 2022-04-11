@@ -84,7 +84,7 @@ func (p *Provider) EnsureConfigFile() error {
 	return nil
 }
 
-// broadcastError emits a message to the log and all notifyhub subscribers
+// broadcastError emits a message to the log and all event subscribers
 func (p *Provider) broadcastError(message string, err error) {
 	p.logger.Error(message, zap.Error(err))
 	p.ErrorEvents.Broadcast(fmt.Sprintf("%s: %s", message, err))
