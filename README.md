@@ -58,7 +58,7 @@ Here are some plugins that you can try to get an idea for Aetherometer's capabil
 <img src="docs/settings.png" alt="preview" />
 
 1. Click on the Settings button in the top right of the window.
-2. Enter in the plugin name and URL.
+2. Select a preset from the dropdown or enter in the plugin name and URL.
 3. Click the "Add Plugin" button (plus sign).
 
 ### Removing Plugins / Closing Panes
