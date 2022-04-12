@@ -41,7 +41,7 @@ jobs:
       uses: actions/download-artifact@v3
 
     - name: zip exe for release
-      run: zip aetherometer-windows-amd64.zip ./aetherometer-windows/aetherometer.exe
+      run: zip -j aetherometer-windows-amd64.zip ./aetherometer-windows/aetherometer.exe
 
     - name: Release
       uses: softprops/action-gh-release@v1
