@@ -229,6 +229,7 @@ func checkAppUpdate(version string, logger *zap.Logger) error {
 	}
 	if latest.LessOrEqual(version) {
 		logger.Info("Current version is the latest.", zap.String("version", version))
+		return nil
 	}
 
 	logger.Info("Found newer Aetheromter version.", zap.String("version", latest.Version()))
