@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Modal } from "carbon-components-svelte";
+	import { Button, InlineNotification, Modal } from "carbon-components-svelte";
 
 	import FolderOpen16 from "carbon-icons-svelte/lib/FolderOpen16";
 	import { onMount } from "svelte";
@@ -97,9 +97,15 @@
 	</div>
 
 	<h4>Loaded Plugins</h4>
-	<br />
+	<div style="display: flex">
+		<InlineNotification
+			lowContrast
+			hideCloseButton
+			kind="info"
+			subtitle="Be sure to save your data before closing plugins or FFXIV since plugins will be closed without warning."
+		/>
+	</div>
 	<PluginList plugins={config.Plugins} {addPlugin} {deletePlugin} />
-	<p>Settings are automatically saved.</p>
 </Modal>
 
 <style>
