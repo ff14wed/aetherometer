@@ -9,10 +9,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"syscall"
+
+	"github.com/ff14wed/aetherometer/core/config"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ff14wed/aetherometer/core/config"
+	"github.com/creativeprojects/go-selfupdate"
 	"github.com/sqweek/dialog"
 	"go.uber.org/zap"
 )
@@ -141,9 +146,7 @@ func ensureHookAdapter(hookPath string, logger *zap.Logger) error {
 	return nil
 }
 
-func CheckUpdates(configFile string, logger *zap.Logger) error {
-	logger.Info("Checking for updates...")
-
+func checkResourceUpdates(configFile string, logger *zap.Logger) error {
 	cfg := config.Config{}
 	if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 		// Config file doesn't exist, so write the config to disk first
@@ -190,5 +193,77 @@ func CheckUpdates(configFile string, logger *zap.Logger) error {
 	}
 
 	logger.Info("Finished checking for updates.")
+	return nil
+}
+
+func restartApp(exe string) error {
+	if runtime.GOOS == "windows" {
+		cmd := exec.Command(exe, os.Args[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+		cmd.Env = os.Environ()
+		err := cmd.Run()
+		if err == nil {
+			os.Exit(0)
+		}
+		return err
+	}
+
+	return syscall.Exec(exe, append([]string{exe}, os.Args[1:]...), os.Environ())
+}
+
+func checkAppUpdate(version string, logger *zap.Logger) error {
+	if version == "development" {
+		logger.Info("Skipping app update for development version.")
+		return nil
+	}
+	latest, found, err := selfupdate.DetectLatest("ff14wed/aetherometer")
+	if err != nil {
+		logger.Error("Unable to detect latest version... Skipping app update.", zap.Error(err))
+		return nil
+	}
+	if !found {
+		logger.Error("No version could be found from github repository... Skipping app update.", zap.Error(err))
+		return nil
+	}
+	if latest.LessOrEqual(version) {
+		logger.Info("Current version is the latest.", zap.String("version", version))
+	}
+
+	logger.Info("Found newer Aetheromter version.", zap.String("version", latest.Version()))
+
+	updateDlg := dialog.Message("A new version of Aetherometer (%s) is available. Update?", latest.Version())
+	updateDlg.Title("Aetherometer Update")
+	if !updateDlg.YesNo() {
+		logger.Info("Skipping app update due to user cancellation.")
+		return nil
+	}
+
+	exe, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("could not locate executable path: %s", err)
+	}
+	if err := selfupdate.UpdateTo(latest.AssetURL, latest.AssetName, exe); err != nil {
+		return fmt.Errorf("error occurred while updating binary: %s", err)
+	}
+	logger.Info("Successfully updated to latest version", zap.String("version", latest.Version()))
+
+	if err := restartApp(exe); err != nil {
+		return fmt.Errorf("error restarting app: %s", err)
+	}
+	return nil
+}
+
+func CheckUpdates(version string, configFile string, logger *zap.Logger) error {
+	logger.Info("Checking for updates...")
+
+	if err := checkAppUpdate(version, logger); err != nil {
+		return err
+	}
+	if err := checkResourceUpdates(configFile, logger); err != nil {
+		return err
+	}
+
 	return nil
 }

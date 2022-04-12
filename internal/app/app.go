@@ -74,7 +74,7 @@ func (b *App) Initialize() error {
 		return fmt.Errorf("could not setup default config: %v", err)
 	}
 
-	if err = CheckUpdates(b.cfgPath, b.logger); err != nil {
+	if err = CheckUpdates(b.version, b.cfgPath, b.logger); err != nil {
 		return fmt.Errorf("error updating: %s", err)
 	}
 
