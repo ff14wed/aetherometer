@@ -93,7 +93,7 @@ var ExpectedMapInfo = map[uint16]datasheet.MapInfo{
 		PlaceName: 1409, TerritoryType: 196,
 	},
 	33: datasheet.MapInfo{
-		Key: 33, ID: "s1fa/00", SizeFactor: 400, PlaceName: 359, TerritoryType: 206,
+		Key: 33, ID: "s1fa/00", SizeFactor: 400, PlaceName: 359, TerritoryType: 1046,
 	},
 	403: datasheet.MapInfo{
 		Key: 403, ID: "s1fa/00", SizeFactor: 400, PlaceName: 359, PlaceNameSub: 19,
@@ -117,17 +117,17 @@ var ExpectedPlaceNames = map[uint16]datasheet.PlaceName{
 
 // ExpectedTerritoryInfo derives from TerritoryTypeCSV
 var ExpectedTerritoryInfo = map[uint16]datasheet.TerritoryInfo{
-	1:   datasheet.TerritoryInfo{Key: 1, Name: "", Map: 0},
-	128: datasheet.TerritoryInfo{Key: 128, Name: "s1t1", Map: 11},
-	129: datasheet.TerritoryInfo{Key: 129, Name: "s1t2", Map: 12},
-	130: datasheet.TerritoryInfo{Key: 130, Name: "w1t1", Map: 13},
-	131: datasheet.TerritoryInfo{Key: 131, Name: "w1t2", Map: 14},
-	132: datasheet.TerritoryInfo{Key: 132, Name: "f1t1", Map: 2},
-	133: datasheet.TerritoryInfo{Key: 133, Name: "f1t2", Map: 3},
-	196: datasheet.TerritoryInfo{Key: 196, Name: "w1b4", Map: 178},
-	206: datasheet.TerritoryInfo{Key: 206, Name: "s1fa", Map: 33},
-	293: datasheet.TerritoryInfo{Key: 293, Name: "s1fa_2", Map: 403},
-	296: datasheet.TerritoryInfo{Key: 296, Name: "s1fa_3", Map: 403},
+	1:    datasheet.TerritoryInfo{Key: 1, Name: "", Map: 0},
+	128:  datasheet.TerritoryInfo{Key: 128, Name: "s1t1", Map: 11},
+	129:  datasheet.TerritoryInfo{Key: 129, Name: "s1t2", Map: 12},
+	130:  datasheet.TerritoryInfo{Key: 130, Name: "w1t1", Map: 13},
+	131:  datasheet.TerritoryInfo{Key: 131, Name: "w1t2", Map: 14},
+	132:  datasheet.TerritoryInfo{Key: 132, Name: "f1t1", Map: 2},
+	133:  datasheet.TerritoryInfo{Key: 133, Name: "f1t2", Map: 3},
+	196:  datasheet.TerritoryInfo{Key: 196, Name: "w1b4", Map: 178},
+	293:  datasheet.TerritoryInfo{Key: 293, Name: "s1fa_2", Map: 403},
+	296:  datasheet.TerritoryInfo{Key: 296, Name: "s1fa_3", Map: 403},
+	1046: datasheet.TerritoryInfo{Key: 1046, Name: "s1fa_re", Map: 33},
 }
 
 // ExpectedStatusData derives from StatusCSV

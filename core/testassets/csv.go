@@ -95,7 +95,7 @@ int32,MapCondition,byte,byte,sbyte,byte,uint16,str,uint16,int16,int16,PlaceName,
 14,0,3,3,1,1,60,"w1t2/01",200,0,0,24,41,373,-1,0,131,True,False,False
 73,0,3,3,2,1,62,"w1t2/02",200,0,0,24,41,698,-1,0,131,True,False,False
 178,0,0,0,0,1,143,"w1b4/00",200,-448,0,24,1409,0,-1,0,196,True,False,False
-33,0,0,0,0,1,0,"s1fa/00",400,0,0,22,359,0,-1,0,206,True,False,False
+33,0,0,0,0,1,0,"s1fa/00",400,0,0,22,359,0,-1,0,1046,True,False,False
 403,0,0,0,0,1,0,"s1fa/00",400,0,0,22,359,19,-1,0,293,True,False,False
 `
 
@@ -127,9 +127,9 @@ int32,str,str,byte,PlaceName,PlaceName,PlaceName,Map,LoadingImage,byte,byte,Cont
 132,"f1t1","ffxiv/fst_f1/twn/f1t1/level/f1t1",1,23,506,52,2,3,0,0,0,False,1,True,0,True,False,False,False,1003,122009,123202,852087,0,2,-1,2,4,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
 133,"f1t2","ffxiv/fst_f1/twn/f1t2/level/f1t2",1,23,506,53,3,3,0,0,0,False,2,True,0,True,False,False,False,1003,122009,123203,852103,0,2,-1,0,5,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
 196,"w1b4","ffxiv/wil_w1/bah/w1b4/level/w1b4",1,24,505,1409,178,4,2,17,110,False,44,False,0,True,False,False,False,1001,122010,124534,0,0,0,-1,63,-1,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
-206,"s1fa","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,33,2,2,10,57,False,23,False,0,True,False,False,False,1001,-1,-1,0,0,0,-1,6,-1,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
 293,"s1fa_2","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,403,2,2,10,60,False,23,False,0,True,False,False,False,1001,122001,124009,0,0,0,-1,6,-1,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
 296,"s1fa_3","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,403,2,2,10,64,False,23,False,0,True,False,False,False,1001,122001,124010,0,0,0,-1,16,-1,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
+1046,"s1fa_re","ffxiv/sea_s1/fld/s1fa/level/s1fa",1,22,502,359,33,2,2,10,57,False,23,False,0,True,False,False,False,1001,-1,-1,0,0,0,-1,6,-1,False,0,0,0,0,0,False,False,0,False,False,False,False,False,0
 `
 
 const StatusCSV = `
