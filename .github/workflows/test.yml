@@ -20,4 +20,4 @@ jobs:
     - name: Test
       run: |
         cd core
-        go run github.com/onsi/ginkgo/ginkgo -r -p --randomizeAllSpecs --failOnPending --randomizeSuites --race
+        go run github.com/onsi/ginkgo/v2/ginkgo -r -p --randomizeAllSpecs --failOnPending --randomizeSuites --race

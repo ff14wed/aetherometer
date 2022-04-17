@@ -2,8 +2,7 @@ package models_test
 
 import (
 	"github.com/ff14wed/aetherometer/core/models"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

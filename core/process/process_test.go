@@ -5,7 +5,7 @@ import (
 
 	"github.com/ff14wed/aetherometer/core/process"
 	"github.com/ff14wed/aetherometer/core/process/processfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

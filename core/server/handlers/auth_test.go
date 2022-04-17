@@ -16,7 +16,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/server/handlers"
 	"github.com/ff14wed/aetherometer/core/testhelpers"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 )

@@ -7,7 +7,7 @@ import (
 	"github.com/ff14wed/aetherometer/core/hub"
 	"github.com/ff14wed/aetherometer/core/models"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

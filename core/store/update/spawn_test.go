@@ -14,7 +14,7 @@ import (
 	"github.com/ff14wed/xivnet/v3/datatypes"
 	"gopkg.in/dealancer/validate.v2"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 )

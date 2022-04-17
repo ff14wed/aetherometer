@@ -3,7 +3,7 @@ package testassets_test
 import (
 	"github.com/ff14wed/aetherometer/core/datasheet"
 	"github.com/ff14wed/aetherometer/core/testassets"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

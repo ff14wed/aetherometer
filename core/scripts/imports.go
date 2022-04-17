@@ -9,5 +9,5 @@ import (
 	_ "github.com/99designs/gqlgen/cmd"
 	_ "github.com/99designs/gqlgen/codegen"
 	_ "github.com/maxbrunsfeld/counterfeiter/v6"
-	_ "github.com/onsi/ginkgo/ginkgo"
+	_ "github.com/onsi/ginkgo/v2/ginkgo"
 )
