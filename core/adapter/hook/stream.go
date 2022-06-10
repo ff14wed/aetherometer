@@ -65,6 +65,13 @@ func NewStream(streamID uint32, cfg AdapterConfig, logger *zap.Logger) Stream {
 	sp := NewStreamPinger(ss, pingInterval, streamLogger)
 	sr := NewStreamReader(hookConn, streamLogger)
 	frameDecoderFactory := func(r io.Reader) message.FrameDecoder {
+		if cfg.OodleFactory != nil {
+			oodleImpl, err := cfg.OodleFactory.New(streamID)
+			if err == nil {
+				return xivnet.NewDecoderWithOodle(r, 65535, oodleImpl)
+			}
+			streamLogger.Error("Failed to initialize oodle, falling back to decoder without Oodle", zap.Error(err))
+		}
 		return xivnet.NewDecoder(r, 65535)
 	}
 	fr := NewFrameReader(

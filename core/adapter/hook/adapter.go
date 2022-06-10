@@ -10,11 +10,16 @@ import (
 	"github.com/ff14wed/aetherometer/core/config"
 	"github.com/ff14wed/aetherometer/core/process"
 	"github.com/ff14wed/aetherometer/core/stream"
+	"github.com/ff14wed/xivnet/v3"
 )
 
 // Adapter defines the implementation of the hook Adapter
 type Adapter struct {
 	*suture.Supervisor
+}
+
+type OodleFactory interface {
+	New(processID uint32) (xivnet.OodleImpl, error)
 }
 
 // AdapterConfig provides commonly accessed configuration for the hook
@@ -27,6 +32,7 @@ type AdapterConfig struct {
 
 	RemoteProcessProvider RemoteProcessProvider
 	ProcessEnumerator     process.Enumerator
+	OodleFactory          OodleFactory
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoteProcessProvider
