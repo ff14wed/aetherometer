@@ -11339,15 +11339,15 @@ int32,str,sbyte,str,sbyte,sbyte,sbyte,sbyte,sbyte
 11335,"serpent lancer",0,"serpent lancers",0,0,1,1,0
 11336,"flame thaumaturge",0,"flame thaumaturges",0,0,1,1,0
 11337,"serpent conjurer",0,"serpent conjurers",0,0,1,0,0
-11338,"",0,"",0,0,0,0,0
-11339,"",0,"",0,0,0,0,0
-11340,"",0,"",0,0,0,0,0
-11341,"",0,"",0,0,0,0,0
-11342,"",0,"",0,0,0,0,0
-11343,"",0,"",0,0,0,0,0
-11344,"",0,"",0,0,0,0,0
-11345,"",0,"",0,0,0,0,0
-11346,"",0,"",0,0,0,0,0
+11338,"full-grown manjusaka",0,"full-grown manjusaka",0,0,1,0,0
+11339,"overgrown manjusaka",0,"overgrown manjusaka",0,1,1,0,0
+11340,"raging valras",0,"raging valras",0,0,1,0,0
+11341,"brilliant starmite",0,"brilliant starmites",0,0,1,0,0
+11342,"sparkling odqan",0,"sparkling odqan",0,0,1,0,0
+11343,"long-legged Akyaali crab",0,"long-legged Akyaali crabs",0,0,1,0,0
+11344,"raging vajralangula",0,"raging vajralangula",0,0,1,0,0
+11345,"murderous asvattha",0,"murderous asvattha",0,0,1,0,0
+11346,"tiny Gajasura",0,"tiny Gajasura",0,0,1,0,0
 11347,"Terminus shriver",0,"Terminus shrivers",0,0,1,0,0
 11348,"Terminus twitcher",0,"Terminus twitchers",0,0,1,0,0
 11349,"Terminus beholder",0,"Terminus beholders",0,0,1,0,0
