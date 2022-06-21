@@ -188,6 +188,7 @@ type RecipeInfo {
   id: Int!
   name: String!
   recipeLevel: Int!
+  itemID: Int!
   element: Int!
   canHQ: Boolean!
   difficulty: Int!

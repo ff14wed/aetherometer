@@ -98,6 +98,7 @@ var _ = Describe("Recipe", func() {
 				ID:          33074,
 				Name:        "Rakshasa Knuckles",
 				RecipeLevel: 380,
+				ItemID:      23769,
 				Element:     0,
 				CanHq:       true,
 				Difficulty:  1500,
@@ -111,6 +112,7 @@ var _ = Describe("Recipe", func() {
 				ID:          1,
 				Name:        "Bronze Ingot",
 				RecipeLevel: 1,
+				ItemID:      5056,
 				Element:     0,
 				CanHq:       true,
 			}))
@@ -120,6 +122,7 @@ var _ = Describe("Recipe", func() {
 			Expect(r.GetInfo(33067)).To(Equal(&models.RecipeInfo{
 				ID:          33067,
 				RecipeLevel: 320,
+				ItemID:      23002,
 				Element:     0,
 				CanHq:       true,
 				Difficulty:  1200,

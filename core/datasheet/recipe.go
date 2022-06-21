@@ -98,6 +98,7 @@ func (r *RecipeStore) GetInfo(key uint32) *models.RecipeInfo {
 	info := &models.RecipeInfo{
 		ID:          int(key),
 		RecipeLevel: int(recipe.RecipeLevel),
+		ItemID:      int(recipe.ItemID),
 		Element:     int(recipe.RecipeElement),
 		CanHq:       recipe.CanHQ,
 	}

@@ -182,6 +182,7 @@ type RecipeInfo struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	RecipeLevel int    `json:"recipeLevel"`
+	ItemID      int    `json:"itemID"`
 	Element     int    `json:"element"`
 	CanHq       bool   `json:"canHQ"`
 	Difficulty  int    `json:"difficulty"`
