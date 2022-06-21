@@ -34,6 +34,9 @@ func genericSetup() (testEnv testVars) {
 		ClassJob:  &models.ClassJob{},
 		Resources: &models.Resources{},
 		Location:  &models.Location{},
+		Statuses: []*models.Status{
+			&models.Status{ID: 1},
+		},
 	}
 
 	testEnv.streams = &store.Streams{

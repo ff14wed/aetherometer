@@ -12,7 +12,6 @@ func init() {
 	registerIngressHandler(new(datatypes.EffectResult), newEffectResultUpdate)
 }
 
-// TODO: Add testing
 func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store.Update {
 	data := b.Data.(*datatypes.EffectResult)
 
@@ -53,7 +52,6 @@ func newEffectResultUpdate(streamID int, b *xivnet.Block, d *datasheet.Collectio
 			Hp:       int(data.CurrentHP),
 			Mp:       int(data.CurrentMP),
 			MaxHp:    int(data.MaxHP),
-			MaxMp:    10000,
 			LastTick: b.Time,
 		},
 	}
@@ -73,7 +71,12 @@ func (u effectResultUpdate) ModifyStore(streams *store.Streams) ([]models.Stream
 }
 
 func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Entity) ([]models.StreamEvent, []models.EntityEvent, error) {
-	entity.Resources = &u.resources
+	entity.Resources.Hp = u.resources.Hp
+	entity.Resources.MaxHp = u.resources.MaxHp
+	entity.Resources.Mp = u.resources.Mp
+	entity.Resources.LastTick = u.resources.LastTick
+
+	resourcesClone := *entity.Resources
 
 	if len(entity.Statuses) <= int(u.statusListLength) {
 		diff := int(u.statusListLength) - len(entity.Statuses)
@@ -82,11 +85,12 @@ func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Ent
 
 	var statusEvents []models.EntityEvent
 	for i, s := range u.statuses {
-		entity.Statuses[i] = &s
+		sCopy := s
+		entity.Statuses[i] = &sCopy
 		statusEvents = append(statusEvents, models.EntityEvent{
 			StreamID: u.streamID,
 			EntityID: u.subjectID,
-			Type:     models.UpsertStatus{Index: i, Status: &s},
+			Type:     models.UpsertStatus{Index: i, Status: &sCopy},
 		})
 	}
 
@@ -94,7 +98,7 @@ func (u effectResultUpdate) modifyFunc(stream *models.Stream, entity *models.Ent
 		{
 			StreamID: u.streamID,
 			EntityID: u.subjectID,
-			Type:     models.UpdateResources{Resources: entity.Resources},
+			Type:     models.UpdateResources{Resources: &resourcesClone},
 		},
 	}, statusEvents...), nil
 }
