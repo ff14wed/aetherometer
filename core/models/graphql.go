@@ -1865,7 +1865,7 @@ type CraftingInfo {
   currentCondition: Int!
   previousCondition: Int!
 
-  reuseProc: Boolean!
+  reuseProc: Boolean! @deprecated(reason: "Reuse doesn't exist anymore.")
 }
 
 type RecipeInfo {
