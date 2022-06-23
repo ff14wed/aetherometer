@@ -99,6 +99,8 @@ type CraftingInfo struct {
 	DurabilityDelta     int         `json:"durabilityDelta"`
 	CurrentCondition    int         `json:"currentCondition"`
 	PreviousCondition   int         `json:"previousCondition"`
+	Completed           bool        `json:"completed"`
+	Failed              bool        `json:"failed"`
 	ReuseProc           bool        `json:"reuseProc"`
 }
 

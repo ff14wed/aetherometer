@@ -17,6 +17,10 @@ func newDirectorPlaySceneUpdate(streamID int, b *xivnet.Block, d *datasheet.Coll
 	data := b.Data.(*datatypes.EventPlay32)
 
 	if craftState, matches := data.Data.(datatypes.CraftState); matches {
+		flags := craftState.Flags
+		failed := (flags & 0x8) > 0
+		completed := (flags & 0x4) > 0
+
 		action := d.ActionData.GetAction(craftState.CraftAction)
 		return craftingInfoUpdate{
 			streamID: streamID,
@@ -33,6 +37,8 @@ func newDirectorPlaySceneUpdate(streamID int, b *xivnet.Block, d *datasheet.Coll
 				DurabilityDelta:     int(craftState.DurabilityDelta),
 				CurrentCondition:    int(craftState.CurrentCondition),
 				PreviousCondition:   int(craftState.PreviousCondition),
+				Completed:           completed,
+				Failed:              failed,
 			},
 		}
 	}

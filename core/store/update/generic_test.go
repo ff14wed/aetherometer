@@ -35,7 +35,7 @@ func genericSetup() (testEnv testVars) {
 		Resources: &models.Resources{},
 		Location:  &models.Location{},
 		Statuses: []*models.Status{
-			&models.Status{ID: 1},
+			{ID: 1},
 		},
 	}
 

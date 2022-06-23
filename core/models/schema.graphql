@@ -181,6 +181,8 @@ type CraftingInfo {
   currentCondition: Int!
   previousCondition: Int!
 
+  completed: Boolean!
+  failed: Boolean!
   reuseProc: Boolean! @deprecated(reason: "Reuse doesn't exist anymore.")
 }
 

@@ -112,9 +112,11 @@ type ComplexityRoot struct {
 	}
 
 	CraftingInfo struct {
+		Completed           func(childComplexity int) int
 		CurrentCondition    func(childComplexity int) int
 		Durability          func(childComplexity int) int
 		DurabilityDelta     func(childComplexity int) int
+		Failed              func(childComplexity int) int
 		HqChance            func(childComplexity int) int
 		LastCraftActionID   func(childComplexity int) int
 		LastCraftActionName func(childComplexity int) int
@@ -683,6 +685,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ClassJob.Name(childComplexity), true
 
+	case "CraftingInfo.completed":
+		if e.complexity.CraftingInfo.Completed == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.Completed(childComplexity), true
+
 	case "CraftingInfo.currentCondition":
 		if e.complexity.CraftingInfo.CurrentCondition == nil {
 			break
@@ -703,6 +712,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CraftingInfo.DurabilityDelta(childComplexity), true
+
+	case "CraftingInfo.failed":
+		if e.complexity.CraftingInfo.Failed == nil {
+			break
+		}
+
+		return e.complexity.CraftingInfo.Failed(childComplexity), true
 
 	case "CraftingInfo.hqChance":
 		if e.complexity.CraftingInfo.HqChance == nil {
@@ -1865,6 +1881,8 @@ type CraftingInfo {
   currentCondition: Int!
   previousCondition: Int!
 
+  completed: Boolean!
+  failed: Boolean!
   reuseProc: Boolean! @deprecated(reason: "Reuse doesn't exist anymore.")
 }
 
@@ -4150,6 +4168,76 @@ func (ec *executionContext) _CraftingInfo_previousCondition(ctx context.Context,
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CraftingInfo_completed(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CraftingInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Completed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CraftingInfo_failed(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CraftingInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Failed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CraftingInfo_reuseProc(ctx context.Context, field graphql.CollectedField, obj *CraftingInfo) (ret graphql.Marshaler) {
@@ -10339,6 +10427,26 @@ func (ec *executionContext) _CraftingInfo(ctx context.Context, sel ast.Selection
 		case "previousCondition":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._CraftingInfo_previousCondition(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "completed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CraftingInfo_completed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "failed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CraftingInfo_failed(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
