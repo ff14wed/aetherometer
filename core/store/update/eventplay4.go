@@ -23,7 +23,7 @@ func newEventPlay4Update(streamID int, b *xivnet.Block, d *datasheet.Collection)
 			return craftingInfoUpdate{
 				streamID: streamID,
 				craftingInfo: &models.CraftingInfo{
-					Recipe:            recipeInfo,
+					Recipe:            &recipeInfo,
 					StepNum:           1,
 					CurrentCondition:  1,
 					PreviousCondition: 1,

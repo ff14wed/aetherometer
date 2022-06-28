@@ -3,7 +3,9 @@ package datasheet
 import (
 	"fmt"
 	"io"
-	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // BNPCInfo stores information about a game monster
@@ -113,7 +115,8 @@ func (b *BNPCStore) GetBNPCInfo(bNPCNameID, bNPCBaseID, modelCharaID uint32) *BN
 	if !ok {
 		return nil
 	}
-	bNPCInfo.Name = strings.Title(bNPCName.Name)
+
+	bNPCInfo.Name = cases.Title(language.English).String(bNPCName.Name)
 
 	bNPCBase, ok := b.BNPCBases[bNPCBaseID]
 	var scale float32 = 1.0

@@ -149,8 +149,8 @@ func generateSpawnUpdate(
 	)
 
 	if subjectID == currentID {
-		homeWorld = *d.WorldData.Lookup(int(data.HomeWorld))
-		currentWorld = *d.WorldData.Lookup(int(data.CurrentWorld))
+		homeWorld = d.WorldData.Lookup(int(data.HomeWorld))
+		currentWorld = d.WorldData.Lookup(int(data.CurrentWorld))
 		isWorldSet = true
 	}
 

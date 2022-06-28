@@ -50,7 +50,7 @@ func newChatFromUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) s
 			ChannelType: "Private",
 
 			ContentID: data.FromCharacterID,
-			World:     speakerWorld,
+			World:     &speakerWorld,
 			Name:      data.FromName.String(),
 
 			Message: data.Message.String(),
@@ -69,7 +69,7 @@ func newChatToUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) sto
 			ChannelType: "PrivateTo",
 
 			ContentID: data.ToCharacterID,
-			World:     toWorld,
+			World:     &toWorld,
 			Name:      data.ToName.String(),
 
 			Message: data.Message.String(),
@@ -88,7 +88,7 @@ func newChatFromXWorldUpdate(streamID int, b *xivnet.Block, d *datasheet.Collect
 
 			ContentID: data.FromCharacterID,
 			EntityID:  uint64(data.FromEntityID),
-			World:     speakerWorld,
+			World:     &speakerWorld,
 			Name:      data.FromName.String(),
 
 			Message: data.Message.String(),
@@ -126,12 +126,12 @@ func newChatUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) store
 		streamID: streamID,
 		chatEvent: models.ChatEvent{
 			ChannelID:    data.ChannelID,
-			ChannelWorld: channelWorld,
+			ChannelWorld: &channelWorld,
 			ChannelType:  channelType,
 
 			ContentID: data.SpeakerCharacterID,
 			EntityID:  uint64(data.SpeakerEntityID),
-			World:     speakerWorld,
+			World:     &speakerWorld,
 			Name:      data.SpeakerName.String(),
 
 			Message: data.Message.String(),
@@ -149,7 +149,7 @@ func newEgressChatUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection)
 		streamID: streamID,
 		chatEvent: models.ChatEvent{
 			ChannelID:    data.ChannelID,
-			ChannelWorld: channelWorld,
+			ChannelWorld: &channelWorld,
 			ChannelType:  channelType,
 
 			Message: data.Message.String(),
@@ -201,7 +201,7 @@ func newChatXWorldUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection)
 
 			ContentID: data.SpeakerCharacterID,
 			EntityID:  uint64(data.SpeakerEntityID),
-			World:     speakerWorld,
+			World:     &speakerWorld,
 			Name:      data.SpeakerName.String(),
 
 			Message: data.Message.String(),
@@ -252,7 +252,7 @@ func newChatZoneUpdate(streamID int, b *xivnet.Block, d *datasheet.Collection) s
 
 			ContentID: data.CharacterID,
 			EntityID:  uint64(data.EntityID),
-			World:     speakerWorld,
+			World:     &speakerWorld,
 			Name:      data.SpeakerName.String(),
 
 			Message: data.Message.String(),

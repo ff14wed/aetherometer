@@ -44,14 +44,14 @@ var _ = Describe("World", func() {
 		})
 
 		It("returns the World with the requested world ID", func() {
-			Expect(s.Lookup(5)).To(Equal(&models.World{
+			Expect(s.Lookup(5)).To(Equal(models.World{
 				ID:   5,
 				Name: "c-contents2",
 			}))
 		})
 
 		It("returns an Unknown world if the requested world does not exist", func() {
-			Expect(s.Lookup(123)).To(Equal(&models.World{
+			Expect(s.Lookup(123)).To(Equal(models.World{
 				ID:   123,
 				Name: "Unknown_123",
 			}))

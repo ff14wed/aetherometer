@@ -90,12 +90,14 @@ func (r *RecipeStore) PopulateItems(dataReader io.Reader) error {
 }
 
 // GetInfo returns the normalized information about the recipe
-func (r *RecipeStore) GetInfo(key uint32) *models.RecipeInfo {
+func (r *RecipeStore) GetInfo(key uint32) models.RecipeInfo {
 	recipe, found := r.Recipes[key]
 	if !found {
-		return nil
+		return models.RecipeInfo{
+			ID: int(key),
+		}
 	}
-	info := &models.RecipeInfo{
+	info := models.RecipeInfo{
 		ID:          int(key),
 		RecipeLevel: int(recipe.RecipeLevel),
 		ItemID:      int(recipe.ItemID),
