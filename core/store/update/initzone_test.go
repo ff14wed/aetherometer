@@ -144,5 +144,16 @@ var _ = Describe("InitZone Update", func() {
 		Expect(validate.Validate(streams)).To(Succeed())
 	})
 
+	It("does not change the stats", func() {
+		u := generator.Generate(streamID, false, b)
+		Expect(u).ToNot(BeNil())
+		_, _, err := u.ModifyStore(streams)
+		Expect(err).ToNot(HaveOccurred())
+
+		Expect(streams.Map[streamID].Stats).To(Equal(&models.Stats{Strength: 1}))
+
+		Expect(validate.Validate(streams)).To(Succeed())
+	})
+
 	streamValidationTests(testEnv, false)
 })

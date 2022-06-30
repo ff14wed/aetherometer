@@ -254,6 +254,39 @@ type ComplexityRoot struct {
 		Entities func(childComplexity int) int
 	}
 
+	Stats struct {
+		AttackMagicPotency  func(childComplexity int) int
+		AttackPower         func(childComplexity int) int
+		Control             func(childComplexity int) int
+		Cp                  func(childComplexity int) int
+		Craftsmanship       func(childComplexity int) int
+		CriticalHit         func(childComplexity int) int
+		Defense             func(childComplexity int) int
+		Delay               func(childComplexity int) int
+		Determination       func(childComplexity int) int
+		Dexterity           func(childComplexity int) int
+		DirectHitRate       func(childComplexity int) int
+		ElementalBonus      func(childComplexity int) int
+		Evasion             func(childComplexity int) int
+		Gathering           func(childComplexity int) int
+		Gp                  func(childComplexity int) int
+		Haste               func(childComplexity int) int
+		HealingMagicPotency func(childComplexity int) int
+		Hp                  func(childComplexity int) int
+		Intelligence        func(childComplexity int) int
+		MagicDefense        func(childComplexity int) int
+		Mind                func(childComplexity int) int
+		Mp                  func(childComplexity int) int
+		Perception          func(childComplexity int) int
+		Piety               func(childComplexity int) int
+		SkillSpeed          func(childComplexity int) int
+		SpellSpeed          func(childComplexity int) int
+		Strength            func(childComplexity int) int
+		Tenacity            func(childComplexity int) int
+		Tp                  func(childComplexity int) int
+		Vitality            func(childComplexity int) int
+	}
+
 	Status struct {
 		ActorID     func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -276,6 +309,7 @@ type ComplexityRoot struct {
 		InstanceNum  func(childComplexity int) int
 		Place        func(childComplexity int) int
 		ServerID     func(childComplexity int) int
+		Stats        func(childComplexity int) int
 	}
 
 	StreamEvent struct {
@@ -331,6 +365,10 @@ type ComplexityRoot struct {
 
 	UpdateResources struct {
 		Resources func(childComplexity int) int
+	}
+
+	UpdateStats struct {
+		Stats func(childComplexity int) int
 	}
 
 	UpdateTarget struct {
@@ -1323,6 +1361,216 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SetEntities.Entities(childComplexity), true
 
+	case "Stats.attackMagicPotency":
+		if e.complexity.Stats.AttackMagicPotency == nil {
+			break
+		}
+
+		return e.complexity.Stats.AttackMagicPotency(childComplexity), true
+
+	case "Stats.attackPower":
+		if e.complexity.Stats.AttackPower == nil {
+			break
+		}
+
+		return e.complexity.Stats.AttackPower(childComplexity), true
+
+	case "Stats.control":
+		if e.complexity.Stats.Control == nil {
+			break
+		}
+
+		return e.complexity.Stats.Control(childComplexity), true
+
+	case "Stats.cp":
+		if e.complexity.Stats.Cp == nil {
+			break
+		}
+
+		return e.complexity.Stats.Cp(childComplexity), true
+
+	case "Stats.craftsmanship":
+		if e.complexity.Stats.Craftsmanship == nil {
+			break
+		}
+
+		return e.complexity.Stats.Craftsmanship(childComplexity), true
+
+	case "Stats.criticalHit":
+		if e.complexity.Stats.CriticalHit == nil {
+			break
+		}
+
+		return e.complexity.Stats.CriticalHit(childComplexity), true
+
+	case "Stats.defense":
+		if e.complexity.Stats.Defense == nil {
+			break
+		}
+
+		return e.complexity.Stats.Defense(childComplexity), true
+
+	case "Stats.delay":
+		if e.complexity.Stats.Delay == nil {
+			break
+		}
+
+		return e.complexity.Stats.Delay(childComplexity), true
+
+	case "Stats.determination":
+		if e.complexity.Stats.Determination == nil {
+			break
+		}
+
+		return e.complexity.Stats.Determination(childComplexity), true
+
+	case "Stats.dexterity":
+		if e.complexity.Stats.Dexterity == nil {
+			break
+		}
+
+		return e.complexity.Stats.Dexterity(childComplexity), true
+
+	case "Stats.directHitRate":
+		if e.complexity.Stats.DirectHitRate == nil {
+			break
+		}
+
+		return e.complexity.Stats.DirectHitRate(childComplexity), true
+
+	case "Stats.elementalBonus":
+		if e.complexity.Stats.ElementalBonus == nil {
+			break
+		}
+
+		return e.complexity.Stats.ElementalBonus(childComplexity), true
+
+	case "Stats.evasion":
+		if e.complexity.Stats.Evasion == nil {
+			break
+		}
+
+		return e.complexity.Stats.Evasion(childComplexity), true
+
+	case "Stats.gathering":
+		if e.complexity.Stats.Gathering == nil {
+			break
+		}
+
+		return e.complexity.Stats.Gathering(childComplexity), true
+
+	case "Stats.gp":
+		if e.complexity.Stats.Gp == nil {
+			break
+		}
+
+		return e.complexity.Stats.Gp(childComplexity), true
+
+	case "Stats.haste":
+		if e.complexity.Stats.Haste == nil {
+			break
+		}
+
+		return e.complexity.Stats.Haste(childComplexity), true
+
+	case "Stats.healingMagicPotency":
+		if e.complexity.Stats.HealingMagicPotency == nil {
+			break
+		}
+
+		return e.complexity.Stats.HealingMagicPotency(childComplexity), true
+
+	case "Stats.hp":
+		if e.complexity.Stats.Hp == nil {
+			break
+		}
+
+		return e.complexity.Stats.Hp(childComplexity), true
+
+	case "Stats.intelligence":
+		if e.complexity.Stats.Intelligence == nil {
+			break
+		}
+
+		return e.complexity.Stats.Intelligence(childComplexity), true
+
+	case "Stats.magicDefense":
+		if e.complexity.Stats.MagicDefense == nil {
+			break
+		}
+
+		return e.complexity.Stats.MagicDefense(childComplexity), true
+
+	case "Stats.mind":
+		if e.complexity.Stats.Mind == nil {
+			break
+		}
+
+		return e.complexity.Stats.Mind(childComplexity), true
+
+	case "Stats.mp":
+		if e.complexity.Stats.Mp == nil {
+			break
+		}
+
+		return e.complexity.Stats.Mp(childComplexity), true
+
+	case "Stats.perception":
+		if e.complexity.Stats.Perception == nil {
+			break
+		}
+
+		return e.complexity.Stats.Perception(childComplexity), true
+
+	case "Stats.piety":
+		if e.complexity.Stats.Piety == nil {
+			break
+		}
+
+		return e.complexity.Stats.Piety(childComplexity), true
+
+	case "Stats.skillSpeed":
+		if e.complexity.Stats.SkillSpeed == nil {
+			break
+		}
+
+		return e.complexity.Stats.SkillSpeed(childComplexity), true
+
+	case "Stats.spellSpeed":
+		if e.complexity.Stats.SpellSpeed == nil {
+			break
+		}
+
+		return e.complexity.Stats.SpellSpeed(childComplexity), true
+
+	case "Stats.strength":
+		if e.complexity.Stats.Strength == nil {
+			break
+		}
+
+		return e.complexity.Stats.Strength(childComplexity), true
+
+	case "Stats.tenacity":
+		if e.complexity.Stats.Tenacity == nil {
+			break
+		}
+
+		return e.complexity.Stats.Tenacity(childComplexity), true
+
+	case "Stats.tp":
+		if e.complexity.Stats.Tp == nil {
+			break
+		}
+
+		return e.complexity.Stats.Tp(childComplexity), true
+
+	case "Stats.vitality":
+		if e.complexity.Stats.Vitality == nil {
+			break
+		}
+
+		return e.complexity.Stats.Vitality(childComplexity), true
+
 	case "Status.actorID":
 		if e.complexity.Status.ActorID == nil {
 			break
@@ -1448,6 +1696,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Stream.ServerID(childComplexity), true
+
+	case "Stream.stats":
+		if e.complexity.Stream.Stats == nil {
+			break
+		}
+
+		return e.complexity.Stream.Stats(childComplexity), true
 
 	case "StreamEvent.streamID":
 		if e.complexity.StreamEvent.StreamID == nil {
@@ -1581,6 +1836,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateResources.Resources(childComplexity), true
+
+	case "UpdateStats.stats":
+		if e.complexity.UpdateStats.Stats == nil {
+			break
+		}
+
+		return e.complexity.UpdateStats.Stats(childComplexity), true
 
 	case "UpdateTarget.targetID":
 		if e.complexity.UpdateTarget.TargetID == nil {
@@ -1718,6 +1980,8 @@ type Stream {
   enmity: Enmity!
   craftingInfo: CraftingInfo
 
+  stats: Stats
+
   entities: [Entity!]!
 }
 
@@ -1798,6 +2062,39 @@ type Resources {
   maxHP: Int!
   maxMP: Int!
   lastTick: Timestamp!
+}
+
+type Stats {
+  strength: Int!
+  dexterity: Int!
+  vitality: Int!
+  intelligence: Int!
+  mind: Int!
+  piety: Int!
+  hp: Int!
+  mp: Int!
+  tp: Int!
+  gp: Int!
+  cp: Int!
+  delay: Int!
+  tenacity: Int!
+  attackPower: Int!
+  defense: Int!
+  directHitRate: Int!
+  evasion: Int!
+  magicDefense: Int!
+  criticalHit: Int!
+  attackMagicPotency: Int!
+  healingMagicPotency: Int!
+  elementalBonus: Int!
+  determination: Int!
+  skillSpeed: Int!
+  spellSpeed: Int!
+  haste: Int!
+  craftsmanship: Int!
+  control: Int!
+  gathering: Int!
+  perception: Int!
 }
 
 type Location {
@@ -1920,6 +2217,7 @@ union StreamEventType =
   UpdateMap |
   UpdateCraftingInfo |
   UpdateEnmity |
+  UpdateStats |
   ChatEvent
 
 type AddStream {
@@ -1949,6 +2247,10 @@ type UpdateCraftingInfo {
 
 type UpdateEnmity {
   enmity: Enmity!
+}
+
+type UpdateStats {
+  stats: Stats!
 }
 
 type ChatEvent {
@@ -6907,6 +7209,1056 @@ func (ec *executionContext) _SetEntities_entities(ctx context.Context, field gra
 	return ec.marshalNEntity2ᚕgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Stats_strength(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Strength, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_dexterity(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Dexterity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_vitality(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Vitality, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_intelligence(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Intelligence, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_mind(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_piety(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Piety, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_hp(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Hp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_mp(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_tp(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_gp(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Gp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_cp(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_delay(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Delay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_tenacity(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenacity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_attackPower(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AttackPower, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_defense(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Defense, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_directHitRate(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DirectHitRate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_evasion(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Evasion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_magicDefense(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MagicDefense, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_criticalHit(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CriticalHit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_attackMagicPotency(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AttackMagicPotency, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_healingMagicPotency(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HealingMagicPotency, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_elementalBonus(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ElementalBonus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_determination(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Determination, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_skillSpeed(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SkillSpeed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_spellSpeed(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SpellSpeed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_haste(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Haste, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_craftsmanship(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Craftsmanship, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_control(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Control, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_gathering(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Gathering, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stats_perception(ctx context.Context, field graphql.CollectedField, obj *Stats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Perception, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Status_id(ctx context.Context, field graphql.CollectedField, obj *Status) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7497,6 +8849,38 @@ func (ec *executionContext) _Stream_craftingInfo(ctx context.Context, field grap
 	res := resTmp.(*CraftingInfo)
 	fc.Result = res
 	return ec.marshalOCraftingInfo2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐCraftingInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Stream_stats(ctx context.Context, field graphql.CollectedField, obj *Stream) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Stream",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Stats, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Stats)
+	fc.Result = res
+	return ec.marshalOStats2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStats(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Stream_entities(ctx context.Context, field graphql.CollectedField, obj *Stream) (ret graphql.Marshaler) {
@@ -8211,6 +9595,41 @@ func (ec *executionContext) _UpdateResources_resources(ctx context.Context, fiel
 	res := resTmp.(*Resources)
 	fc.Result = res
 	return ec.marshalNResources2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐResources(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateStats_stats(ctx context.Context, field graphql.CollectedField, obj *UpdateStats) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateStats",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Stats, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Stats)
+	fc.Result = res
+	return ec.marshalNStats2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStats(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UpdateTarget_targetID(ctx context.Context, field graphql.CollectedField, obj *UpdateTarget) (ret graphql.Marshaler) {
@@ -9691,6 +11110,13 @@ func (ec *executionContext) _StreamEventType(ctx context.Context, sel ast.Select
 			return graphql.Null
 		}
 		return ec._UpdateEnmity(ctx, sel, obj)
+	case UpdateStats:
+		return ec._UpdateStats(ctx, sel, &obj)
+	case *UpdateStats:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._UpdateStats(ctx, sel, obj)
 	case ChatEvent:
 		return ec._ChatEvent(ctx, sel, &obj)
 	case *ChatEvent:
@@ -11631,6 +13057,327 @@ func (ec *executionContext) _SetEntities(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var statsImplementors = []string{"Stats"}
+
+func (ec *executionContext) _Stats(ctx context.Context, sel ast.SelectionSet, obj *Stats) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, statsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Stats")
+		case "strength":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_strength(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "dexterity":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_dexterity(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "vitality":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_vitality(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "intelligence":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_intelligence(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mind":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_mind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "piety":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_piety(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "hp":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_hp(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mp":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_mp(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tp":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_tp(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "gp":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_gp(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cp":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_cp(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "delay":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_delay(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tenacity":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_tenacity(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "attackPower":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_attackPower(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "defense":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_defense(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "directHitRate":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_directHitRate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "evasion":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_evasion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "magicDefense":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_magicDefense(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "criticalHit":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_criticalHit(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "attackMagicPotency":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_attackMagicPotency(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "healingMagicPotency":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_healingMagicPotency(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "elementalBonus":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_elementalBonus(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "determination":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_determination(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "skillSpeed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_skillSpeed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "spellSpeed":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_spellSpeed(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "haste":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_haste(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "craftsmanship":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_craftsmanship(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "control":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_control(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "gathering":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_gathering(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "perception":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stats_perception(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var statusImplementors = []string{"Status"}
 
 func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, obj *Status) graphql.Marshaler {
@@ -11825,6 +13572,13 @@ func (ec *executionContext) _Stream(ctx context.Context, sel ast.SelectionSet, o
 		case "craftingInfo":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Stream_craftingInfo(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "stats":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Stream_stats(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -12249,6 +14003,37 @@ func (ec *executionContext) _UpdateResources(ctx context.Context, sel ast.Select
 		case "resources":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._UpdateResources_resources(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateStatsImplementors = []string{"UpdateStats", "StreamEventType"}
+
+func (ec *executionContext) _UpdateStats(ctx context.Context, sel ast.SelectionSet, obj *UpdateStats) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateStatsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateStats")
+		case "stats":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateStats_stats(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -13201,6 +14986,16 @@ func (ec *executionContext) marshalNResources2ᚖgithubᚗcomᚋff14wedᚋaether
 	return ec._Resources(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNStats2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStats(ctx context.Context, sel ast.SelectionSet, v *Stats) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Stats(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNStatus2ᚕᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStatus(ctx context.Context, sel ast.SelectionSet, v []*Status) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -13716,6 +15511,13 @@ func (ec *executionContext) marshalONPCInfo2ᚖgithubᚗcomᚋff14wedᚋaetherom
 		return graphql.Null
 	}
 	return ec._NPCInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOStats2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStats(ctx context.Context, sel ast.SelectionSet, v *Stats) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Stats(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOStatus2ᚖgithubᚗcomᚋff14wedᚋaetherometerᚋcoreᚋmodelsᚐStatus(ctx context.Context, sel ast.SelectionSet, v *Status) graphql.Marshaler {

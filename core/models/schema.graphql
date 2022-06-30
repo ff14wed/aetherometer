@@ -18,6 +18,8 @@ type Stream {
   enmity: Enmity!
   craftingInfo: CraftingInfo
 
+  stats: Stats
+
   entities: [Entity!]!
 }
 
@@ -98,6 +100,39 @@ type Resources {
   maxHP: Int!
   maxMP: Int!
   lastTick: Timestamp!
+}
+
+type Stats {
+  strength: Int!
+  dexterity: Int!
+  vitality: Int!
+  intelligence: Int!
+  mind: Int!
+  piety: Int!
+  hp: Int!
+  mp: Int!
+  tp: Int!
+  gp: Int!
+  cp: Int!
+  delay: Int!
+  tenacity: Int!
+  attackPower: Int!
+  defense: Int!
+  directHitRate: Int!
+  evasion: Int!
+  magicDefense: Int!
+  criticalHit: Int!
+  attackMagicPotency: Int!
+  healingMagicPotency: Int!
+  elementalBonus: Int!
+  determination: Int!
+  skillSpeed: Int!
+  spellSpeed: Int!
+  haste: Int!
+  craftsmanship: Int!
+  control: Int!
+  gathering: Int!
+  perception: Int!
 }
 
 type Location {
@@ -220,6 +255,7 @@ union StreamEventType =
   UpdateMap |
   UpdateCraftingInfo |
   UpdateEnmity |
+  UpdateStats |
   ChatEvent
 
 type AddStream {
@@ -249,6 +285,10 @@ type UpdateCraftingInfo {
 
 type UpdateEnmity {
   enmity: Enmity!
+}
+
+type UpdateStats {
+  stats: Stats!
 }
 
 type ChatEvent {

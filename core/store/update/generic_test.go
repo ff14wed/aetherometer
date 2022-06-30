@@ -50,6 +50,7 @@ func genericSetup() (testEnv testVars) {
 				CurrentWorld: models.World{ID: 123, Name: "Foo"},
 				HomeWorld:    models.World{ID: 456, Name: "Bar"},
 
+				Stats: &models.Stats{Strength: 1},
 				EntitiesMap: map[uint64]*models.Entity{
 					testEnv.subjectID: testEnv.entity,
 					0x23456789:        nil,

@@ -225,6 +225,39 @@ type SetEntities struct {
 
 func (SetEntities) IsEntityEventType() {}
 
+type Stats struct {
+	Strength            int `json:"strength"`
+	Dexterity           int `json:"dexterity"`
+	Vitality            int `json:"vitality"`
+	Intelligence        int `json:"intelligence"`
+	Mind                int `json:"mind"`
+	Piety               int `json:"piety"`
+	Hp                  int `json:"hp"`
+	Mp                  int `json:"mp"`
+	Tp                  int `json:"tp"`
+	Gp                  int `json:"gp"`
+	Cp                  int `json:"cp"`
+	Delay               int `json:"delay"`
+	Tenacity            int `json:"tenacity"`
+	AttackPower         int `json:"attackPower"`
+	Defense             int `json:"defense"`
+	DirectHitRate       int `json:"directHitRate"`
+	Evasion             int `json:"evasion"`
+	MagicDefense        int `json:"magicDefense"`
+	CriticalHit         int `json:"criticalHit"`
+	AttackMagicPotency  int `json:"attackMagicPotency"`
+	HealingMagicPotency int `json:"healingMagicPotency"`
+	ElementalBonus      int `json:"elementalBonus"`
+	Determination       int `json:"determination"`
+	SkillSpeed          int `json:"skillSpeed"`
+	SpellSpeed          int `json:"spellSpeed"`
+	Haste               int `json:"haste"`
+	Craftsmanship       int `json:"craftsmanship"`
+	Control             int `json:"control"`
+	Gathering           int `json:"gathering"`
+	Perception          int `json:"perception"`
+}
+
 type Status struct {
 	ID          int       `json:"id"`
 	Param       int       `json:"param"`
@@ -310,6 +343,12 @@ type UpdateResources struct {
 }
 
 func (UpdateResources) IsEntityEventType() {}
+
+type UpdateStats struct {
+	Stats *Stats `json:"stats" validate:"nil=false"`
+}
+
+func (UpdateStats) IsStreamEventType() {}
 
 type UpdateTarget struct {
 	TargetID uint64 `json:"targetID"`

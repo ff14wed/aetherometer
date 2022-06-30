@@ -30,6 +30,8 @@ type Stream struct {
 	Enmity       Enmity        `json:"enmity"`
 	CraftingInfo *CraftingInfo `json:"craftingInfo"`
 
+	Stats *Stats `json:"stats"`
+
 	EntitiesMap map[uint64]*Entity `json:"entities"`
 }
 
