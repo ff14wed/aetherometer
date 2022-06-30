@@ -140,10 +140,12 @@ var _ = Describe("Manager", func() {
 			fakeProvider.SubscribeEgressReturns(egressChan)
 			fakeProvider.SendRequestReturns([]byte("ack"), nil)
 			manager.StreamUp() <- fakeProvider
+
+			Eventually(fakeHandler.ServeCalled).Should(BeTrue())
+			Eventually(fakeProvider.SubscribeEgressCallCount()).Should(BeNumerically(">", 0))
 		})
 
 		It("creates a new Handler for the stream", func() {
-			Eventually(fakeHandler.ServeCalled).Should(BeTrue())
 			Expect(handlerFactoryArgs.StreamID).To(Equal(1234))
 			Expect(handlerFactoryArgs.IngressChan).To(Equal(ingressChan))
 			Expect(handlerFactoryArgs.EgressChan).To(Equal(egressChan))
@@ -152,9 +154,6 @@ var _ = Describe("Manager", func() {
 		})
 
 		Describe("SendRequest", func() {
-			BeforeEach(func() {
-				Eventually(fakeHandler.ServeCalled).Should(BeTrue())
-			})
 			It("handles requests for the stream", func() {
 				resp, err := manager.SendRequest(1234, []byte("foo"))
 				Expect(err).ToNot(HaveOccurred())
@@ -169,7 +168,6 @@ var _ = Describe("Manager", func() {
 
 		Context("when the stream is closed", func() {
 			BeforeEach(func() {
-				Eventually(fakeHandler.ServeCalled).Should(BeTrue())
 				Consistently(fakeHandler.StopCalled).Should(BeFalse())
 				manager.StreamDown() <- 1234
 			})
