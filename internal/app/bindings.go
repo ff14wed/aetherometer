@@ -63,7 +63,10 @@ func (b *Bindings) GetStreams() []StreamInfo {
 	}
 	var infos []StreamInfo
 	for _, s := range streams {
-		if char, ok := s.EntitiesMap[s.CharacterID]; ok {
+		if s.EntitiesMap == nil {
+			continue
+		}
+		if char, ok := s.EntitiesMap[s.CharacterID]; ok && char != nil {
 			infos = append(infos, StreamInfo{
 				ID:   s.ID,
 				Name: char.Name,
