@@ -94,7 +94,9 @@
 	function refreshCurrentTab() {
 		for (let iframe of iframes) {
 			if (iframe.id === $selectedTabID) {
-				iframe.src = iframe.src;
+				let target = new URL(iframe.src);
+				target.searchParams.set("noCache", (+new Date()).toString());
+				iframe.src = target.toString();
 			}
 		}
 	}
