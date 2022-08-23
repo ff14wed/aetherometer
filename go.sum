@@ -89,8 +89,8 @@ github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7
 github.com/fasthttp/websocket v1.4.4/go.mod h1:Tf1hkwdVG8a4tmcxNdTLcZQJc3r7EOnbCLgdM8wqBmA=
 github.com/fasthttp/websocket v1.4.6 h1:Zi0Z6sUUvLmtxXd/kMLVBVJPvck3bqPqMWUbwhUy0R8=
 github.com/fasthttp/websocket v1.4.6/go.mod h1:n0BlOQvJdPbTuBkZT0O5+jk/sp/1/VCzquR1BehI2F4=
-github.com/ff14wed/xivnet/v3 v3.39.0 h1:U55/jfM7Y9tRmzXCJWYZLDNsgvXRoVjqunLaMCUchI4=
-github.com/ff14wed/xivnet/v3 v3.39.0/go.mod h1:0q924/HnqOd8Vf/sJmO2hfKGl9RgkISdoog3zS794uQ=
+github.com/ff14wed/xivnet/v3 v3.39.1 h1:fek3zEyVHq18x1xpgKERPkT/8XZAZDZPmfwxqhy3HwM=
+github.com/ff14wed/xivnet/v3 v3.39.1/go.mod h1:0q924/HnqOd8Vf/sJmO2hfKGl9RgkISdoog3zS794uQ=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
