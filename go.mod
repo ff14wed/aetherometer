@@ -8,7 +8,7 @@ require (
 	github.com/Microsoft/go-winio v0.5.1
 	github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29
 	github.com/creativeprojects/go-selfupdate v0.6.1
-	github.com/ff14wed/xivnet/v3 v3.41.0
+	github.com/ff14wed/xivnet/v3 v3.42.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/gorilla/websocket v1.4.2
