@@ -56,41 +56,35 @@ func (f *OodleFactory) New(processID uint32) (xivnet.OodleImpl, error) {
 			return
 		}
 		f.ffxivOnce.handle = ffxivHandle
-		f.ffxivOnce.offsetOodleNetwork1UDP_State_Size = 0x15ef3e0
-		f.ffxivOnce.offsetOodleNetwork1_Shared_Size = 0x15f0d60
-		f.ffxivOnce.offsetOodleNetwork1_Shared_SetWindow = 0x15f0c30
-		f.ffxivOnce.offsetOodleNetwork1UDP_Train_State_Counting = 0x15e9c30
-		f.ffxivOnce.offsetOodleNetwork1UDP_Decode = 0x15eed40
-		f.ffxivOnce.offset_match_set_from_histo_normalized = 0x15ee650
-		f.ffxivOnce.offset_nomatch_set_from_histo_normalized = 0x15ee260
+		f.ffxivOnce.offsetOodleNetwork1_Shared_Size = 0x1648230
+		f.ffxivOnce.offsetOodleNetwork1_Shared_SetWindow = 0x1648100
+		f.ffxivOnce.offsetOodleNetwork1UDP_Train_State_Counting = 0x1641100
+		f.ffxivOnce.offsetOodleNetwork1UDP_Decode = 0x1646210
+		f.ffxivOnce.offset_match_set_from_histo_normalized = 0x1645b20
+		f.ffxivOnce.offset_nomatch_set_from_histo_normalized = 0x1645730
 
 	})
 	if f.ffxivOnce.err != nil {
 		return nil, f.ffxivOnce.err
 	}
 
-	stateSize, err := callWrapper(f.handle, f.ffxivOnce.offsetOodleNetwork1UDP_State_Size)
-	if err != nil {
-		return nil, err
-	}
-
-	sharedDictSize, err := callWrapper(f.handle, f.ffxivOnce.offsetOodleNetwork1_Shared_Size, 0x13)
+	sharedDictSize, err := callWrapper(f.handle, f.ffxivOnce.offsetOodleNetwork1_Shared_Size, 0x11)
 	if err != nil {
 		return nil, err
 	}
 
 	d := &decompressor{
 		ffxivOnce:  &f.ffxivOnce,
-		state:      make([]byte, stateSize),
+		state:      make([]byte, 0x2EB400),
 		sharedDict: make([]byte, sharedDictSize),
-		initDict:   make([]byte, 0x8000),
+		initDict:   make([]byte, 0x100000),
 	}
 
 	_, err = callWrapper(
 		f.handle,
 		f.ffxivOnce.offsetOodleNetwork1_Shared_SetWindow,
 		uintptr(unsafe.Pointer(&d.sharedDict[0])),
-		0x13,
+		0x11,
 		uintptr(unsafe.Pointer(&d.initDict[0])),
 		uintptr(len(d.initDict)),
 	)
