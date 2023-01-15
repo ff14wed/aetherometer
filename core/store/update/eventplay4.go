@@ -19,7 +19,7 @@ func newEventPlay4Update(streamID int, b *xivnet.Block, d *datasheet.Collection)
 	if data.EventID == 0xA0001 {
 		switch data.P2 {
 		case 2:
-			recipeInfo := d.RecipeData.GetInfo(data.Params[0])
+			recipeInfo := d.RecipeData.GetInfo(data.Data[0])
 			return craftingInfoUpdate{
 				streamID: streamID,
 				craftingInfo: &models.CraftingInfo{
