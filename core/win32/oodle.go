@@ -56,12 +56,12 @@ func (f *OodleFactory) New(processID uint32) (xivnet.OodleImpl, error) {
 			return
 		}
 		f.ffxivOnce.handle = ffxivHandle
-		f.ffxivOnce.offsetOodleNetwork1_Shared_Size = 0x1648230
-		f.ffxivOnce.offsetOodleNetwork1_Shared_SetWindow = 0x1648100
-		f.ffxivOnce.offsetOodleNetwork1UDP_Train_State_Counting = 0x1641100
-		f.ffxivOnce.offsetOodleNetwork1UDP_Decode = 0x1646210
-		f.ffxivOnce.offset_match_set_from_histo_normalized = 0x1645b20
-		f.ffxivOnce.offset_nomatch_set_from_histo_normalized = 0x1645730
+		f.ffxivOnce.offsetOodleNetwork1_Shared_Size = 0x16485f0
+		f.ffxivOnce.offsetOodleNetwork1_Shared_SetWindow = 0x16484c0
+		f.ffxivOnce.offsetOodleNetwork1UDP_Train_State_Counting = 0x16414c0
+		f.ffxivOnce.offsetOodleNetwork1UDP_Decode = 0x16465d0
+		f.ffxivOnce.offset_match_set_from_histo_normalized = 0x1645ee0
+		f.ffxivOnce.offset_nomatch_set_from_histo_normalized = 0x1645af0
 
 	})
 	if f.ffxivOnce.err != nil {
