@@ -13,8 +13,8 @@ import (
 
 type HandlerFactoryArgs struct {
 	StreamID    int
-	IngressChan <-chan *xivnet.Frame
-	EgressChan  <-chan *xivnet.Frame
+	IngressChan <-chan *xivnet.Block
+	EgressChan  <-chan *xivnet.Block
 	UpdateChan  chan<- store.Update
 	Generator   update.Generator
 	Logger      *zap.Logger

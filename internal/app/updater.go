@@ -23,7 +23,7 @@ import (
 )
 
 const datasheetsUpstream string = "https://raw.githubusercontent.com/ff14wed/aetherometer/master/resources/datasheets/"
-const hookSha256Sum string = "858f0e1d29d32d9e98481e63edba6c9dc61cf9308a414643b14b6173b71d2e74"
+const hookSha256Sum string = "8d592a4ae901047477b65d4275f1e05242a9e5cc98e72aabcf2468205606ef20"
 
 var dataFiles = []string{
 	"Action.csv",
@@ -125,7 +125,7 @@ func ensureHookAdapter(hookPath string, logger *zap.Logger) error {
 			msgBuilder.Title("Aetherometer update in progress").Info()
 		}()
 
-		hookDLLBytes, err := readDataFromURL("https://github.com/ff14wed/xivhook/releases/download/0.4.0/xivhook.dll")
+		hookDLLBytes, err := readDataFromURL("https://github.com/ff14wed/deucalion/releases/download/0.9.1/deucalion.dll")
 		if err != nil {
 			return err
 		}
@@ -134,8 +134,13 @@ func ensureHookAdapter(hookPath string, logger *zap.Logger) error {
 		if _, err := io.Copy(hasher, buf); err != nil {
 			return err
 		}
-		if fmt.Sprintf("%x", hasher.Sum(nil)) != hookSha256Sum {
-			return fmt.Errorf("downloaded Hook DLL failed SHA256 sum check")
+		downloadedSha256Sum := fmt.Sprintf("%x", hasher.Sum(nil))
+		if downloadedSha256Sum != hookSha256Sum {
+			return fmt.Errorf(
+				"downloaded Hook DLL failed SHA256 sum check: %s vs %s",
+				downloadedSha256Sum,
+				hookSha256Sum,
+			)
 		}
 		if err := ioutil.WriteFile(hookPath, hookDLLBytes, 0755); err != nil {
 			return err

@@ -28,8 +28,8 @@ var _ = Describe("Handler", func() {
 
 		streams store.Streams
 
-		ingressChan chan *xivnet.Frame
-		egressChan  chan *xivnet.Frame
+		ingressChan chan *xivnet.Block
+		egressChan  chan *xivnet.Block
 		updateChan  chan store.Update
 		generator   update.Generator
 
@@ -52,8 +52,8 @@ var _ = Describe("Handler", func() {
 		logger, err := zapCfg.Build()
 		Expect(err).ToNot(HaveOccurred())
 
-		ingressChan = make(chan *xivnet.Frame)
-		egressChan = make(chan *xivnet.Frame)
+		ingressChan = make(chan *xivnet.Block)
+		egressChan = make(chan *xivnet.Block)
 		updateChan = make(chan store.Update, 2)
 		generator = update.NewGenerator(nil)
 
@@ -154,7 +154,7 @@ var _ = Describe("Handler", func() {
 		})
 	})
 
-	Context("when an ingress frame is emitted by the stream", func() {
+	Context("when an ingress block is emitted by the stream", func() {
 		BeforeEach(func() {
 			Eventually(updateChan).Should(Receive())
 			streams.Map[1234] = &models.Stream{
@@ -182,12 +182,9 @@ var _ = Describe("Handler", func() {
 				}
 			}
 
-			f := &xivnet.Frame{}
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, -600))
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, -200))
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, 200))
-
-			ingressChan <- f
+			ingressChan <- movementBlock(200, 200, -600)
+			ingressChan <- movementBlock(200, 200, -200)
+			ingressChan <- movementBlock(200, 200, 200)
 		})
 
 		It("converts all of the blocks to updates and applies them to the stream", func() {
@@ -224,7 +221,7 @@ var _ = Describe("Handler", func() {
 		})
 	})
 
-	Context("when an egress frame is emitted by the stream", func() {
+	Context("when an egress block is emitted by the stream", func() {
 		BeforeEach(func() {
 			Eventually(updateChan).Should(Receive())
 			streams.Map[1234] = &models.Stream{
@@ -252,12 +249,9 @@ var _ = Describe("Handler", func() {
 				}
 			}
 
-			f := &xivnet.Frame{}
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, -600))
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, -200))
-			f.Blocks = append(f.Blocks, movementBlock(200, 200, 200))
-
-			egressChan <- f
+			egressChan <- movementBlock(200, 200, -600)
+			egressChan <- movementBlock(200, 200, -200)
+			egressChan <- movementBlock(200, 200, 200)
 		})
 
 		It("converts all of the blocks to updates and applies them to the stream", func() {

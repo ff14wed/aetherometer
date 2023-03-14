@@ -27,7 +27,7 @@ func defaultConfig() (config.Config, error) {
 		Adapters: config.Adapters{
 			Hook: config.HookConfig{
 				Enabled:      true,
-				DLLPath:      filepath.Join(dirPath, "resources", "win", "xivhook.dll"),
+				DLLPath:      filepath.Join(dirPath, "resources", "win", "deucalion.dll"),
 				FFXIVProcess: "ffxiv_dx11.exe",
 			},
 		},

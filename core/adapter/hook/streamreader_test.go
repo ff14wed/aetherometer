@@ -99,19 +99,19 @@ var _ = Describe("StreamReader", func() {
 		Expect(hookConn.CloseCallCount()).To(Equal(1))
 	})
 
-	It("receives data on the hook connection and decodes it into envelopes", func() {
+	It("receives data on the hook connection and decodes it into payloads", func() {
 		sendFakeData(readData{
 			data: append([]byte{
 				20, 0, 0, 0, // Length
 				200,          // Op
-				210, 4, 0, 0, // Data
+				210, 4, 0, 0, // Channel
 			}, []byte("Hello World")...),
 		})
 
-		var e hook.Envelope
-		Eventually(sr.ReceivedEnvelopesListener()).Should(Receive(&e))
-		Expect(e).To(Equal(hook.Envelope{
-			Length: 20, Op: 200, Data: 1234, Additional: []byte("Hello World"),
+		var e hook.Payload
+		Eventually(sr.ReceivedPayloadsListener()).Should(Receive(&e))
+		Expect(e).To(Equal(hook.Payload{
+			Length: 20, Op: 200, Channel: 1234, Data: []byte("Hello World"),
 		}))
 	})
 
@@ -124,9 +124,9 @@ var _ = Describe("StreamReader", func() {
 				data: []byte{9, 0, 0, 0, 200, 210, 4, 0, 0},
 			})
 
-			var e hook.Envelope
-			Eventually(sr.ReceivedEnvelopesListener()).Should(Receive(&e))
-			Expect(e).To(Equal(hook.Envelope{Length: 9, Op: 200, Data: 1234, Additional: []byte{}}))
+			var e hook.Payload
+			Eventually(sr.ReceivedPayloadsListener()).Should(Receive(&e))
+			Expect(e).To(Equal(hook.Payload{Length: 9, Op: 200, Channel: 1234, Data: []byte{}}))
 		})
 	})
 

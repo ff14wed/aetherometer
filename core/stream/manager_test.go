@@ -127,15 +127,15 @@ var _ = Describe("Manager", func() {
 	Context("when a new stream is created", func() {
 		var (
 			fakeProvider *streamfakes.FakeProvider
-			ingressChan  <-chan *xivnet.Frame
-			egressChan   <-chan *xivnet.Frame
+			ingressChan  <-chan *xivnet.Block
+			egressChan   <-chan *xivnet.Block
 		)
 
 		BeforeEach(func() {
 			fakeProvider = new(streamfakes.FakeProvider)
 			fakeProvider.StreamIDReturns(1234)
-			ingressChan = make(chan *xivnet.Frame)
-			egressChan = make(chan *xivnet.Frame)
+			ingressChan = make(chan *xivnet.Block)
+			egressChan = make(chan *xivnet.Block)
 			fakeProvider.SubscribeIngressReturns(ingressChan)
 			fakeProvider.SubscribeEgressReturns(egressChan)
 			fakeProvider.SendRequestReturns([]byte("ack"), nil)

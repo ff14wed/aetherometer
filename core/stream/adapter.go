@@ -13,19 +13,19 @@ import (
 // stream. It must provide methods for ingesting data and allow some way of
 // controlling the stream.
 //
-// It is assumed that all blocks in the frames produced by this Provider are
-// already parsed into the correct xivnet datatype. This is to ensure backwards
-// compatibility with older data when the datatype opcodes are updated.
+// It is assumed that all blocks produced by this Provider are already parsed
+// into the correct xivnet datatype. This is to ensure backwards compatibility
+// with older data when the datatype opcodes are updated.
 type Provider interface {
 	// StreamID returns a unique identifier for the stream. This identifier
 	// must be unique across all adapters.
 	StreamID() int
 	// SubscribeIngress notifies the core of network packets in the ingress
 	// direction from this stream.
-	SubscribeIngress() <-chan *xivnet.Frame
+	SubscribeIngress() <-chan *xivnet.Block
 	// SubscribeEgress notifies the core of network packets in the egress
 	// direction from this stream.
-	SubscribeEgress() <-chan *xivnet.Frame
+	SubscribeEgress() <-chan *xivnet.Block
 	// SendRequest provides an interface to allow clients to query or control
 	// the adapter.
 	SendRequest(req []byte) (resp []byte, err error)

@@ -7,52 +7,53 @@ import (
 	"io"
 )
 
-// Constants for the ops field in an Envelope
+// Constants for the ops field in a Payload
 const (
 	OpDebug = iota
 	OpPing
 	OpExit
 	OpRecv
 	OpSend
+	OpOption
 )
 
-// Envelope defines the message format used to communicate with the hook
-// Length is the length of the entire envelope, including the length field.
-// The size of the Envelope is 9 bytes + len(Additional).
-type Envelope struct {
-	Length     uint32
-	Op         byte
-	Data       uint32
-	Additional []byte
+// Payload defines the message format used to communicate with the hook
+// Length is the length of the entire payload, including the length field.
+// The size of the Payload is 9 bytes + len(Data).
+type Payload struct {
+	Length  uint32
+	Op      byte
+	Channel uint32
+	Data    []byte
 }
 
-// DecodeEnvelope transforms byte data to an Envelope
-func DecodeEnvelope(data []byte) Envelope {
-	e := Envelope{}
+// DecodePayload transforms byte data to an Payload
+func DecodePayload(data []byte) Payload {
+	e := Payload{}
 	e.Length = binary.LittleEndian.Uint32(data[0:4])
 	e.Op = data[4]
-	e.Data = binary.LittleEndian.Uint32(data[5:9])
-	e.Additional = make([]byte, len(data[9:]))
-	copy(e.Additional, data[9:])
+	e.Channel = binary.LittleEndian.Uint32(data[5:9])
+	e.Data = make([]byte, len(data[9:]))
+	copy(e.Data, data[9:])
 	return e
 }
 
-// EncodeEnvelope transforms an Envelope to byte data
-func (e Envelope) Encode() []byte {
-	buf := make([]byte, len(e.Additional)+9)
+// EncodePayload transforms an Payload to byte data
+func (e Payload) Encode() []byte {
+	buf := make([]byte, len(e.Data)+9)
 	binary.LittleEndian.PutUint32(buf[0:4], uint32(len(buf)))
 	buf[4] = e.Op
-	binary.LittleEndian.PutUint32(buf[5:9], e.Data)
-	copy(buf[9:], e.Additional)
+	binary.LittleEndian.PutUint32(buf[5:9], e.Channel)
+	copy(buf[9:], e.Data)
 	return buf
 }
 
 // ErrInvalidLength is returned whenever data is corrupted in the byte
 // stream and we have potentially faulty data.
-var ErrInvalidLength = errors.New("Invalid length encountered in byte stream")
+var ErrInvalidLength = errors.New("invalid length encountered in byte stream")
 
 // Decoder is responsible for reading bytes from the provided reader
-// and decoding the data into envelopes
+// and decoding the data into payloads
 type Decoder struct {
 	reader *bufio.Reader
 }
@@ -70,20 +71,20 @@ func (d *Decoder) consumeBytes(numBytes uint32) {
 	_, _ = d.reader.Discard(int(numBytes))
 }
 
-// NextEnvelope consumes an some amount of data on the Reader and returns
-// the next full Envelope. Since the Envelope isn't by itself a robust format
+// NextPayload consumes an some amount of data on the Reader and returns
+// the next full Payload. Since the Payload isn't by itself a robust format
 // of data transmission, the decoder might or might not recover from decoding
 // faulty data. Since the intended io.Reader is a named pipe connection, the
 // chance of a failure happening is really low.
 //
 // If the length is at least readable, but it's too small, it will discard
-// the faulty data and continue attempting to read Envelopes. However,
+// the faulty data and continue attempting to read Payloads. However,
 // there is no recovery path if the data is corrupted in other ways, and
-// subsequent calls to NextEnvelope will return the same thing.
-func (d *Decoder) NextEnvelope() (Envelope, error) {
+// subsequent calls to NextPayload will return the same thing.
+func (d *Decoder) NextPayload() (Payload, error) {
 	lengthBytes, err := d.reader.Peek(4)
 	if err != nil {
-		return Envelope{}, err
+		return Payload{}, err
 	}
 
 	length := binary.LittleEndian.Uint32(lengthBytes)
@@ -93,15 +94,15 @@ func (d *Decoder) NextEnvelope() (Envelope, error) {
 	}
 	if length < 9 {
 		d.consumeBytes(length)
-		return Envelope{}, ErrInvalidLength
+		return Payload{}, ErrInvalidLength
 	}
 
 	envBytes, err := d.reader.Peek(int(length))
 	if err != nil {
-		return Envelope{}, err
+		return Payload{}, err
 	}
 
-	env := DecodeEnvelope(envBytes)
+	env := DecodePayload(envBytes)
 	d.consumeBytes(length)
 	return env, nil
 }

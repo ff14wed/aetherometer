@@ -34,8 +34,6 @@ func (b *builder) Build(
 ) stream.Adapter {
 	p := win32.Provider{}
 
-	oodleFactory := new(win32.OodleFactory)
-
 	return NewAdapter(
 		AdapterConfig{
 			HookConfig:            b.cfg.Adapters.Hook,
@@ -43,7 +41,6 @@ func (b *builder) Build(
 			StreamDown:            streamDown,
 			RemoteProcessProvider: p,
 			ProcessEnumerator:     p,
-			OodleFactory:          oodleFactory,
 		},
 		logger,
 	)

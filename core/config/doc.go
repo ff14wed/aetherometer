@@ -20,7 +20,7 @@ The following shows an example TOML config file for Aetherometer.
 	[adapters]
 		[adapters.hook]
 			enabled = true
-			dll_path = "C:\\path\\to\\aetherometer\\resources\\win\\xivhook.dll"
+			dll_path = "C:\\path\\to\\aetherometer\\resources\\win\\deucalion.dll"
 			ffxiv_process = "ffxiv_dx11.exe"
 
 	[plugins]

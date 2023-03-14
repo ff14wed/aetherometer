@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ff14wed/aetherometer/core/message"
 	"github.com/ff14wed/aetherometer/core/stream"
 	"github.com/ff14wed/xivnet/v3"
 	"github.com/thejerf/suture"
@@ -31,8 +30,8 @@ type hookStream struct {
 	streamID uint32
 	*suture.Supervisor
 
-	sender      *StreamSender
-	frameReader *FrameReader
+	sender    *StreamSender
+	ipcReader *IPCReader
 }
 
 // NewStream creates a new hook Stream
@@ -64,20 +63,9 @@ func NewStream(streamID uint32, cfg AdapterConfig, logger *zap.Logger) Stream {
 	ss := NewStreamSender(hookConn, streamLogger)
 	sp := NewStreamPinger(ss, pingInterval, streamLogger)
 	sr := NewStreamReader(hookConn, streamLogger)
-	frameDecoderFactory := func(r io.Reader) message.FrameDecoder {
-		if cfg.OodleFactory != nil {
-			oodleImpl, err := cfg.OodleFactory.New(streamID)
-			if err == nil {
-				return xivnet.NewDecoderWithOodle(r, 65535, oodleImpl)
-			}
-			streamLogger.Error("Failed to initialize oodle, falling back to decoder without Oodle", zap.Error(err))
-		}
-		return xivnet.NewDecoder(r, 65535)
-	}
-	fr := NewFrameReader(
+	fr := NewIPCReader(
 		streamID,
-		sr.ReceivedEnvelopesListener(),
-		frameDecoderFactory,
+		sr.ReceivedPayloadsListener(),
 		streamLogger,
 	)
 
@@ -87,7 +75,13 @@ func NewStream(streamID uint32, cfg AdapterConfig, logger *zap.Logger) Stream {
 	s.Add(fr)
 
 	s.sender = ss
-	s.frameReader = fr
+	s.ipcReader = fr
+
+	// Configure Deucalion to send Zone and Chat for both directions
+	go func() {
+		time.Sleep(1 * time.Second)
+		s.sender.Send(OpOption, 54, nil)
+	}()
 
 	return s
 }
@@ -98,26 +92,26 @@ func (s *hookStream) StreamID() int {
 }
 
 // SubscribeIngress provides parsed ingress frames read from the hook
-func (s *hookStream) SubscribeIngress() <-chan *xivnet.Frame {
-	return s.frameReader.SubscribeIngress()
+func (s *hookStream) SubscribeIngress() <-chan *xivnet.Block {
+	return s.ipcReader.SubscribeIngress()
 }
 
 // SubscribeIngress provides parsed egress frames read from the hook
-func (s *hookStream) SubscribeEgress() <-chan *xivnet.Frame {
-	return s.frameReader.SubscribeEgress()
+func (s *hookStream) SubscribeEgress() <-chan *xivnet.Block {
+	return s.ipcReader.SubscribeEgress()
 }
 
 // SendRequest sends a request directly to this stream's hook
 func (s *hookStream) SendRequest(req []byte) ([]byte, error) {
 	// This particular implementation of SendRequest requires that the request
-	// bytes must be directly marshalable to an Envelope
+	// bytes must be directly marshalable to an Payload
 	// Length does not need to be provided
-	var env Envelope
+	var env Payload
 	err := json.Unmarshal(req, &env)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal data to envelope: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal data to payload: %s", err)
 	}
-	s.sender.Send(env.Op, env.Data, env.Additional)
+	s.sender.Send(env.Op, env.Channel, env.Data)
 	return []byte(`OK`), nil
 }
 
@@ -136,24 +130,20 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 		return nil, err
 	}
 
-	isOwner := true
-
 	err := rpp.InjectDLL(streamID, dllPath)
 	if _, ok := err.(DLLAlreadyInjectedError); ok {
-		isOwner = false
-
 	} else if err != nil {
 		return nil, err
 	}
 
 	var conn net.Conn
-	pipeName := fmt.Sprintf(`\\.\pipe\xivhook-%d`, streamID)
+	pipeName := fmt.Sprintf(`\\.\pipe\deucalion-%d`, streamID)
 	dialTimeout := 5 * time.Second
 
 	for i := 0; i < 5; i++ {
 		conn, err = rpp.DialPipe(pipeName, &dialTimeout)
 		if err == nil {
-			return &hookConn{Conn: conn, rpp: rpp, isOwner: isOwner}, nil
+			return &hookConn{Conn: conn, rpp: rpp}, nil
 		}
 		// If we got some sort of error connecting to the pipe, that means
 		// the hook hasn't started the pipe server yet. We need to retry in
@@ -168,8 +158,7 @@ func InitializeHook(streamID uint32, cfg AdapterConfig) (net.Conn, error) {
 
 type hookConn struct {
 	net.Conn
-	rpp     RemoteProcessProvider
-	isOwner bool
+	rpp RemoteProcessProvider
 
 	once sync.Once
 }
@@ -194,17 +183,11 @@ func (h *hookConn) Read(p []byte) (int, error) {
 	return n, err
 }
 
-// Close implements the Close interface of a net.Conn. It will attempt to send
-// an Exit to the connection before closing. It is safe to call Close() more
-// than once since subsequent Close() calls will be no-ops.
+// Close implements the Close interface of a net.Conn. It is safe to call
+// Close() more than once since subsequent Close() calls will be no-ops.
 func (h *hookConn) Close() error {
 	var err error
 	h.once.Do(func() {
-		if h.isOwner {
-			// The hook should automatically unload itself from FFXIV after
-			// closing the owner core process.
-			_, _ = h.Conn.Write(Envelope{Op: OpExit}.Encode())
-		}
 		err = h.Conn.Close()
 	})
 	return err

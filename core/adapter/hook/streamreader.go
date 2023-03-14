@@ -9,12 +9,12 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . io.ReadCloser
 
 // StreamReader reads data from the hook connection and decodes it into
-// envelopes
+// payloads
 type StreamReader struct {
 	hookConn io.ReadCloser
 	logger   *zap.Logger
 
-	recvChan chan Envelope
+	recvChan chan Payload
 	stopDone chan struct{}
 }
 
@@ -24,13 +24,13 @@ func NewStreamReader(hookConn io.ReadCloser, logger *zap.Logger) *StreamReader {
 		hookConn: hookConn,
 		logger:   logger.Named("stream-reader"),
 
-		recvChan: make(chan Envelope),
+		recvChan: make(chan Payload),
 		stopDone: make(chan struct{}),
 	}
 }
 
 // Serve runs the service responsible for reading data from the hook connection
-// and decoding the data as envelopes.
+// and decoding the data as payloads.
 func (r *StreamReader) Serve() {
 	defer close(r.recvChan)
 	defer close(r.stopDone)
@@ -39,7 +39,7 @@ func (r *StreamReader) Serve() {
 	d := NewDecoder(r.hookConn, 262144)
 
 	for {
-		env, err := d.NextEnvelope()
+		env, err := d.NextPayload()
 		if err == nil {
 			r.recvChan <- env
 		} else if err == io.EOF {
@@ -63,8 +63,8 @@ func (r *StreamReader) Stop() {
 	<-r.stopDone
 }
 
-// ReceivedEnvelopesListener returns a channel on which consumers can listen
-// for envelopes from the hook connection.
-func (r *StreamReader) ReceivedEnvelopesListener() <-chan Envelope {
+// ReceivedPayloadsListener returns a channel on which consumers can listen
+// for payloads from the hook connection.
+func (r *StreamReader) ReceivedPayloadsListener() <-chan Payload {
 	return r.recvChan
 }

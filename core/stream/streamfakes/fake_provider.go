@@ -32,25 +32,25 @@ type FakeProvider struct {
 	streamIDReturnsOnCall map[int]struct {
 		result1 int
 	}
-	SubscribeEgressStub        func() <-chan *xivnet.Frame
+	SubscribeEgressStub        func() <-chan *xivnet.Block
 	subscribeEgressMutex       sync.RWMutex
 	subscribeEgressArgsForCall []struct {
 	}
 	subscribeEgressReturns struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}
 	subscribeEgressReturnsOnCall map[int]struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}
-	SubscribeIngressStub        func() <-chan *xivnet.Frame
+	SubscribeIngressStub        func() <-chan *xivnet.Block
 	subscribeIngressMutex       sync.RWMutex
 	subscribeIngressArgsForCall []struct {
 	}
 	subscribeIngressReturns struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}
 	subscribeIngressReturnsOnCall map[int]struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -176,7 +176,7 @@ func (fake *FakeProvider) StreamIDReturnsOnCall(i int, result1 int) {
 	}{result1}
 }
 
-func (fake *FakeProvider) SubscribeEgress() <-chan *xivnet.Frame {
+func (fake *FakeProvider) SubscribeEgress() <-chan *xivnet.Block {
 	fake.subscribeEgressMutex.Lock()
 	ret, specificReturn := fake.subscribeEgressReturnsOnCall[len(fake.subscribeEgressArgsForCall)]
 	fake.subscribeEgressArgsForCall = append(fake.subscribeEgressArgsForCall, struct {
@@ -199,36 +199,36 @@ func (fake *FakeProvider) SubscribeEgressCallCount() int {
 	return len(fake.subscribeEgressArgsForCall)
 }
 
-func (fake *FakeProvider) SubscribeEgressCalls(stub func() <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeEgressCalls(stub func() <-chan *xivnet.Block) {
 	fake.subscribeEgressMutex.Lock()
 	defer fake.subscribeEgressMutex.Unlock()
 	fake.SubscribeEgressStub = stub
 }
 
-func (fake *FakeProvider) SubscribeEgressReturns(result1 <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeEgressReturns(result1 <-chan *xivnet.Block) {
 	fake.subscribeEgressMutex.Lock()
 	defer fake.subscribeEgressMutex.Unlock()
 	fake.SubscribeEgressStub = nil
 	fake.subscribeEgressReturns = struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}{result1}
 }
 
-func (fake *FakeProvider) SubscribeEgressReturnsOnCall(i int, result1 <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeEgressReturnsOnCall(i int, result1 <-chan *xivnet.Block) {
 	fake.subscribeEgressMutex.Lock()
 	defer fake.subscribeEgressMutex.Unlock()
 	fake.SubscribeEgressStub = nil
 	if fake.subscribeEgressReturnsOnCall == nil {
 		fake.subscribeEgressReturnsOnCall = make(map[int]struct {
-			result1 <-chan *xivnet.Frame
+			result1 <-chan *xivnet.Block
 		})
 	}
 	fake.subscribeEgressReturnsOnCall[i] = struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}{result1}
 }
 
-func (fake *FakeProvider) SubscribeIngress() <-chan *xivnet.Frame {
+func (fake *FakeProvider) SubscribeIngress() <-chan *xivnet.Block {
 	fake.subscribeIngressMutex.Lock()
 	ret, specificReturn := fake.subscribeIngressReturnsOnCall[len(fake.subscribeIngressArgsForCall)]
 	fake.subscribeIngressArgsForCall = append(fake.subscribeIngressArgsForCall, struct {
@@ -251,32 +251,32 @@ func (fake *FakeProvider) SubscribeIngressCallCount() int {
 	return len(fake.subscribeIngressArgsForCall)
 }
 
-func (fake *FakeProvider) SubscribeIngressCalls(stub func() <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeIngressCalls(stub func() <-chan *xivnet.Block) {
 	fake.subscribeIngressMutex.Lock()
 	defer fake.subscribeIngressMutex.Unlock()
 	fake.SubscribeIngressStub = stub
 }
 
-func (fake *FakeProvider) SubscribeIngressReturns(result1 <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeIngressReturns(result1 <-chan *xivnet.Block) {
 	fake.subscribeIngressMutex.Lock()
 	defer fake.subscribeIngressMutex.Unlock()
 	fake.SubscribeIngressStub = nil
 	fake.subscribeIngressReturns = struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}{result1}
 }
 
-func (fake *FakeProvider) SubscribeIngressReturnsOnCall(i int, result1 <-chan *xivnet.Frame) {
+func (fake *FakeProvider) SubscribeIngressReturnsOnCall(i int, result1 <-chan *xivnet.Block) {
 	fake.subscribeIngressMutex.Lock()
 	defer fake.subscribeIngressMutex.Unlock()
 	fake.SubscribeIngressStub = nil
 	if fake.subscribeIngressReturnsOnCall == nil {
 		fake.subscribeIngressReturnsOnCall = make(map[int]struct {
-			result1 <-chan *xivnet.Frame
+			result1 <-chan *xivnet.Block
 		})
 	}
 	fake.subscribeIngressReturnsOnCall[i] = struct {
-		result1 <-chan *xivnet.Frame
+		result1 <-chan *xivnet.Block
 	}{result1}
 }
 

@@ -72,7 +72,7 @@ var _ = Describe("StreamSender", func() {
 		Eventually(logBuf).Should(gbytes.Say("stream-sender.*Stopping..."))
 	})
 
-	It("encodes and sends envelopes along the hook connection", func() {
+	It("encodes and sends payloads along the hook connection", func() {
 		ss.Send(200, 1234, []byte("Hello World"))
 		Eventually(hookConn.WriteCallCount).Should(Equal(1))
 		Expect(hookConn.WriteArgsForCall(0)).To(Equal(append([]byte{
@@ -91,7 +91,7 @@ var _ = Describe("StreamSender", func() {
 		It("logs an error, but continues running", func() {
 			ss.Send(200, 1234, []byte("Hello World"))
 			Eventually(hookConn.WriteCallCount).Should(Equal(1))
-			Eventually(logBuf).Should(gbytes.Say("ERROR.*stream-sender.*writing bytes to conn.*wrote less than the envelope length"))
+			Eventually(logBuf).Should(gbytes.Say("ERROR.*stream-sender.*writing bytes to conn.*wrote less than the payload length"))
 
 			ss.Send(200, 1234, []byte("Hello World"))
 			Eventually(hookConn.WriteCallCount).Should(Equal(2))

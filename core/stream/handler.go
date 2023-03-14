@@ -10,12 +10,12 @@ import (
 	"go.uber.org/zap"
 )
 
-// handler is a process responsible for taking in xivnet Frames from
+// handler is a process responsible for taking in xivnet Blocks from
 // adapters and generating updates with them
 type handler struct {
 	streamID    int
-	ingressChan <-chan *xivnet.Frame
-	egressChan  <-chan *xivnet.Frame
+	ingressChan <-chan *xivnet.Block
+	egressChan  <-chan *xivnet.Block
 	updateChan  chan<- store.Update
 	generator   update.Generator
 	logger      *zap.Logger
@@ -48,14 +48,10 @@ func (h *handler) Serve() {
 	h.updateChan <- addStreamUpdate{streamID: h.streamID}
 	for {
 		select {
-		case inFrame := <-h.ingressChan:
-			for _, parsedBlock := range inFrame.Blocks {
-				h.updateChan <- h.generator.Generate(h.streamID, false, parsedBlock)
-			}
-		case outFrame := <-h.egressChan:
-			for _, parsedBlock := range outFrame.Blocks {
-				h.updateChan <- h.generator.Generate(h.streamID, true, parsedBlock)
-			}
+		case parsedBlock := <-h.ingressChan:
+			h.updateChan <- h.generator.Generate(h.streamID, false, parsedBlock)
+		case parsedBlock := <-h.egressChan:
+			h.updateChan <- h.generator.Generate(h.streamID, true, parsedBlock)
 		case <-h.stop:
 			h.logger.Info("Stopping...")
 			h.updateChan <- removeStreamUpdate{streamID: h.streamID}

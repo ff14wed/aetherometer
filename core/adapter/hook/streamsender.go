@@ -14,7 +14,7 @@ type StreamSender struct {
 	hookConn io.WriteCloser
 	logger   *zap.Logger
 
-	sendChan chan Envelope
+	sendChan chan Payload
 	stopDone chan struct{}
 }
 
@@ -24,7 +24,7 @@ func NewStreamSender(hookConn io.WriteCloser, logger *zap.Logger) *StreamSender 
 		hookConn: hookConn,
 		logger:   logger.Named("stream-sender"),
 
-		sendChan: make(chan Envelope),
+		sendChan: make(chan Payload),
 		stopDone: make(chan struct{}),
 	}
 }
@@ -35,18 +35,18 @@ func (s *StreamSender) Serve() {
 	defer close(s.stopDone)
 	s.logger.Info("Running")
 	for {
-		envelope, ok := <-s.sendChan
+		payload, ok := <-s.sendChan
 		if !ok {
 			s.logger.Info("Stopping...")
 			return
 		}
-		envBytes := envelope.Encode()
+		envBytes := payload.Encode()
 		n, err := s.hookConn.Write(envBytes)
 		if err != nil {
 			s.logger.Error("writing bytes to conn", zap.Error(err))
 		}
 		if n < len(envBytes) {
-			err := errors.New("wrote less than the envelope length")
+			err := errors.New("wrote less than the payload length")
 			s.logger.Error("writing bytes to conn", zap.Error(err))
 		}
 	}
@@ -58,8 +58,8 @@ func (s *StreamSender) Stop() {
 	<-s.stopDone
 }
 
-// Send queues a request to send the data as an Envelope through the hook
+// Send queues a request to send the data as an Payload through the hook
 // connection.
-func (s *StreamSender) Send(op byte, data uint32, additional []byte) {
-	s.sendChan <- Envelope{Op: op, Data: data, Additional: additional}
+func (s *StreamSender) Send(op byte, channel uint32, data []byte) {
+	s.sendChan <- Payload{Op: op, Channel: channel, Data: data}
 }
