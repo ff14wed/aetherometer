@@ -2,7 +2,16 @@
 
 [![Test](https://github.com/ff14wed/aetherometer/actions/workflows/test.yml/badge.svg)](https://github.com/ff14wed/aetherometer/actions/workflows/test.yml)
 
-**Now updated for Endwalker**
+## DEPRECATION NOTICE
+
+This project will be retired before the release of 7.0 or earlier. The
+maintenance burden for this project is too high for the value it provides.
+Also it is far more efficient to write applications that interact with the game
+such as Dalamud plugins, or applications that consume packets directly now that
+[Deucalion](https://github.com/ff14wed/deucalion) handles much of the packet
+processing.
+
+## About
 
 Aetherometer is a framework that parses network data for FFXIV and presents
 the parsed data stream through a GraphQL API that allows plugins to access
