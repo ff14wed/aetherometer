@@ -23,7 +23,7 @@ import (
 )
 
 const datasheetsUpstream string = "https://raw.githubusercontent.com/ff14wed/aetherometer/master/resources/datasheets/"
-const hookSha256Sum string = "8d592a4ae901047477b65d4275f1e05242a9e5cc98e72aabcf2468205606ef20"
+const hookSha256Sum string = "1699ab217a1cbb8de87a37083fa1eaa81760bea403b5b5a8ccbde22ac00cc8bc"
 
 var dataFiles = []string{
 	"Action.csv",
@@ -125,7 +125,7 @@ func ensureHookAdapter(hookPath string, logger *zap.Logger) error {
 			msgBuilder.Title("Aetherometer update in progress").Info()
 		}()
 
-		hookDLLBytes, err := readDataFromURL("https://github.com/ff14wed/deucalion/releases/download/0.9.1/deucalion.dll")
+		hookDLLBytes, err := readDataFromURL("https://github.com/ff14wed/deucalion/releases/download/0.9.3/deucalion.dll")
 		if err != nil {
 			return err
 		}
