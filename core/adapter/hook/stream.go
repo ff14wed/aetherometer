@@ -80,6 +80,7 @@ func NewStream(streamID uint32, cfg AdapterConfig, logger *zap.Logger) Stream {
 	// Configure Deucalion to send Zone and Chat for both directions
 	go func() {
 		time.Sleep(1 * time.Second)
+		s.sender.Send(OpDebug, 9000, []byte("Aetherometer"))
 		s.sender.Send(OpOption, 54, nil)
 	}()
 

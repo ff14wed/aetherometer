@@ -3,6 +3,7 @@ package hook
 import (
 	"errors"
 	"io"
+	"sync/atomic"
 
 	"go.uber.org/zap"
 )
@@ -14,6 +15,7 @@ type StreamSender struct {
 	hookConn io.WriteCloser
 	logger   *zap.Logger
 
+	isClosed uint32
 	sendChan chan Payload
 	stopDone chan struct{}
 }
@@ -54,6 +56,7 @@ func (s *StreamSender) Serve() {
 
 // Stop will shutdown this service and wait on it to stop before returning.
 func (s *StreamSender) Stop() {
+	atomic.StoreUint32(&s.isClosed, 1)
 	close(s.sendChan)
 	<-s.stopDone
 }
@@ -61,5 +64,7 @@ func (s *StreamSender) Stop() {
 // Send queues a request to send the data as an Payload through the hook
 // connection.
 func (s *StreamSender) Send(op byte, channel uint32, data []byte) {
-	s.sendChan <- Payload{Op: op, Channel: channel, Data: data}
+	if atomic.LoadUint32(&s.isClosed) == 0 {
+		s.sendChan <- Payload{Op: op, Channel: channel, Data: data}
+	}
 }
